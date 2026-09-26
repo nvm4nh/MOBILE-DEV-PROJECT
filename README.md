@@ -68,10 +68,10 @@ Trong bối cảnh xã hội ngày càng bận rộn và già hóa dân số, nh
 
 | STT | Thành Viên | MSSV | Vai Trò | Nhiệm Vụ Độc Lập Phụ Trách |
 |:---:|:---|:---:|:---|:---|
-| 1 | **[Họ và Tên 1]** *(Trưởng nhóm)* | [MSSV] | Leader & AI Module | - Khởi tạo project, quản lý Git/GitHub.<br>- Tích hợp Google Gemini API cho Chatbot AI.<br>- Lập trình màn hình Tạo yêu cầu & Chatbot hỗ trợ.<br>- Viết Báo cáo: **Chương 1 & Chương 5**. |
-| 2 | **[Họ và Tên 2]** | [MSSV] | Database & Backend Lead | - Thiết lập Firebase (Auth, Firestore, Security Rules).<br>- Thiết kế lược đồ CSDL và các hàm Repository truy vấn.<br>- Lập trình màn hình Đăng ký/Đăng nhập & Quản lý hồ sơ người thân.<br>- Viết Báo cáo: **Chương 4 & Chương 6**. |
-| 3 | **[Họ và Tên 3]** | [MSSV] | UI/UX & Matching Algorithm | - Thiết kế Wireframe/UI chuẩn cho người cao tuổi (chữ to, nút lớn).<br>- Viết thuật toán Matching (tính khoảng cách GPS theo Haversine + sở thích).<br>- Lập trình màn hình Trang chủ & Màn hình Tìm kiếm/Bộ lọc gợi ý.<br>- Viết Báo cáo: **Chương 2 & Chương 3**. |
-| 4 | **[Họ và Tên 4]** | [MSSV] | Realtime Chat & QA Lead | - Lập trình tính năng Nhắn tin trò chuyện thời gian thực.<br>- Lập trình màn hình Đánh giá sao & Lịch sử hoạt động.<br>- Kiểm thử ứng dụng trên Emulator/Thiết bị thật, quay video demo.<br>- Tổng hợp, chỉnh sửa định dạng Báo cáo và làm Slide. |
+| 1 | **[Ông Tố Quyên]** *(Trưởng nhóm)* | [31231024412] | Leader & AI Module | - Khởi tạo project, quản lý Git/GitHub.<br>- Tích hợp Google Gemini API cho Chatbot AI.<br>- Lập trình màn hình Tạo yêu cầu & Chatbot hỗ trợ.<br>- Viết Báo cáo: **Chương 1 & Chương 5**. |
+| 2 | **[Lê Trọng Hiếu]** | [31231025382] | Database & Backend Lead | - Thiết lập Firebase (Auth, Firestore, Security Rules).<br>- Thiết kế lược đồ CSDL và các hàm Repository truy vấn.<br>- Lập trình màn hình Đăng ký/Đăng nhập & Quản lý hồ sơ người thân.<br>- Viết Báo cáo: **Chương 4 & Chương 6**. |
+| 3 | **[Khiếu Hoàng Nam Anh]** | [31241022203] | UI/UX & Matching Algorithm | - Thiết kế Wireframe/UI chuẩn cho người cao tuổi (chữ to, nút lớn).<br>- Viết thuật toán Matching (tính khoảng cách GPS theo Haversine + sở thích).<br>- Lập trình màn hình Trang chủ & Màn hình Tìm kiếm/Bộ lọc gợi ý.<br>- Viết Báo cáo: **Chương 2 & Chương 3**. |
+| 4 | **[Nguyễn Văn Trường]** | [31221025476] | Realtime Chat & QA Lead | - Lập trình tính năng Nhắn tin trò chuyện thời gian thực.<br>- Lập trình màn hình Đánh giá sao & Lịch sử hoạt động.<br>- Kiểm thử ứng dụng trên Emulator/Thiết bị thật, quay video demo.<br>- Tổng hợp, chỉnh sửa định dạng Báo cáo và làm Slide. |
 
 ---
 
