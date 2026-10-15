@@ -12,10 +12,10 @@
 * **Repository GitHub:** [https://github.com/nvm4nh/MOBILE-DEV-PROJECT](https://github.com/nvm4nh/MOBILE-DEV-PROJECT)
 * **Design UI/UX:** [Figma SeniorTribe](https://www.figma.com/design/joOcxsdJHhw9Dm8O4XIGUi/Untitled?node-id=0-1&t=JtOY4b3zqACJ78iL-1)
 * **Danh sách thành viên:**
-  1. **31241022203 — Khiếu Hoàng Nam Anh** (Trưởng nhóm)
-  2. **31231025382 — Lê Trọng Hiếu**
-  3. **31231024412 — Ông Tố Quyên**
-  4. **31221025476 — Nguyễn Văn Trường**
+  1. **31231024412 — Ông Tố Quyên** (Trưởng nhóm)
+  2. **31241022203 — Khiếu Hoàng Nam Anh** (Thành viên)
+  3. **31231025382 — Lê Trọng Hiếu** (Thành viên)
+  4. **31221025476 — Nguyễn Văn Trường** (Thành viên)
 
 ---
 
@@ -265,9 +265,9 @@ Hệ thống được phân rã thành 5 phân hệ lớn:
 
 | STT | Thành viên & MSSV | Vai trò & Nhánh Git | Trách nhiệm Code (40%) | Trách nhiệm Báo cáo (40%) & Demo (20%) | Minh chứng Git |
 |:---:|:---|:---|:---|:---|:---:|
-| 1 | **Khiếu Hoàng Nam Anh**<br>`31241022203` | **Trưởng nhóm**<br>Nhánh: `feat/requests`, `main` | • Khởi tạo khung Android Native chung.<br>• Viết Firestore Transaction tiếp nhận nhu cầu (F10).<br>• Viết chức năng Hủy & trả lại nhu cầu (F14). | • Viết Sơ đồ luồng công việc (Workflow Diagram - Mục 2.1).<br>• Viết Chương 6: Toàn bộ 5 quy trình thực thi.<br>• Phụ trách slide thuyết trình & điều phối demo 5 phút. | Commit `78cfc18`, `90f8d1a`<br>PR #3, PR #4 |
-| 2 | **Lê Trọng Hiếu**<br>`31231025382` | **Thành viên**<br>Nhánh: `feat/requests` | • Code form Ghi nhận nhu cầu (F06).<br>• Code Rà soát duyệt nhu cầu (F07).<br>• Code Tìm kiếm & lọc nhu cầu (F08, F09).<br>• Thiết lập Firestore Security Rules. | • Viết Sơ đồ phân rã chức năng (BFD - Mục 2.2).<br>• Viết Chương 4: Cơ sở dữ liệu, Sơ đồ tương tác & Truy vấn.<br>• Soạn Phụ lục hướng dẫn cài đặt & tổng hợp PDF. | Nhánh `feat/requests`<br>Issue #1, PR tuần 1 |
-| 3 | **Ông Tố Quyên**<br>`31231024412` | **Thành viên**<br>Nhánh: `feat/chat-schedule` | • Code module Chat realtime 1-1 qua Firestore (F11).<br>• Code Đề xuất & thống nhất lịch hẹn (F12).<br>• Code Đối soát kết quả & lịch sử hỗ trợ (F13, F15).<br>• Review & merge PR tuần 1, tuần 2. | • Viết Chương 5: Mục 5.1 Cấu trúc app & Mục 5.3 Chat/Lịch.<br>• Kiểm thử xoay màn hình không mất dữ liệu chat.<br>• Chạy thử nghiệm tích hợp luồng hoàn thành. | Commit `4455569`, `23183e1`<br>PR #2 |
+| 1 | **Ông Tố Quyên**<br>`31231024412` | **Trưởng nhóm (Leader)**<br>Nhánh: `feat/chat-schedule`, `main` | • Quản trị repository, điều phối nhánh và merge PR tuần 1, tuần 2.<br>• Code module Chat realtime 1-1 qua Firestore (F11).<br>• Code Đề xuất & thống nhất lịch hẹn (F12).<br>• Code Đối soát kết quả & lịch sử hỗ trợ (F13, F15). | • Viết Chương 5: Mục 5.1 Cấu trúc app & Mục 5.3 Chat/Lịch.<br>• Điều phối phân công nhiệm vụ, quản lý tiến độ tổng thể.<br>• Phụ trách slide thuyết trình & điều phối buổi demo 5 phút.<br>• Kiểm thử xoay màn hình mục chat. | Commit `4455569`, `23183e1`<br>PR #2, merge PRs |
+| 2 | **Khiếu Hoàng Nam Anh**<br>`31241022203` | **Thành viên**<br>Nhánh: `feat/requests`, `main` | • Khởi tạo khung Android Native chung.<br>• Viết Firestore Transaction tiếp nhận nhu cầu (F10).<br>• Viết chức năng Hủy & trả lại nhu cầu (F14). | • Viết Sơ đồ luồng công việc (Workflow Diagram - Mục 2.1).<br>• Viết Chương 6: Toàn bộ 5 quy trình thực thi.<br>• Tham gia thuyết trình & demo kỹ thuật. | Commit `78cfc18`, `90f8d1a`<br>PR #3, PR #4 |
+| 3 | **Lê Trọng Hiếu**<br>`31231025382` | **Thành viên**<br>Nhánh: `feat/requests` | • Code form Ghi nhận nhu cầu (F06).<br>• Code Rà soát duyệt nhu cầu (F07).<br>• Code Tìm kiếm & lọc nhu cầu (F08, F09).<br>• Thiết lập Firestore Security Rules. | • Viết Sơ đồ phân rã chức năng (BFD - Mục 2.2).<br>• Viết Chương 4: Cơ sở dữ liệu, Sơ đồ tương tác & Truy vấn.<br>• Soạn Phụ lục hướng dẫn cài đặt & tổng hợp PDF. | Nhánh `feat/requests`<br>Issue #1, PR tuần 1 |
 | 4 | **Nguyễn Văn Trường**<br>`31221025476` | **Thành viên**<br>Nhánh: `feat/auth-profile`, `feat/community-offline` | • Code Đăng nhập Email/Google & Phân quyền (F01–F03).<br>• Code Bảng tin & đăng bài tổ chức (F04, F05).<br>• Code bộ nhớ đệm Offline bằng SQLite (F16, T05).<br>• Xử lý Responsive xoay ngang màn hình (T04). | • Viết Chương 1: Tổng quan đề tài & công cụ (Mục 1.1–1.4).<br>• Viết Chương 3: Toàn bộ ảnh chụp dọc/ngang giao diện.<br>• Viết Chương 5: Mục 5.2 Kết nối DB & Mục 5.3 Offline SQLite.<br>• Chạy kiểm tra đạo văn Turnitin (< 20%). | Nhánh `feat/community-offline`<br>PR #1 |
 
 ---
