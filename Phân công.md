@@ -4,13 +4,13 @@
 
 ## 1. PHÂN CÔNG CHÍNH
 
-| Thành viên | Chức năng phụ trách | Phần báo cáo | Nhánh GitHub | Hạn chức năng chính | Hạn báo cáo |
-|:---|:---|:---|:---:|:---:|:---:|
-| **HIẾU VÀ NAM ANH** | **Nhu cầu, duyệt, tìm lọc, tiếp nhận, hủy/trả lại:** F06–F10, F14 | Chương 2. BFD, Chương 6. Chat và lịch ở mục 5.3. Phụ lục và định dạng PDF. | eat/requests | | 14/10 |
-| | **Chat, lịch, kết quả, lịch sử:** F11–F13, F15 | Chương 1. Chương 2. Workflow Diagram **[ƯU TIÊN]**<br>Mục 5.1. Tài khoản và hồ sơ ở mục 5.3. | eat/chat-schedule | | 14/10 |
-| | **VẼ FIGMA [xong MVP]** | [UI Figma Giao diện chức năng](https://www.figma.com/design/joOcxsdJHhw9Dm8O4XIGUi/Untitled?node-id=0-1&t=JtOY4b3zqACJ78iL-1) | | | |
-| **QUYÊN VÀ TRƯỜNG** | **Tài khoản, phân quyền, hồ sơ:** F01–F03 | Chương 3. Bài đăng và offline ở mục 5.3. | eat/auth-profile | | Ngày 16 |
-| | **Bảng tin, đăng bài, giao diện chung, offline:** F04–F05, F16 | Chương 2, 4. Mục 5.2. Nhu cầu hỗ trợ ở mục 5.3. | eat/community-offline | 14/10 | Ngày 16 |
+| STT | Thành viên | MSSV | Chức năng phụ trách | Phần báo cáo | Nhánh GitHub | Hạn chức năng chính | Hạn báo cáo |
+|:---:|:---|:---:|:---|:---|:---:|:---:|:---:|
+| 1 | **Khiếu Hoàng Nam Anh** *(Leader)* | `31241022203` | **Nhu cầu, duyệt, tìm lọc, tiếp nhận, hủy/trả lại:** F06–F10, F14 | Sơ đồ luồng công việc (Workflow Diagram - Mục 2.1), Chương 6. Quy trình thực thi, Phụ lục và định dạng PDF. | `feat/requests` | | 14/10 |
+| 2 | **Lê Trọng Hiếu** | `31231025382` | **Ghi nhận, duyệt, cơ sở dữ liệu:** F06–F09 | Sơ đồ phân rã chức năng (BFD - Mục 2.2), Chương 4. Cơ sở dữ liệu và truy vấn Firestore. | `feat/requests` | | 14/10 |
+| | | | **VẼ FIGMA [xong MVP]** | [UI Figma Giao diện chức năng](https://www.figma.com/design/joOcxsdJHhw9Dm8O4XIGUi/Untitled?node-id=0-1&t=JtOY4b3zqACJ78iL-1) | | | |
+| 3 | **Ông Tố Quyên** | `31231024412` | **Chat, lịch, kết quả, lịch sử:** F11–F13, F15 | Chương 5. Cấu trúc ứng dụng & Chat/Lịch (Mục 5.1 & 5.3). | `feat/chat-schedule` | | Ngày 16 |
+| 4 | **Nguyễn Văn Trường** | `31221025476` | **Tài khoản, phân quyền, hồ sơ, bảng tin, offline:** F01–F05, F16 | Chương 1. Tổng quan, Chương 3. Giao diện (dọc/ngang), Chương 5.2 Kết nối DB & 5.3 Offline SQLite. | `feat/auth-profile`<br>`feat/community-offline` | 14/10 | Ngày 16 |
 
 > 📌 **Ghi chú quan trọng:**  
 > - **Ngày 11–12:** Sửa lỗi và kiểm tra xoay màn hình.  
@@ -53,17 +53,17 @@
 
 | Bước | Thao tác | Người làm | Nội dung cụ thể | Kết quả | Khi nào |
 |:---:|:---|:---|:---|:---|:---|
-| **1** | Chuẩn bị project chung | Nam Anh | Đưa khung Android chạy được vào main. Có README hướng dẫn chạy. | Một project để cả nhóm dùng. | Ngày 1–2 |
+| **1** | Chuẩn bị project chung | Khiếu Hoàng Nam Anh | Đưa khung Android chạy được vào main. Có README hướng dẫn chạy. | Một project để cả nhóm dùng. | Ngày 1–2 |
 | **2** | Clone, Pull rồi tạo nhánh | Từng thành viên | Lấy main mới nhất và tạo nhánh ghi ở bảng phân công. | Mỗi nhánh có đủ project. | Lần đầu làm việc |
 | **3** | Tạo Issue và làm code | Người phụ trách chức năng | Issue ghi một người phụ trách, hạn và tiêu chí hoàn thành. Sửa phần đã giao. | Có đầu việc rõ ràng. | Trước mỗi đầu việc |
-| **4** | Commit rồi Push | Người viết code | Commit lưu thay đổi. Push đưa code lên GitHub. Ví dụ: eat: thêm gửi tin nhắn. | Code và lịch sử thay đổi có trên GitHub. | Sau mỗi phần chạy được. Mỗi tuần phải có code. |
+| **4** | Commit rồi Push | Người viết code | Commit lưu thay đổi. Push đưa code lên GitHub. Ví dụ: `feat: thêm gửi tin nhắn`. | Code và lịch sử thay đổi có trên GitHub. | Sau mỗi phần chạy được. Mỗi tuần phải có code. |
 | **5** | Mở PR và kiểm tra | Tác giả mở PR, người khác kiểm tra | PR ghi chức năng đã làm và cách kiểm thử. Chỉ ghép khi build và luồng liên quan chạy được. | Có minh chứng review và đề nghị ghép code. | Khi phần việc sẵn sàng tích hợp |
 | **6** | Merge rồi Pull bản mới | Quyên merge, từng người Pull | Merge đưa code vào main. Nhánh cho đầu việc mới lấy từ main mới nhất. | main chứa bản app đã tích hợp. | Sau mỗi PR được kiểm tra |
 
 ### 📌 Tóm tắt quy trình phối hợp 6 bước:
-1. **Nam Anh** chuẩn bị project chung chạy được, đưa vào main.
-2. Chủ repo cấp quyền cho các thành viên. Mỗi người tải toàn bộ project về máy bằng thao tác Clone.
-3. Mỗi người tạo nhánh từ main, rồi code phần mình phụ trách. Nhánh vẫn chứa toàn bộ project, nhưng người đó sửa phần việc của mình.
-4. Commit rồi Push để đưa thay đổi lên GitHub.
-5. Mở Pull Request vào main. Một người khác kiểm tra; một người phụ trách gộp/tích hợp lại.
-6. Sau khi ghép, mọi người Pull bản mới về máy trước khi làm phần tiếp theo.
+1. **Nam Anh** chuẩn bị project chung chạy được, đưa vào `main`.
+2. Chủ repo cấp quyền cho các thành viên. Mỗi người tải toàn bộ project về máy bằng thao tác `Clone`.
+3. Mỗi người tạo nhánh từ `main`, rồi code phần mình phụ trách. Nhánh vẫn chứa toàn bộ project, nhưng người đó sửa phần việc của mình.
+4. `Commit` rồi `Push` để đưa thay đổi lên GitHub.
+5. Mở `Pull Request` vào `main`. Một người khác kiểm tra; một người phụ trách gộp/tích hợp lại.
+6. Sau khi ghép, mọi người `Pull` bản mới về máy trước khi làm phần tiếp theo.

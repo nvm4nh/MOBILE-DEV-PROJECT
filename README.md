@@ -22,12 +22,12 @@
 ## 👥 THÀNH VIÊN NHÓM & PHÂN CÔNG ĐỘC LẬP
 > ⚠️ **Tuân thủ quy định giảng viên:** Phân chia trách nhiệm độc lập, rõ ràng từng cá nhân; minh chứng dựa trên nhánh (branch), commit và pull request trên GitHub.
 
-| STT | Thành viên | Vai trò | Nhánh GitHub | Phụ trách Code chính | Phụ trách Báo cáo & Thuyết trình |
-|:---:|:---|:---|:---:|:---|:---|
-| 1 | **Nguyễn Văn Nam Anh** | **Trưởng nhóm** | eat/requests<br>main | • Cấu hình khung Android chung.<br>• Transaction tiếp nhận nhu cầu (F10).<br>• Hủy & trả lại nhu cầu (F14). | • Sơ đồ công việc (Workflow Diagram - Mục 2.1).<br>• Chương 6: Quy trình thực thi.<br>• Slide thuyết trình & điều phối demo 5p. |
-| 2 | **Trần Minh Hiếu** | **Thành viên** | eat/requests | • Form Ghi nhận nhu cầu (F06).<br>• Rà soát & duyệt nhu cầu (F07).<br>• Tìm kiếm & lọc nhu cầu (F08, F09).<br>• Firestore Security Rules. | • Sơ đồ phân rã chức năng (BFD - Mục 2.2).<br>• Chương 4: Cơ sở dữ liệu, ERD & Truy vấn.<br>• Phụ lục hướng dẫn cài đặt & ghép PDF. |
-| 3 | **Ông Tố Quyên** | **Thành viên** | eat/chat-schedule | • Chat phối hợp realtime 1-1 (F11).<br>• Đề xuất & thống nhất lịch hẹn (F12).<br>• Đối soát kết quả & lịch sử (F13, F15).<br>• Kiểm tra & merge code tuần 1, tuần 2. | • Sơ đồ lớp (Class Diagram - Mục 2.3).<br>• Chương 5: Cấu trúc ứng dụng & Chat/Lịch.<br>• Kiểm thử xoay màn hình mục chat.<br>• Chạy thử nghiệm tích hợp chung. |
-| 4 | **Nguyễn Stefan (Trường)** | **Thành viên** | eat/auth-profile<br>eat/community-offline | • Đăng nhập Email/Google & Phân quyền (F01–F03).<br>• Bảng tin & đăng bài tổ chức (F04, F05).<br>• Offline cache lưu bài viết bằng SQLite (F16, T05).<br>• Xử lý Responsive xoay màn hình (T04). | • Chương 1: Tổng quan đề tài & công cụ.<br>• Chương 3: Thiết kế giao diện (dọc/ngang).<br>• Chương 5: Kết nối DB & SQLite Offline.<br>• Kiểm tra đạo văn Turnitin (< 20%). |
+| STT | Họ và Tên | MSSV | Vai trò | Nhánh GitHub | Phụ trách Code chính | Phụ trách Báo cáo & Thuyết trình |
+|:---:|:---|:---:|:---|:---:|:---|:---|
+| 1 | **Khiếu Hoàng Nam Anh** | `31241022203` | **Trưởng nhóm** | `feat/requests`<br>`main` | • Cấu hình khung Android chung.<br>• Transaction tiếp nhận nhu cầu (F10).<br>• Hủy & trả lại nhu cầu (F14). | • Sơ đồ luồng công việc (Workflow Diagram - Mục 2.1).<br>• Chương 6: Quy trình thực thi.<br>• Slide thuyết trình & điều phối demo 5p. |
+| 2 | **Lê Trọng Hiếu** | `31231025382` | **Thành viên** | `feat/requests` | • Form Ghi nhận nhu cầu (F06).<br>• Rà soát & duyệt nhu cầu (F07).<br>• Tìm kiếm & lọc nhu cầu (F08, F09).<br>• Firestore Security Rules. | • Sơ đồ phân rã chức năng (BFD - Mục 2.2).<br>• Chương 4: Cơ sở dữ liệu, Sơ đồ tương tác & Truy vấn.<br>• Phụ lục hướng dẫn cài đặt & ghép PDF. |
+| 3 | **Ông Tố Quyên** | `31231024412` | **Thành viên** | `feat/chat-schedule` | • Chat phối hợp realtime 1-1 (F11).<br>• Đề xuất & thống nhất lịch hẹn (F12).<br>• Đối soát kết quả & lịch sử (F13, F15).<br>• Kiểm tra & merge code tuần 1, tuần 2. | • Chương 5: Cấu trúc ứng dụng & Chat/Lịch (Mục 5.1 & 5.3).<br>• Kiểm thử xoay màn hình mục chat.<br>• Chạy thử nghiệm tích hợp chung. |
+| 4 | **Nguyễn Văn Trường** | `31221025476` | **Thành viên** | `feat/auth-profile`<br>`feat/community-offline` | • Đăng nhập Email/Google & Phân quyền (F01–F03).<br>• Bảng tin & đăng bài tổ chức (F04, F05).<br>• Offline cache lưu bài viết bằng SQLite (F16, T05).<br>• Xử lý Responsive xoay màn hình (T04). | • Chương 1: Tổng quan đề tài & công cụ (Mục 1.1–1.4).<br>• Chương 3: Thiết kế giao diện (dọc/ngang).<br>• Chương 5: Kết nối DB & SQLite Offline (Mục 5.2 & 5.3).<br>• Kiểm tra đạo văn Turnitin (< 20%). |
 
 ---
 
@@ -54,12 +54,11 @@ Kết nối nhu cầu hỗ trợ đã được đầu mối cộng đồng ghi n
 * **Người cao tuổi:** Người được hỗ trợ, có quyền đồng ý hoặc từ chối phương án hỗ trợ; không bắt buộc phải có tài khoản.
 
 ### 3. Quy trình luân chuyển trạng thái (6 bước khép kín)
-`
+```
 [Ghi nhận] ➔ [Rà soát] ➔ [Tiếp nhận] ➔ [Thống nhất lịch] ➔ [Thực hiện] ➔ [Ghi nhận kết quả]
  (REVIEW)      (OPEN)     (ACCEPTED)      (SCHEDULED)      (DELIVERED)      (COMPLETED)
-`
-* **Bảo vệ quyền riêng tư:** Thông tin cá nhân nhạy cảm (tên đầy đủ, địa chỉ nhà, số điện thoại, giấy đồng ý) được lưu trữ riêng trong collection 
-eeds_private và chỉ phân quyền cho đầu mối ghi nhận cùng đại diện được giao tiếp nhận sau khi đã duyệt.
+```
+* **Bảo vệ quyền riêng tư:** Thông tin cá nhân nhạy cảm (tên đầy đủ, địa chỉ nhà, số điện thoại, giấy đồng ý) được lưu trữ riêng trong collection `needs_private` và chỉ phân quyền cho đầu mối ghi nhận cùng đại diện được giao tiếp nhận sau khi đã duyệt.
 
 ---
 
@@ -69,11 +68,11 @@ eeds_private và chỉ phân quyền cho đầu mối ghi nhận cùng đại di
   * **Authentication:** Xác thực tài khoản bằng Email/Mật khẩu và **Google Sign-In API**.
   * **Cloud Firestore:** Lưu trữ dữ liệu NoSQL realtime, phân quyền bằng Security Rules và xử lý chống nhận trùng bằng **Firestore Transaction**.
 * **Responsive Layout:**
-  * Hỗ trợ xoay ngang (Landscape) và dọc (Portrait) không vỡ giao diện.
-  * Giữ nguyên dữ liệu form nhập dở khi xoay thiết bị thông qua ViewModel và onSaveInstanceState.
+  * Hỗ trợ xoay ngang (`Landscape`) và dọc (`Portrait`) không vỡ giao diện.
+  * Giữ nguyên dữ liệu form nhập dở khi xoay thiết bị thông qua `ViewModel` và `onSaveInstanceState`.
 * **Cơ chế Caching & SQLite Offline:**
-  * Tích hợp bộ nhớ đệm cục bộ với SQLiteOpenHelper.
-  * Tự động lưu cache các bài viết cộng đồng đã tải; khi ngắt kết nối mạng (Offline), người dùng vẫn đọc được các bài đã xem trước đó.
+  * Tích hợp bộ nhớ đệm cục bộ với `SQLiteOpenHelper`.
+  * Tự động lưu cache các bài viết cộng đồng đã tải; khi ngắt kết nối mạng (`Offline`), người dùng vẫn đọc được các bài đã xem trước đó.
 
 ---
 
@@ -86,16 +85,16 @@ eeds_private và chỉ phân quyền cho đầu mối ghi nhận cùng đại di
 
 ### Các bước khởi chạy
 1. **Clone repository:**
-   `ash
+   ```bash
    git clone https://github.com/nvm4nh/MOBILE-DEV-PROJECT.git
-   `
-2. **Mở project:** Khởi động Android Studio và chọn thư mục SeniorTribeApp.
-3. **Cấu hình Firebase:** Đặt file google-services.json được cấp vào thư mục SeniorTribeApp/app/.
+   ```
+2. **Mở project:** Khởi động Android Studio và chọn thư mục `SeniorTribeApp`.
+3. **Cấu hình Firebase:** Đặt file `google-services.json` được cấp vào thư mục `SeniorTribeApp/app/`.
 4. **Đồng bộ dependencies:** Nhấn **Sync Project with Gradle Files**.
-5. **Chạy ứng dụng:** Chọn thiết bị ảo (Emulator API 30+) hoặc cắm điện thoại Android (đã bật USB Debugging), nhấn **Run 'app'** (Shift + F10).
+5. **Chạy ứng dụng:** Chọn thiết bị ảo (Emulator API 30+) hoặc cắm điện thoại Android (đã bật USB Debugging), nhấn **Run 'app'** (`Shift + F10`).
 
 ---
 
 ## 🎨 THIẾT KẾ GIAO DIỆN & LIÊN KẾT LIÊN QUAN
 * **Figma Prototype:** [Truy cập bản thiết kế UI/UX SeniorTribe trên Figma](https://www.figma.com/design/joOcxsdJHhw9Dm8O4XIGUi/Untitled?node-id=0-1&t=JtOY4b3zqACJ78iL-1)
-* **Báo cáo PDF:** Đang được hoàn thiện theo mẫu Mau Do An - Mobile v2.docx tại nhánh main.
+* **Báo cáo PDF:** Đang được hoàn thiện theo mẫu `Mau Do An - Mobile v2.docx` tại nhánh `main`.
