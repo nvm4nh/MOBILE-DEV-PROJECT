@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_blue">#16325C</color>
+    <color name="background_light">#F7F8FC</color>
+    <color name="light_green_badge">#C0EBC0</color>
+    <color name="dark_green_text">#2E6B2E</color>
+    <color name="orange_banner_bg">#FFE0CB</color>
+    <color name="orange_button_bg">#6B3D00</color>
+    <color name="gray_banner_bg">#E2E6F0</color>
+    <color name="green_button_bg">#346B41</color>
+    <color name="light_blue_btn_bg">#DDE4FA</color>
+    <color name="text_gray">#555555</color>
+    <color name="light_green_btn_bg">#A6ECA6</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+</resources>
