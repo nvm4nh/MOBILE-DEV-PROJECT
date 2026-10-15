@@ -35,7 +35,7 @@
 
 Các tài liệu chính thức của đồ án được chuẩn hóa theo mẫu của giảng viên TS. Đặng Ngọc Hoàng Thành:
 
-1. 📘 **[Kế hoạch & Đề cương Báo cáo chi tiết (theo Mau Do An - Web v2.docx)](KE_HOACH_BAO_CAO.md)**: Bản chuyển hướng chi tiết 7 chương báo cáo chuẩn barem (Tổng quan, Phân tích thiết kế, Giao diện, CSDL, Cài đặt ứng dụng, Quy trình thực thi, Hướng mở rộng và Phụ lục).
+1. 📘 **[Kế hoạch & Đề cương Báo cáo chi tiết (theo Mau Do An - Mobile v2.docx)](KE_HOACH_BAO_CAO.md)**: Bản chuyển hướng chi tiết 7 chương báo cáo chuẩn barem (Tổng quan, Phân tích thiết kế, Giao diện, CSDL, Cài đặt ứng dụng, Quy trình thực thi, Hướng mở rộng và Phụ lục).
 2. 📋 **[Checklist Công Việc & Deadline](Checklist.md)** *(hoặc [Trang tính1.md](Trang%20tính1.md))*: Danh mục 11 tác vụ MVP (M01–M10), 15 tác vụ mở rộng (E01–E15) và tiến độ báo cáo.
 3. 🎯 **[Tổng Quan Đề Tài](Tổng%20quan.md)**: Bài toán nghiên cứu, đối tượng sử dụng, quy trình nghiệp vụ và cơ sở thực tiễn (Vầng Trăng Khuyết, HelpAge).
 4. ⚙️ **[Phạm Vi Chức Năng](Phạm%20vi%20chức%20năng.md)**: Chi tiết 16 chức năng MVP (F01–F16), bảng luồng 7 trạng thái, kỹ thuật (T01–T06) và 9 quy tắc nghiệp vụ (R01–R09).
@@ -98,4 +98,4 @@ eeds_private và chỉ phân quyền cho đầu mối ghi nhận cùng đại di
 
 ## 🎨 THIẾT KẾ GIAO DIỆN & LIÊN KẾT LIÊN QUAN
 * **Figma Prototype:** [Truy cập bản thiết kế UI/UX SeniorTribe trên Figma](https://www.figma.com/design/joOcxsdJHhw9Dm8O4XIGUi/Untitled?node-id=0-1&t=JtOY4b3zqACJ78iL-1)
-* **Báo cáo PDF:** Đang được hoàn thiện theo mẫu Mau Do An - Web v2.docx tại nhánh main.
+* **Báo cáo PDF:** Đang được hoàn thiện theo mẫu Mau Do An - Mobile v2.docx tại nhánh main.
