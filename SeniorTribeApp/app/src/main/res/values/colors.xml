@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Primary (Teal - Nhân ái, Y tế, Bình yên) -->
+    <color name="primary">#00897B</color>
+    <color name="primary_dark">#004D40</color>
+    <color name="primary_light">#E0F2F1</color>
+    <color name="on_primary">#FFFFFF</color>
+
+    <!-- Brand Secondary (Warm Orange - Ấm áp, Thân thiện với người già) -->
+    <color name="secondary">#FB8C00</color>
+    <color name="secondary_dark">#EF6C00</color>
+    <color name="secondary_light">#FFF3E0</color>
+    <color name="on_secondary">#FFFFFF</color>
+
+    <!-- Neutrals & Surfaces -->
+    <color name="background">#F8FAF9</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F0F4F3</color>
+    <color name="divider">#E0E5E4</color>
+    <color name="text_primary">#1C2A28</color>
+    <color name="text_secondary">#607270</color>
+    <color name="text_hint">#9EAFA9</color>
+
+    <!-- Status Workflow (6 bước quy trình SeniorTribe) -->
+    <color name="status_review">#FFA000</color>      <!-- REVIEW: Chờ rà soát -->
+    <color name="status_open">#1E88E5</color>        <!-- OPEN: Chờ tiếp nhận -->
+    <color name="status_accepted">#7E57C2</color>    <!-- ACCEPTED: Đã tiếp nhận -->
+    <color name="status_scheduled">#00ACC1</color>   <!-- SCHEDULED: Đã hẹn lịch -->
+    <color name="status_delivered">#43A047</color>   <!-- DELIVERED: Đã hỗ trợ -->
+    <color name="status_completed">#2E7D32</color>   <!-- COMPLETED: Hoàn thành -->
+    <color name="status_cancelled">#757575</color>   <!-- CANCELLED: Đã hủy -->
+
+    <!-- Urgency levels -->
+    <color name="urgency_low">#4CAF50</color>
+    <color name="urgency_medium">#FF9800</color>
+    <color name="urgency_high">#E53935</color>
+    <color name="urgency_urgent">#B71C1C</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+</resources>
