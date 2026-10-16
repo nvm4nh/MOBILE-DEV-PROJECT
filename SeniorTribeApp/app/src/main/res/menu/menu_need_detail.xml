@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tùy chọn trên màn hình chi tiết nhu cầu; hiện/ẩn theo quyền và trạng thái. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_edit_need"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/action_edit_need"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_return_need"
+        android:icon="@drawable/ic_undo"
+        android:title="@string/action_return_need"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_cancel_need"
+        android:icon="@drawable/ic_close"
+        android:title="@string/action_cancel_need"
+        app:showAsAction="never" />
+</menu>

@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Thẻ nhu cầu: chỉ có mã, tiêu đề, khu vực mức phường và thời gian mong muốn (không có thông tin riêng). -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Needs.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="@dimen/card_corner_radius"
-    app:cardElevation="@dimen/card_elevation"
-    app:strokeColor="@color/divider"
-    app:strokeWidth="1dp"
-    app:cardBackgroundColor="@color/surface">
+    android:clickable="true"
+    android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,88 +23,60 @@
 
             <TextView
                 android:id="@+id/tvCaseCode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_badge"
-                android:text="#ST-2026-001"
-                android:textColor="@color/primary"
-                android:textStyle="bold"
-                android:textSize="12sp" />
-
-            <View
                 android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                tools:text="NC-0151" />
 
             <TextView
                 android:id="@+id/tvStatus"
+                style="@style/Needs.StatusChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chờ tiếp nhận"
-                android:textStyle="bold"
-                android:textSize="13sp" />
+                tools:text="Chờ rà soát" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Thăm hỏi và trò chuyện định kỳ cùng cụ bà neo đơn"
+            android:layout_marginTop="10dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="Trò chuyện cuối tuần với cụ ông thích nhạc xưa" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvArea"
+            style="@style/Needs.Text.Meta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/tvCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Trò chuyện, tâm sự"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" • "
-                android:textColor="@color/text_hint" />
-
-            <TextView
-                android:id="@+id/tvDistrict"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Quận 8, TP.HCM"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/tvUrgency"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cần sớm"
-                android:textStyle="bold"
-                android:textSize="12sp" />
-        </LinearLayout>
+            android:drawableStart="@drawable/ic_place"
+            tools:text="Phường 9, Quận 3" />
 
         <TextView
             android:id="@+id/tvTime"
+            style="@style/Needs.Text.Meta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Ghi nhận 1 ngày trước"
-            android:textColor="@color/text_hint"
-            android:textSize="11sp" />
+            android:layout_marginTop="4dp"
+            android:drawableStart="@drawable/ic_time"
+            tools:text="Chiều thứ 7 hoặc Chủ nhật" />
+
+        <TextView
+            android:id="@+id/tvExtra"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:visibility="gone"
+            tools:text="Phụ trách: Nguyễn Minh Khoa · Đoàn TN Phường 7"
+            tools:visibility="visible" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
