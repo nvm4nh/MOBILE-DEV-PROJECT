@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F10 · Phần tóm tắt của nhu cầu trên màn hình chi tiết. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvCaseCode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            tools:text="NC-0142" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            style="@style/Needs.StatusChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Chờ tiếp nhận" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/Needs.Text.ScreenTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        tools:text="Trò chuyện cuối tuần với cụ bà sống một mình" />
+
+    <!-- Ghi chú theo trạng thái: yêu cầu bổ sung, đã hủy... -->
+    <TextView
+        android:id="@+id/tvStatusNote"
+        style="@style/Needs.Note.Warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        tools:text="Điều phối viên yêu cầu bổ sung: ghi rõ khung giờ cụ thể."
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tvContent"
+        style="@style/Needs.Text.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        tools:text="Cụ bà sống một mình, thích nghe cải lương và hay kể chuyện ngày xưa." />
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Needs.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/detail_info_title"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvTopic"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_topic"
+                android:textColor="@color/text_primary"
+                tools:text="Trò chuyện, thăm hỏi" />
+
+            <TextView
+                android:id="@+id/tvArea"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:drawableStart="@drawable/ic_place"
+                android:textColor="@color/text_primary"
+                tools:text="Phường 7, Quận 3" />
+
+            <TextView
+                android:id="@+id/tvDesiredTime"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:drawableStart="@drawable/ic_time"
+                android:textColor="@color/text_primary"
+                tools:text="Chiều thứ 7 · 14:00–16:00" />
+
+            <TextView
+                android:id="@+id/tvRecorder"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:drawableStart="@drawable/ic_groups"
+                android:textColor="@color/text_primary"
+                tools:text="Ghi nhận bởi Đoàn Thanh niên Phường 7 · 10/10" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Tổ chức đang phụ trách (từ ACCEPTED trở đi) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardAssignment"
+        style="@style/Needs.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/detail_assignment_title"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvAssignedOrg"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_groups"
+                android:textColor="@color/text_primary"
+                tools:text="Hội Chữ thập đỏ Quận 3" />
+
+            <TextView
+                android:id="@+id/tvAssignee"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:drawableStart="@drawable/ic_person"
+                android:textColor="@color/text_primary"
+                tools:text="Đại diện: Nguyễn Minh Khoa" />
+
+            <TextView
+                android:id="@+id/tvAcceptedAt"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:drawableStart="@drawable/ic_time"
+                tools:text="Tiếp nhận lúc 09:30 11/10/2026" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

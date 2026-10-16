@@ -1,5 +1,7 @@
 plugins {
     id 'com.android.application'
+    // Đọc app/google-services.json (project Firebase "seniortribe", cùng file với nhánh feat/auth-profile)
+    id 'com.google.gms.google-services'
 }
 
 android {
