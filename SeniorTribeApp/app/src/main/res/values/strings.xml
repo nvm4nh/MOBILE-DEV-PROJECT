@@ -1,0 +1,80 @@
+<resources>
+    <string name="app_name">SeniorTribe</string>
+    <string name="app_slogan">Mạng xã hội hỗ trợ &amp; bầu bạn cùng người cao tuổi neo đơn</string>
+
+    <!-- Navigation Tabs -->
+    <string name="nav_feed">Bảng tin</string>
+    <string name="nav_needs">Nhu cầu</string>
+    <string name="nav_chat">Tin nhắn</string>
+    <string name="nav_schedule">Lịch hẹn</string>
+    <string name="nav_profile">Hồ sơ</string>
+
+    <!-- Auth -->
+    <string name="login_title">Đăng nhập SeniorTribe</string>
+    <string name="login_subtitle">Kết nối yêu thương, đồng hành cùng người cao tuổi</string>
+    <string name="email_hint">Địa chỉ email</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="confirm_password_hint">Xác nhận mật khẩu</string>
+    <string name="full_name_hint">Họ và tên</string>
+    <string name="phone_hint">Số điện thoại</string>
+    <string name="district_hint">Khu vực (Quận / Huyện)</string>
+    <string name="org_hint">Tổ chức trực thuộc</string>
+    <string name="role_hint">Vai trò công tác</string>
+    <string name="btn_login">Đăng nhập</string>
+    <string name="btn_google_sign_in">Đăng nhập bằng Google</string>
+    <string name="btn_register">Đăng ký tài khoản</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="no_account">Chưa có tài khoản? Đăng ký ngay</string>
+    <string name="have_account">Đã có tài khoản? Đăng nhập</string>
+    <string name="btn_reset_password">Gửi liên kết đặt lại mật khẩu</string>
+
+    <!-- Roles -->
+    <string name="role_reporter">Đầu mối ghi nhận</string>
+    <string name="role_coordinator">Điều phối viên</string>
+    <string name="role_assignee">Đại diện tổ chức tiếp nhận</string>
+
+    <!-- Feed -->
+    <string name="feed_title">Bảng tin cộng đồng</string>
+    <string name="feed_offline_notice">Đang xem dữ liệu ngoại tuyến đã lưu (SQLite cache)</string>
+    <string name="btn_create_post">Đăng bài viết mới</string>
+    <string name="post_title_hint">Tiêu đề bài viết hoạt động</string>
+    <string name="post_content_hint">Chia sẻ hoạt động thăm hỏi, hỗ trợ người cao tuổi...</string>
+
+    <!-- Needs -->
+    <string name="needs_title">Nhu cầu hỗ trợ</string>
+    <string name="btn_create_need">Ghi nhận nhu cầu</string>
+    <string name="search_hint">Tìm theo mã ca, chủ đề, quận/huyện...</string>
+    <string name="need_title_hint">Tóm tắt nhu cầu (VD: Thăm khám và trò chuyện định kỳ)</string>
+    <string name="need_elderly_name">Họ và tên người cao tuổi</string>
+    <string name="need_address">Địa chỉ / Khu vực cư ngụ</string>
+    <string name="need_category">Loại hình hỗ trợ</string>
+    <string name="need_urgency">Mức độ cần thiết</string>
+    <string name="need_desc">Mô tả chi tiết hoàn cảnh &amp; nhu cầu</string>
+    <string name="need_consent">Bằng chứng người cao tuổi đồng ý hỗ trợ</string>
+    <string name="btn_accept_need">Tiếp nhận ca hỗ trợ này</string>
+    <string name="btn_open_chat">Mở phòng chat phối hợp</string>
+    <string name="btn_propose_schedule">Đề xuất lịch thăm hỏi</string>
+    <string name="btn_cancel_need">Hủy / Trả lại ca</string>
+    <string name="btn_deliver_confirm">Báo đã hỗ trợ (DELIVERED)</string>
+    <string name="btn_complete_need">Đối soát &amp; Hoàn thành (COMPLETED)</string>
+
+    <!-- Statuses -->
+    <string name="status_review_label">Chờ rà soát</string>
+    <string name="status_open_label">Chờ tiếp nhận</string>
+    <string name="status_accepted_label">Đã tiếp nhận</string>
+    <string name="status_scheduled_label">Đã chốt lịch</string>
+    <string name="status_delivered_label">Chờ đối soát</string>
+    <string name="status_completed_label">Hoàn thành</string>
+    <string name="status_cancelled_label">Đã hủy</string>
+
+    <!-- Chat & Schedule -->
+    <string name="chat_title">Trao đổi phối hợp</string>
+    <string name="send_message_hint">Nhập tin nhắn...</string>
+    <string name="schedule_title">Lịch hẹn thăm hỏi</string>
+    <string name="btn_propose">Gửi đề xuất lịch</string>
+    <string name="btn_agree">Người cao tuổi đồng ý</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Hồ sơ cá nhân</string>
+    <string name="btn_logout">Đăng xuất</string>
+</resources>
