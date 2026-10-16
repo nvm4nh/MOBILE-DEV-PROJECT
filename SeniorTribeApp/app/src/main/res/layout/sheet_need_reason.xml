@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F14 · Bảng trả lại / hủy nhu cầu: bắt buộc chọn lý do, có thể ghi chú thêm. -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="24dp">
+
+        <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tvSheetTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="Trả lại nhu cầu NC-0142" />
+
+        <TextView
+            android:id="@+id/tvSheetMessage"
+            style="@style/Needs.Text.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            tools:text="Nhu cầu sẽ quay về Chờ tiếp nhận để tổ chức khác nhận." />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/reason_label"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Lý do trả lại (tổ chức) -->
+        <RadioGroup
+            android:id="@+id/rgReturnReasons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rbReturnNoStaff"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/reason_return_no_staff" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rbReturnSchedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/reason_return_schedule" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rbReturnCapacity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/reason_return_capacity" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rbReturnOther"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/reason_other" />
+        </RadioGroup>
+
+        <!-- Lý do hủy (đầu mối) -->
+        <RadioGroup
+            android:id="@+id/rgCancelReasons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:visibility="gone">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rbCancelNoNeed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/reason_cancel_no_need" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rbCancelDeclined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/reason_cancel_declined" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rbCancelHelped"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/reason_cancel_helped" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rbCancelOther"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/reason_other" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/tvReasonError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/reason_error_required"
+            android:textColor="@color/error"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <TextView
+            style="@style/Needs.Text.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/etReasonNote"
+            android:text="@string/reason_note_label" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilReasonNote"
+            style="@style/Needs.Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:counterEnabled="true"
+            app:counterMaxLength="300"
+            app:placeholderText="@string/reason_note_placeholder">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etReasonNote"
+                style="@style/Needs.InputText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|start"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLength="300"
+                android:minLines="2" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfirmReason"
+            style="@style/Needs.Button.Danger"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            tools:text="Trả lại nhu cầu" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDismissReason"
+            style="@style/Needs.Button.Text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/action_close" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

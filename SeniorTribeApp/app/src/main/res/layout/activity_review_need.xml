@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F07 · Rà soát nhu cầu (điều phối viên). -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootReviewNeed"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationContentDescription="@string/action_back"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="@string/review_title"
+            app:titleTextColor="@color/text_primary" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressBusy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/primary" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="32dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    style="@style/Needs.StatusChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="Chờ rà soát" />
+
+                <TextView
+                    android:id="@+id/tvSubmittedBy"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    tools:text="Gửi bởi Trần Thị Mai · 10/10" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvTitle"
+                style="@style/Needs.Text.ScreenTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                tools:text="Trò chuyện cuối tuần với cụ ông thích nhạc xưa" />
+
+            <TextView
+                android:id="@+id/tvContent"
+                style="@style/Needs.Text.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                tools:text="Cụ ông sống một mình, thích nghe nhạc xưa, mong có người đến trò chuyện vào chiều cuối tuần." />
+
+            <TextView
+                android:id="@+id/tvTopic"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:drawableStart="@drawable/ic_topic"
+                tools:text="Trò chuyện, thăm hỏi" />
+
+            <TextView
+                android:id="@+id/tvArea"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:drawableStart="@drawable/ic_place"
+                tools:text="Phường 9, Quận 3" />
+
+            <TextView
+                android:id="@+id/tvDesiredTime"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:drawableStart="@drawable/ic_time"
+                tools:text="Chiều thứ 7 hoặc Chủ nhật" />
+
+            <TextView
+                android:id="@+id/tvSource"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:drawableStart="@drawable/ic_source"
+                tools:text="Nguồn: Thăm hộ gia đình ngày 10/10" />
+
+            <TextView
+                android:id="@+id/tvConsent"
+                style="@style/Needs.Text.Meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:drawableStart="@drawable/ic_check"
+                tools:text="Đồng ý: Hỏi trực tiếp tại nhà · 10/10/2026" />
+
+            <TextView
+                android:id="@+id/tvPreviousNote"
+                style="@style/Needs.Note.Info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                tools:text="Lần trước đã yêu cầu bổ sung: ghi rõ khung giờ cụ thể."
+                tools:visibility="visible" />
+
+            <!-- Danh sách kiểm tra trước khi duyệt -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Needs.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="12dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/review_checklist_title"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/cbNoIdentity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:text="@string/review_check_no_identity"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/cbSourceClear"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:text="@string/review_check_source"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/cbConsentRecorded"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:text="@string/review_check_consent"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp" />
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/cbWardOnly"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:text="@string/review_check_ward"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                style="@style/Needs.Note.Warning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/review_internal_warning" />
+
+            <TextView
+                style="@style/Needs.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:labelFor="@id/etReviewNote"
+                android:text="@string/review_note_label" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilReviewNote"
+                style="@style/Needs.Input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:counterEnabled="true"
+                app:counterMaxLength="500"
+                app:placeholderText="@string/review_note_placeholder">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etReviewNote"
+                    style="@style/Needs.InputText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|start"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLength="500"
+                    android:minLines="3" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRequestRevision"
+                    style="@style/Needs.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/review_request_revision" />
+
+                <Space
+                    android:layout_width="12dp"
+                    android:layout_height="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnApprove"
+                    style="@style/Needs.Button.Primary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/review_approve" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <include layout="@layout/view_list_state" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

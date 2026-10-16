@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F10 · Thẻ "Thông tin riêng": vạch xám khi không có quyền xem, nội dung thật khi có quyền. -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardPrivate"
+    style="@style/Needs.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_lock"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/text_secondary"
+            android:gravity="center_vertical"
+            android:text="@string/form_section_private"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Không có quyền: hiện vạch xám thay cho dữ liệu thật -->
+        <LinearLayout
+            android:id="@+id/layoutPrivateMasked"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:importantForAccessibility="noHideDescendants"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.55"
+                    android:background="@drawable/bg_placeholder_bar" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.45" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.8"
+                    android:background="@drawable/bg_placeholder_bar" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.2" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="12dp"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.68"
+                    android:background="@drawable/bg_placeholder_bar" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.32" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvPrivateHint"
+            style="@style/Needs.Text.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/detail_private_hidden" />
+
+        <!-- Có quyền: hiện dữ liệu thật -->
+        <LinearLayout
+            android:id="@+id/layoutPrivateShown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                style="@style/Needs.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/form_elderly_name" />
+
+            <TextView
+                android:id="@+id/tvPrivateName"
+                style="@style/Needs.Text.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textIsSelectable="true"
+                tools:text="Ông Lê Văn B." />
+
+            <TextView
+                style="@style/Needs.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/form_contact" />
+
+            <TextView
+                android:id="@+id/tvPrivateContact"
+                style="@style/Needs.Text.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autoLink="phone"
+                android:textIsSelectable="true"
+                tools:text="Qua con gái · 09xx xxx 123" />
+
+            <TextView
+                style="@style/Needs.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/form_address" />
+
+            <TextView
+                android:id="@+id/tvPrivateAddress"
+                style="@style/Needs.Text.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textIsSelectable="true"
+                tools:text="Hẻm 12, đường ..., Phường 9" />
+        </LinearLayout>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressPrivate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/primary" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
