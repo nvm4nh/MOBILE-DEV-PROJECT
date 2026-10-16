@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F06 · Phần "Tóm tắt nhu cầu": sẽ hiển thị cho tổ chức trong mạng lưới sau khi được duyệt. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/Needs.Text.SectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_source"
+        android:text="@string/form_section_summary" />
+
+    <TextView
+        style="@style/Needs.Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/form_case_code" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilCaseCode"
+        style="@style/Needs.Input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etCaseCode"
+            style="@style/Needs.InputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="@string/form_case_code_auto"
+            android:textColor="@color/text_secondary" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        style="@style/Needs.Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/etTitle"
+        android:text="@string/form_title" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilTitle"
+        style="@style/Needs.Input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:counterEnabled="true"
+        app:counterMaxLength="120"
+        app:placeholderText="@string/form_title_placeholder">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etTitle"
+            style="@style/Needs.InputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences"
+            android:maxLength="120" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        style="@style/Needs.Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/etTopic"
+        android:text="@string/form_topic" />
+
+    <!-- Bấm vào để chọn chủ đề trong danh sách (không gõ tay) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilTopic"
+        style="@style/Needs.Input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:endIconDrawable="@drawable/ic_arrow_drop_down"
+        app:endIconMode="custom"
+        app:placeholderText="@string/form_topic_placeholder">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etTopic"
+            style="@style/Needs.InputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:inputType="none" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        style="@style/Needs.Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/etContent"
+        android:text="@string/form_content" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilContent"
+        style="@style/Needs.Input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:counterEnabled="true"
+        app:counterMaxLength="1000"
+        app:placeholderText="@string/form_content_placeholder">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etContent"
+            style="@style/Needs.InputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|start"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLength="1000"
+            android:minLines="4" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        style="@style/Needs.Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/etArea"
+        android:text="@string/form_area" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilArea"
+        style="@style/Needs.Input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:helperText="@string/form_area_helper"
+        app:placeholderText="@string/form_area_placeholder">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etArea"
+            style="@style/Needs.InputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapWords"
+            android:maxLength="120" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        style="@style/Needs.Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/etDesiredTime"
+        android:text="@string/form_desired_time" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilDesiredTime"
+        style="@style/Needs.Input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:placeholderText="@string/form_desired_time_placeholder">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etDesiredTime"
+            style="@style/Needs.InputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences"
+            android:maxLength="120" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        style="@style/Needs.Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/etSource"
+        android:text="@string/form_source" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilSource"
+        style="@style/Needs.Input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:placeholderText="@string/form_source_placeholder">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etSource"
+            style="@style/Needs.InputText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences"
+            android:maxLength="200" />
+    </com.google.android.material.textfield.TextInputLayout>
+</LinearLayout>

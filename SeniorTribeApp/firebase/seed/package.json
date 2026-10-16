@@ -1,0 +1,11 @@
+{
+  "name": "seniortribe-seed",
+  "private": true,
+  "description": "Tạo tổ chức, quyền thành viên và vài nhu cầu mẫu để demo SeniorTribe",
+  "scripts": {
+    "seed": "node seed-demo.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

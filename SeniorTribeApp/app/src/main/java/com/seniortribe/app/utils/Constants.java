@@ -42,4 +42,14 @@ public class Constants {
     public static final String EXTRA_NEED_ID = "extra_need_id";
     public static final String EXTRA_POST = "extra_post";
     public static final String EXTRA_CHAT_PARTNER = "extra_chat_partner";
+
+    // ----- Nhu cầu hỗ trợ (F06–F10, F14) -----
+    public static final String COL_MEMBERSHIPS = "memberships";      // memberships/{uid}/organizations/{orgId}
+    public static final String SUB_ORGANIZATIONS = "organizations";
+    public static final String SUB_MEMBERS = "members";              // organizations/{orgId}/members/{uid}
+    public static final String SUB_EVENTS = "events";                // needs_summary/{needId}/events/{eventId}
+    public static final String COL_COUNTERS = "counters";            // counters/needs: { next }
+
+    // Lần tiếp nhận hiện tại; chat theo từng lần tiếp nhận nên dùng id này (quy tắc R08)
+    public static final String EXTRA_ASSIGNMENT_ID = "extra_assignment_id";
 }

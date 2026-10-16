@@ -1,0 +1,347 @@
+rules_version = '2';
+
+// =====================================================================
+// SeniorTribe · Firestore Security Rules
+//
+// Phần 1 (users, memberships) giữ nguyên từ nhánh feat/auth-profile.
+// Phần 2 (nhu cầu hỗ trợ F06–F10, F14) do nhánh feat/requests bổ sung.
+// Phần 3 (bài đăng, chat, lịch) các nhánh khác bổ sung vào cuối file.
+//
+// Nguyên tắc: quyền được cấp sẵn trong memberships, người dùng không tự nâng quyền (R01);
+// mọi lần đổi trạng thái được kiểm tra lại ở đây, kể cả khi app đã kiểm tra (R06).
+// =====================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Hàm chung ----------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function membershipPath(uid, orgId) {
+      return /databases/$(database)/documents/memberships/$(uid)/organizations/$(orgId);
+    }
+
+    // Tài khoản hiện tại là thành viên đang hoạt động của tổ chức orgId
+    function isMember(orgId) {
+      return signedIn()
+        && orgId is string
+        && exists(membershipPath(request.auth.uid, orgId))
+        && get(membershipPath(request.auth.uid, orgId)).data.active == true;
+    }
+
+    // ... và có vai trò role (RECORDER, REVIEWER, REPRESENTATIVE)
+    function hasRole(orgId, role) {
+      return isMember(orgId)
+        && role in get(membershipPath(request.auth.uid, orgId)).data.roles;
+    }
+
+    function changed() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function isText(value, minLen, maxLen) {
+      return value is string && value.size() >= minLen && value.size() <= maxLen;
+    }
+
+    // =================================================================
+    // Phần 1 · Tài khoản và quyền (từ feat/auth-profile)
+    // =================================================================
+
+    function validProfile(data, uid) {
+      return data.keys().hasAll(['uid', 'displayName', 'email', 'area', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'displayName', 'email', 'area', 'createdAt', 'updatedAt'])
+        && data.uid == uid
+        && data.displayName is string
+        && data.displayName.size() >= 2
+        && data.displayName.size() <= 80
+        && data.email is string
+        && data.email == request.auth.token.email
+        && data.area is string
+        && data.area.size() <= 120
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    match /users/{uid} {
+      allow get: if owns(uid);
+      allow list: if false;
+      allow create: if owns(uid)
+        && validProfile(request.resource.data, uid)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if owns(uid)
+        && validProfile(request.resource.data, uid)
+        && changed().hasOnly(['displayName', 'area', 'updatedAt'])
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // Quyền do quản trị tạo trên Console / script seed, app chỉ đọc
+    match /memberships/{uid}/organizations/{organizationId} {
+      allow get, list: if owns(uid);
+      allow create, update, delete: if false;
+    }
+
+    // Hồ sơ tổ chức và danh sách thành viên (để chọn đại diện phụ trách)
+    match /organizations/{orgId} {
+      allow get: if signedIn();
+      allow list, write: if false;
+
+      match /members/{memberUid} {
+        allow read: if isMember(orgId);
+        allow write: if false;
+      }
+    }
+
+    // =================================================================
+    // Phần 2 · Nhu cầu hỗ trợ (F06–F10, F14)
+    // =================================================================
+
+    function needPath(needId) {
+      return /databases/$(database)/documents/needs_summary/$(needId);
+    }
+
+    function assignmentPath(assignmentId) {
+      return /databases/$(database)/documents/needs_assignments/$(assignmentId);
+    }
+
+    // Nội dung tóm tắt hợp lệ (F06). Không kiểm tra được "không chứa tên" ở đây,
+    // việc đó do app nhắc và điều phối viên rà soát (F07).
+    function validSummary(d) {
+      return isText(d.title, 5, 120)
+        && isText(d.topic, 1, 60)
+        && isText(d.content, 10, 1000)
+        && isText(d.area, 2, 120)
+        && isText(d.desiredTime, 1, 120)
+        && isText(d.source, 1, 200)
+        && d.consentRecorded == true
+        && isText(d.consentMethod, 1, 200);
+    }
+
+    // Các field đầu mối được sửa khi nhu cầu chưa có tổ chức nhận
+    function editableKeys() {
+      return ['title', 'topic', 'content', 'area', 'desiredTime', 'source',
+              'consentRecorded', 'consentMethod', 'status', 'needsRevision',
+              'updatedAt', 'submittedAt'];
+    }
+
+    // Field không bao giờ được đổi sau khi tạo
+    function lockedKeys() {
+      return ['caseCode', 'recorderOrgId', 'recorderOrgName', 'recorderUid', 'recorderName', 'createdAt'];
+    }
+
+    // Đọc được bản tóm tắt: nhu cầu OPEN (chỉ phần tóm tắt, không có thông tin nhận diện),
+    // hoặc thành viên đơn vị ghi nhận, hoặc thành viên tổ chức đang phụ trách.
+    // Ghi chú MVP: mọi tài khoản đã đăng nhập đều đọc được bản tóm tắt OPEN.
+    function canReadNeed(d) {
+      return signedIn() && (
+           d.status == 'OPEN'
+        || isMember(d.recorderOrgId)
+        || isMember(d.get('assignedOrgId', '-')));
+    }
+
+    match /needs_summary/{needId} {
+
+      allow read: if canReadNeed(resource.data);
+
+      // F06 · Đầu mối tạo nhu cầu ở REVIEW
+      allow create: if hasRole(request.resource.data.recorderOrgId, 'RECORDER')
+        && request.resource.data.keys().hasOnly([
+             'caseCode', 'title', 'topic', 'content', 'area', 'desiredTime', 'source',
+             'consentRecorded', 'consentMethod', 'status', 'needsRevision', 'reviewNote',
+             'recorderOrgId', 'recorderOrgName', 'recorderUid', 'recorderName',
+             'assignedOrgId', 'assignedOrgName', 'assigneeUid', 'assigneeName',
+             'currentAssignmentId', 'returnCount', 'createdAt', 'updatedAt', 'submittedAt'])
+        && request.resource.data.recorderUid == request.auth.uid
+        && request.resource.data.status == 'REVIEW'
+        && request.resource.data.needsRevision == false
+        && request.resource.data.assignedOrgId == null
+        && request.resource.data.assigneeUid == null
+        && request.resource.data.currentAssignmentId == null
+        && request.resource.data.returnCount == 0
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.caseCode is string
+        && validSummary(request.resource.data);
+
+      allow update: if signedIn() && !changed().hasAny(lockedKeys()) && (
+           recorderEdits()
+        || reviewerDecides()
+        || representativeAccepts()
+        || representativeReturns()
+        || recorderCancels()
+        || coordinationStep());
+
+      allow delete: if false;
+
+      // F08 · Sửa khi còn REVIEW/OPEN; luôn đưa về REVIEW để rà soát lại
+      function recorderEdits() {
+        return hasRole(resource.data.recorderOrgId, 'RECORDER')
+          && resource.data.status in ['REVIEW', 'OPEN']
+          && request.resource.data.status == 'REVIEW'
+          && request.resource.data.needsRevision == false
+          && changed().hasOnly(editableKeys())
+          && validSummary(request.resource.data);
+      }
+
+      // F07 · Điều phối viên cùng đơn vị duyệt hoặc yêu cầu bổ sung; không tự duyệt nhu cầu của mình
+      function reviewerDecides() {
+        return hasRole(resource.data.recorderOrgId, 'REVIEWER')
+          && request.auth.uid != resource.data.recorderUid
+          && resource.data.status == 'REVIEW'
+          && request.resource.data.reviewerUid == request.auth.uid
+          && changed().hasOnly(['status', 'needsRevision', 'reviewNote', 'reviewerUid',
+                                'reviewerName', 'reviewedAt', 'updatedAt'])
+          && (
+               (request.resource.data.status == 'OPEN' && request.resource.data.needsRevision == false)
+            || (request.resource.data.status == 'REVIEW' && request.resource.data.needsRevision == true
+                && isText(request.resource.data.reviewNote, 1, 500))
+          );
+      }
+
+      // F10 · Một tổ chức nhận nhu cầu OPEN, giao cho một đại diện của chính tổ chức đó.
+      // Lần tiếp nhận phải được tạo cùng lúc (getAfter) để chat/lịch gắn theo lần tiếp nhận.
+      function representativeAccepts() {
+        let d = request.resource.data;
+        return resource.data.status == 'OPEN'
+          && resource.data.get('currentAssignmentId', null) == null
+          && d.status == 'ACCEPTED'
+          && hasRole(d.assignedOrgId, 'REPRESENTATIVE')
+          && d.acceptedByUid == request.auth.uid
+          && exists(membershipPath(d.assigneeUid, d.assignedOrgId))
+          && d.currentAssignmentId is string
+          && existsAfter(assignmentPath(d.currentAssignmentId))
+          && changed().hasOnly(['status', 'assignedOrgId', 'assignedOrgName', 'assigneeUid',
+                                'assigneeName', 'acceptedByUid', 'currentAssignmentId',
+                                'acceptedAt', 'updatedAt']);
+      }
+
+      // F14 · Tổ chức phụ trách trả lại trước khi báo đã hỗ trợ (R07)
+      function representativeReturns() {
+        let d = request.resource.data;
+        return resource.data.status in ['ACCEPTED', 'SCHEDULED']
+          && hasRole(resource.data.assignedOrgId, 'REPRESENTATIVE')
+          && d.status == 'OPEN'
+          && d.assignedOrgId == null
+          && d.assigneeUid == null
+          && d.currentAssignmentId == null
+          && d.returnCount == resource.data.get('returnCount', 0) + 1
+          && changed().hasOnly(['status', 'assignedOrgId', 'assignedOrgName', 'assigneeUid',
+                                'assigneeName', 'acceptedByUid', 'currentAssignmentId',
+                                'acceptedAt', 'returnCount', 'lastReturnReason', 'updatedAt']);
+      }
+
+      // F14 · Đầu mối hủy khi chưa hoàn thành, bắt buộc có lý do
+      function recorderCancels() {
+        let d = request.resource.data;
+        return hasRole(resource.data.recorderOrgId, 'RECORDER')
+          && !(resource.data.status in ['COMPLETED', 'CANCELLED'])
+          && d.status == 'CANCELLED'
+          && isText(d.cancelReason, 1, 200)
+          && d.cancelledByUid == request.auth.uid
+          && changed().hasOnly(['status', 'cancelReason', 'cancelNote', 'cancelledByUid',
+                                'cancelledAt', 'updatedAt']);
+      }
+
+      // F12, F13 (nhánh feat/chat-schedule): đề xuất cho các bước sau tiếp nhận.
+      //   ACCEPTED  → SCHEDULED : đầu mối ghi nhận đồng ý lịch
+      //   SCHEDULED → DELIVERED : tổ chức phụ trách báo đã hỗ trợ
+      //   DELIVERED → COMPLETED : đầu mối đối soát xong
+      // Không cho đổi tổ chức / người phụ trách ở các bước này.
+      function coordinationStep() {
+        let from = resource.data.status;
+        let to = request.resource.data.status;
+        return !changed().hasAny(['assignedOrgId', 'assigneeUid', 'currentAssignmentId',
+                                  'cancelReason', 'returnCount'])
+          && (
+               (from == 'ACCEPTED' && to == 'SCHEDULED' && hasRole(resource.data.recorderOrgId, 'RECORDER'))
+            || (from == 'SCHEDULED' && to == 'DELIVERED' && isMember(resource.data.assignedOrgId))
+            || (from == 'DELIVERED' && to == 'COMPLETED' && hasRole(resource.data.recorderOrgId, 'RECORDER'))
+            || (from == to && from in ['ACCEPTED', 'SCHEDULED', 'DELIVERED']
+                && (isMember(resource.data.recorderOrgId) || isMember(resource.data.assignedOrgId)))
+          );
+      }
+
+      // Lịch sử thay đổi trạng thái: chỉ thêm, không sửa / xóa
+      match /events/{eventId} {
+        allow read: if canReadNeed(get(needPath(needId)).data);
+        allow create: if signedIn()
+          && request.resource.data.byUid == request.auth.uid
+          && isMember(request.resource.data.byOrgId)
+          && request.resource.data.at == request.time;
+        allow update, delete: if false;
+      }
+    }
+
+    // Thông tin riêng: chỉ đơn vị ghi nhận, hoặc đúng đại diện được giao sau khi chốt lịch (R03)
+    match /needs_private/{needId} {
+      allow read: if signedIn() && (
+           isMember(resource.data.recorderOrgId)
+        || (get(needPath(needId)).data.assigneeUid == request.auth.uid
+            && get(needPath(needId)).data.status in ['SCHEDULED', 'DELIVERED']));
+
+      allow create: if hasRole(request.resource.data.recorderOrgId, 'RECORDER')
+        && existsAfter(needPath(needId))
+        && getAfter(needPath(needId)).data.recorderOrgId == request.resource.data.recorderOrgId
+        && request.resource.data.keys().hasOnly(['elderlyName', 'contact', 'address', 'recorderOrgId', 'updatedAt'])
+        && isText(request.resource.data.elderlyName, 2, 80)
+        && isText(request.resource.data.contact, 1, 120);
+
+      allow update: if hasRole(resource.data.recorderOrgId, 'RECORDER')
+        && request.resource.data.recorderOrgId == resource.data.recorderOrgId
+        && getAfter(needPath(needId)).data.status == 'REVIEW'
+        && request.resource.data.keys().hasOnly(['elderlyName', 'contact', 'address', 'recorderOrgId', 'updatedAt'])
+        && isText(request.resource.data.elderlyName, 2, 80)
+        && isText(request.resource.data.contact, 1, 120);
+
+      allow delete: if false;
+    }
+
+    // Mỗi lần tiếp nhận một tài liệu; trả lại / hủy chỉ đổi trạng thái, không xóa (R07)
+    match /needs_assignments/{assignmentId} {
+      allow read: if isMember(resource.data.orgId) || isMember(resource.data.recorderOrgId);
+
+      allow create: if hasRole(request.resource.data.orgId, 'REPRESENTATIVE')
+        && request.resource.data.status == 'ACTIVE'
+        && request.resource.data.acceptedByUid == request.auth.uid
+        && getAfter(needPath(request.resource.data.needId)).data.currentAssignmentId == assignmentId
+        && getAfter(needPath(request.resource.data.needId)).data.recorderOrgId == request.resource.data.recorderOrgId;
+
+      allow update: if resource.data.status == 'ACTIVE'
+        && changed().hasOnly(['status', 'endReason', 'endNote', 'endedByUid', 'endedAt'])
+        && request.resource.data.endedByUid == request.auth.uid
+        && (
+             (request.resource.data.status == 'RETURNED' && hasRole(resource.data.orgId, 'REPRESENTATIVE'))
+          || (request.resource.data.status == 'CLOSED' && hasRole(resource.data.recorderOrgId, 'RECORDER'))
+        );
+
+      allow delete: if false;
+    }
+
+    // Bộ đếm mã trường hợp NC-xxxx: chỉ tăng đúng 1 mỗi lần
+    match /counters/needs {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['next'])
+        && request.resource.data.next == 2;
+      allow update: if signedIn()
+        && request.resource.data.keys().hasOnly(['next'])
+        && request.resource.data.next == resource.data.next + 1;
+    }
+
+    // =================================================================
+    // Phần 3 · Bài đăng, chat, lịch: các nhánh khác bổ sung tại đây
+    // =================================================================
+
+    // Mặc định từ chối mọi đường dẫn chưa khai báo
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
