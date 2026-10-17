@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -84,6 +85,7 @@ public class NeedDetailActivity extends AppCompatActivity {
             if (id == R.id.action_edit_need) openEdit();
             else if (id == R.id.action_return_need) openReasonSheet(NeedReasonSheet.MODE_RETURN);
             else if (id == R.id.action_cancel_need) openReasonSheet(NeedReasonSheet.MODE_CANCEL);
+            else if (id == R.id.action_need_history) openHistory();
             else return false;
             return true;
         });
@@ -186,7 +188,11 @@ public class NeedDetailActivity extends AppCompatActivity {
     private void showContent(boolean visible) {
         scrollContent.setVisibility(visible ? View.VISIBLE : View.GONE);
         bottomBar.setVisibility(visible ? bottomBar.getVisibility() : View.GONE);
-        if (!visible) setMenuVisible(false, false, false);
+        if (!visible) {
+            setMenuVisible(false, false, false);
+            MenuItem history = toolbar.getMenu().findItem(R.id.action_need_history);
+            if (history != null) history.setVisible(false);
+        }
     }
 
     private void renderStatusNote(NeedSummary n, Membership me) {
@@ -196,6 +202,16 @@ public class NeedDetailActivity extends AppCompatActivity {
             text = getString(R.string.detail_note_revision, nonNull(n.getReviewNote()));
         } else if (Constants.STATUS_REVIEW.equals(status)) {
             text = getString(R.string.detail_note_review);
+        } else if (Constants.STATUS_SCHEDULED.equals(status) && n.getScheduledAtMillis() > 0) {
+            text = getString(R.string.detail_note_scheduled,
+                    DateTimeUtils.formatDateTime(n.getScheduledAtMillis()), nonNull(n.getScheduledPlace()));
+        } else if (Constants.STATUS_DELIVERED.equals(status)) {
+            text = getString(R.string.detail_note_delivered, nonNull(n.getDeliveredByName()), nonNull(n.getDeliveryReport()));
+            if (!TextUtils.isEmpty(n.getReconcileNote())) {
+                text += "\n" + getString(R.string.coord_reconcile_pending, n.getReconcileNote());
+            }
+        } else if (Constants.STATUS_COMPLETED.equals(status)) {
+            text = getString(R.string.detail_note_completed, nonNull(n.getDeliveryReport()));
         } else if (Constants.STATUS_CANCELLED.equals(status)) {
             text = TextUtils.isEmpty(n.getCancelNote())
                     ? getString(R.string.detail_note_cancelled, nonNull(n.getCancelReason()))
@@ -256,7 +272,10 @@ public class NeedDetailActivity extends AppCompatActivity {
         boolean canReturn = assignedOrg && me.isRepresentative()
                 && (Constants.STATUS_ACCEPTED.equals(status) || Constants.STATUS_SCHEDULED.equals(status));
         boolean canCancel = recorderOrg && me.isRecorder() && !n.isFinished();
-        boolean canChat = (recorderOrg || assignedOrg) && !TextUtils.isEmpty(n.getCurrentAssignmentId());
+        // Chat chỉ giữa đầu mối đã ghi nhận và người được giao phụ trách (F11, R08)
+        boolean chatMember = me != null
+                && (me.getUid().equals(n.getRecorderUid()) || me.getUid().equals(n.getAssigneeUid()));
+        boolean canChat = chatMember && !TextUtils.isEmpty(n.getCurrentAssignmentId());
 
         int primary = ACTION_NONE;
         if (canReview) primary = ACTION_REVIEW;
@@ -273,6 +292,8 @@ public class NeedDetailActivity extends AppCompatActivity {
         bottomBar.setVisibility(primary == ACTION_NONE ? View.GONE : View.VISIBLE);
 
         setMenuVisible(canEdit && primary != ACTION_EDIT && secondary != ACTION_EDIT, canReturn, canCancel);
+        MenuItem history = toolbar.getMenu().findItem(R.id.action_need_history);
+        if (history != null) history.setVisible(recorderOrg || assignedOrg);
     }
 
     private void setupButton(MaterialButton button, int action, NeedSummary n, boolean busy) {
@@ -334,6 +355,13 @@ public class NeedDetailActivity extends AppCompatActivity {
         intent.putExtra(Constants.EXTRA_NEED_ID, needId);
         intent.putExtra(Constants.EXTRA_NEED, current.need);
         intent.putExtra(Constants.EXTRA_ASSIGNMENT_ID, current.need.getCurrentAssignmentId());
+        startActivity(intent);
+    }
+
+    /** F15 · Lịch sử các bước của nhu cầu. */
+    private void openHistory() {
+        Intent intent = new Intent(this, NeedHistoryActivity.class);
+        intent.putExtra(Constants.EXTRA_NEED_ID, needId);
         startActivity(intent);
     }
 

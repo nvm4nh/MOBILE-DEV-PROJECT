@@ -112,6 +112,10 @@ service cloud.firestore {
       return /databases/$(database)/documents/needs_assignments/$(assignmentId);
     }
 
+    function schedulePath(assignmentId, scheduleId) {
+      return /databases/$(database)/documents/needs_assignments/$(assignmentId)/schedules/$(scheduleId);
+    }
+
     // Nội dung tóm tắt hợp lệ (F06). Không kiểm tra được "không chứa tên" ở đây,
     // việc đó do app nhắc và điều phối viên rà soát (F07).
     function validSummary(d) {
@@ -234,7 +238,9 @@ service cloud.firestore {
           && d.returnCount == resource.data.get('returnCount', 0) + 1
           && changed().hasOnly(['status', 'assignedOrgId', 'assignedOrgName', 'assigneeUid',
                                 'assigneeName', 'acceptedByUid', 'currentAssignmentId',
-                                'acceptedAt', 'returnCount', 'lastReturnReason', 'updatedAt']);
+                                'acceptedAt', 'returnCount', 'lastReturnReason', 'updatedAt',
+                                'scheduleId', 'scheduledAt', 'scheduledPlace', 'scheduledByUid'])
+          && d.get('scheduleId', null) == null;
       }
 
       // F14 · Đầu mối hủy khi chưa hoàn thành, bắt buộc có lý do
@@ -249,23 +255,63 @@ service cloud.firestore {
                                 'cancelledAt', 'updatedAt']);
       }
 
-      // F12, F13 (nhánh feat/chat-schedule): đề xuất cho các bước sau tiếp nhận.
-      //   ACCEPTED  → SCHEDULED : đầu mối ghi nhận đồng ý lịch
-      //   SCHEDULED → DELIVERED : tổ chức phụ trách báo đã hỗ trợ
-      //   DELIVERED → COMPLETED : đầu mối đối soát xong
-      // Không cho đổi tổ chức / người phụ trách ở các bước này.
+      // F12, F13 · Các bước phối hợp sau tiếp nhận. Không bước nào được đổi tổ chức
+      // hoặc người phụ trách; mỗi bước chỉ được sửa đúng nhóm field của nó.
       function coordinationStep() {
-        let from = resource.data.status;
-        let to = request.resource.data.status;
-        return !changed().hasAny(['assignedOrgId', 'assigneeUid', 'currentAssignmentId',
-                                  'cancelReason', 'returnCount'])
-          && (
-               (from == 'ACCEPTED' && to == 'SCHEDULED' && hasRole(resource.data.recorderOrgId, 'RECORDER'))
-            || (from == 'SCHEDULED' && to == 'DELIVERED' && isMember(resource.data.assignedOrgId))
-            || (from == 'DELIVERED' && to == 'COMPLETED' && hasRole(resource.data.recorderOrgId, 'RECORDER'))
-            || (from == to && from in ['ACCEPTED', 'SCHEDULED', 'DELIVERED']
-                && (isMember(resource.data.recorderOrgId) || isMember(resource.data.assignedOrgId)))
-          );
+        return recorderConfirmsSchedule()
+          || assignedOrgReportsDelivered()
+          || recorderNotesReconcile()
+          || recorderCompletes();
+      }
+
+      // F12 · ACCEPTED → SCHEDULED: đầu mối ghi nhận người cao tuổi đồng ý một lịch
+      // đang được đề xuất trong lần tiếp nhận hiện tại; lịch được xác nhận cùng lúc.
+      function recorderConfirmsSchedule() {
+        let d = request.resource.data;
+        let schedule = schedulePath(resource.data.currentAssignmentId, d.scheduleId);
+        return resource.data.status == 'ACCEPTED'
+          && d.status == 'SCHEDULED'
+          && hasRole(resource.data.recorderOrgId, 'RECORDER')
+          && d.scheduledByUid == request.auth.uid
+          && d.scheduleId is string
+          && existsAfter(schedule)
+          && getAfter(schedule).data.status == 'CONFIRMED'
+          && d.scheduledAt == getAfter(schedule).data.startAt
+          && changed().hasOnly(['status', 'scheduleId', 'scheduledAt', 'scheduledPlace',
+                                'scheduledByUid', 'updatedAt']);
+      }
+
+      // F13 · SCHEDULED → DELIVERED: thành viên tổ chức phụ trách báo đã hỗ trợ
+      function assignedOrgReportsDelivered() {
+        let d = request.resource.data;
+        return resource.data.status == 'SCHEDULED'
+          && d.status == 'DELIVERED'
+          && isMember(resource.data.assignedOrgId)
+          && d.deliveredByUid == request.auth.uid
+          && isText(d.deliveryReport, 5, 1000)
+          && changed().hasOnly(['status', 'deliveryReport', 'deliveredByUid', 'deliveredByName',
+                                'deliveredAt', 'updatedAt']);
+      }
+
+      // F13 · Đối soát chưa thống nhất: giữ DELIVERED, ghi nội dung cần đối soát
+      function recorderNotesReconcile() {
+        let d = request.resource.data;
+        return resource.data.status == 'DELIVERED'
+          && d.status == 'DELIVERED'
+          && hasRole(resource.data.recorderOrgId, 'RECORDER')
+          && isText(d.reconcileNote, 1, 500)
+          && changed().hasOnly(['reconcileNote', 'reconcileAt', 'updatedAt']);
+      }
+
+      // F13 · DELIVERED → COMPLETED: đầu mối đối soát xong với người cao tuổi
+      function recorderCompletes() {
+        let d = request.resource.data;
+        return resource.data.status == 'DELIVERED'
+          && d.status == 'COMPLETED'
+          && hasRole(resource.data.recorderOrgId, 'RECORDER')
+          && d.completedByUid == request.auth.uid
+          && changed().hasOnly(['status', 'completionNote', 'completedByUid', 'completedAt',
+                                'updatedAt']);
       }
 
       // Lịch sử thay đổi trạng thái: chỉ thêm, không sửa / xóa
@@ -322,6 +368,84 @@ service cloud.firestore {
         );
 
       allow delete: if false;
+
+      // ---------- Phần 3 · Chat và lịch theo lần tiếp nhận (F11, F12, F15) ----------
+
+      function assignment() {
+        return get(assignmentPath(assignmentId)).data;
+      }
+
+      function needOfAssignment() {
+        return get(needPath(assignment().needId)).data;
+      }
+
+      // Lần tiếp nhận còn hiệu lực: chưa trả lại / đóng, nhu cầu đang trong bước phối hợp
+      function assignmentActive() {
+        return assignment().status == 'ACTIVE'
+          && needOfAssignment().status in ['ACCEPTED', 'SCHEDULED', 'DELIVERED']
+          && needOfAssignment().currentAssignmentId == assignmentId;
+      }
+
+      // F11 · Chỉ đầu mối đã ghi nhận và đại diện được giao của lần tiếp nhận này (R08)
+      function chatMember() {
+        return signedIn() && (
+             request.auth.uid == assignment().assigneeUid
+          || request.auth.uid == needOfAssignment().recorderUid);
+      }
+
+      // F11 · Tin nhắn: đọc được cả khi luồng đã kết thúc (chỉ đọc), chỉ gửi khi còn hiệu lực
+      match /messages/{messageId} {
+        allow read: if chatMember();
+        allow create: if chatMember()
+          && assignmentActive()
+          && request.resource.data.keys().hasOnly(['senderUid', 'senderName', 'text', 'at'])
+          && request.resource.data.senderUid == request.auth.uid
+          && isText(request.resource.data.senderName, 1, 80)
+          && isText(request.resource.data.text, 1, 1000)
+          && request.resource.data.at == request.time;
+        allow update, delete: if false;
+      }
+
+      // F12 · Đề xuất lịch: tổ chức phụ trách đề xuất, đầu mối xác nhận hoặc từ chối
+      match /schedules/{scheduleId} {
+        allow read: if isMember(assignment().orgId) || isMember(assignment().recorderOrgId);
+
+        allow create: if (hasRole(assignment().orgId, 'REPRESENTATIVE')
+                          || request.auth.uid == assignment().assigneeUid)
+          && assignmentActive()
+          && needOfAssignment().status == 'ACCEPTED'
+          && request.resource.data.keys().hasOnly(['startAt', 'place', 'note', 'status',
+                                                   'proposedByUid', 'proposedByName', 'createdAt'])
+          && request.resource.data.status == 'PROPOSED'
+          && request.resource.data.proposedByUid == request.auth.uid
+          && request.resource.data.startAt is timestamp
+          && request.resource.data.startAt > request.time
+          && isText(request.resource.data.place, 2, 200)
+          && (request.resource.data.note == null || isText(request.resource.data.note, 0, 500))
+          && request.resource.data.createdAt == request.time;
+
+        allow update: if resource.data.status == 'PROPOSED' && (
+             // Đầu mối xác nhận (cùng lúc nhu cầu chuyển SCHEDULED) hoặc từ chối kèm lý do
+             (hasRole(assignment().recorderOrgId, 'RECORDER')
+              && request.resource.data.decidedByUid == request.auth.uid
+              && changed().hasOnly(['status', 'consentMethod', 'declineReason',
+                                    'decidedByUid', 'decidedByName', 'decidedAt'])
+              && (
+                   (request.resource.data.status == 'CONFIRMED'
+                    && isText(request.resource.data.consentMethod, 1, 200)
+                    && getAfter(needPath(assignment().needId)).data.status == 'SCHEDULED')
+                || (request.resource.data.status == 'DECLINED'
+                    && isText(request.resource.data.declineReason, 1, 300))
+              ))
+             // Tổ chức rút đề xuất cũ khi gửi đề xuất mới
+          || (isMember(assignment().orgId)
+              && request.resource.data.status == 'WITHDRAWN'
+              && changed().hasOnly(['status', 'decidedByUid', 'decidedByName', 'decidedAt'])
+              && request.resource.data.decidedByUid == request.auth.uid)
+        );
+
+        allow delete: if false;
+      }
     }
 
     // Bộ đếm mã trường hợp NC-xxxx: chỉ tăng đúng 1 mỗi lần

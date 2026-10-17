@@ -10,23 +10,31 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.seniortribe.app.R;
-import com.seniortribe.app.models.ScheduleSession;
+import com.seniortribe.app.models.NeedSummary;
 import com.seniortribe.app.utils.DateTimeUtils;
+import com.seniortribe.app.utils.NeedStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/** F15 · Lịch hẹn đã thống nhất và các lần hỗ trợ đã thực hiện. */
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder> {
 
-    private final Context context;
-    private List<ScheduleSession> sessionList = new ArrayList<>();
-
-    public ScheduleAdapter(Context context) {
-        this.context = context;
+    public interface OnScheduleClickListener {
+        void onScheduleClick(NeedSummary need);
     }
 
-    public void setSessions(List<ScheduleSession> sessions) {
-        this.sessionList = sessions != null ? sessions : new ArrayList<>();
+    private final Context context;
+    private final OnScheduleClickListener listener;
+    private List<NeedSummary> items = new ArrayList<>();
+
+    public ScheduleAdapter(Context context, OnScheduleClickListener listener) {
+        this.context = context;
+        this.listener = listener;
+    }
+
+    public void setNeeds(List<NeedSummary> needs) {
+        this.items = needs != null ? needs : new ArrayList<>();
         notifyDataSetChanged();
     }
 
@@ -39,21 +47,32 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
 
     @Override
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
-        ScheduleSession session = sessionList.get(position);
-        holder.tvDateTime.setText(DateTimeUtils.formatDateTime(session.getProposedTime()));
-        holder.tvLocation.setText(session.getLocation() != null ? session.getLocation() : "Địa điểm thăm hỏi");
-        holder.tvNotes.setText(session.getNotes() != null ? session.getNotes() : "Thăm hỏi và trò chuyện cùng cụ");
-        holder.tvStatus.setText(session.isAgreedByElderly() ? "Cụ đã đồng ý" : "Chờ xác nhận");
+        NeedSummary n = items.get(position);
+        holder.tvDateTime.setText(n.getScheduledAtMillis() > 0
+                ? DateTimeUtils.formatDateTime(n.getScheduledAtMillis())
+                : context.getString(R.string.schedule_no_time));
+        NeedStatus.bindChip(holder.tvStatus, n.getStatus());
+        holder.tvLocation.setText(context.getString(R.string.schedule_item_title, safe(n.getCaseCode()), safe(n.getTitle())));
+        holder.tvNotes.setText(context.getString(R.string.schedule_item_meta, safe(n.getScheduledPlace()),
+                safe(n.getAssigneeName()), safe(n.getAssignedOrgName())));
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onScheduleClick(n);
+        });
+    }
+
+    private static String safe(String s) {
+        return s != null ? s : "";
     }
 
     @Override
     public int getItemCount() {
-        return sessionList.size();
+        return items.size();
     }
 
     static class ScheduleViewHolder extends RecyclerView.ViewHolder {
         TextView tvDateTime, tvLocation, tvNotes, tvStatus;
-        public ScheduleViewHolder(@NonNull View itemView) {
+
+        ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);
             tvDateTime = itemView.findViewById(R.id.tvDateTime);
             tvLocation = itemView.findViewById(R.id.tvLocation);
