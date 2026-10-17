@@ -71,11 +71,14 @@
             android:name=".activities.PostDetailActivity"
             android:exported="false" />
 
-        <!-- Chat Activity -->
+        <!-- Chat, lịch hẹn, đối soát (F11–F13) và lịch sử hỗ trợ (F15) -->
         <activity
             android:name=".activities.ChatActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.NeedHistoryActivity"
+            android:exported="false" />
 
     </application>
 

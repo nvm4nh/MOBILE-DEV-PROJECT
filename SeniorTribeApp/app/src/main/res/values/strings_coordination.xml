@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chuỗi giao diện chat phối hợp (F11), lịch hẹn (F12), báo hỗ trợ / đối soát (F13), lịch sử (F15). -->
+<resources>
+
+    <!-- F11 · Chat -->
+    <string name="chat_title_with_code">Trao đổi · %1$s</string>
+    <string name="chat_partner">%1$s · %2$s</string>
+    <string name="chat_send">Gửi tin nhắn</string>
+    <string name="chat_empty">Chưa có tin nhắn. Hãy chào hỏi và trao đổi phương án hỗ trợ.</string>
+    <string name="chat_action_open_need">Xem chi tiết nhu cầu</string>
+    <string name="chat_readonly_completed">Nhu cầu đã hoàn thành. Cuộc trò chuyện chỉ còn đọc.</string>
+    <string name="chat_readonly_cancelled">Nhu cầu đã bị hủy. Cuộc trò chuyện chỉ còn đọc.</string>
+    <string name="chat_readonly_ended">Lần tiếp nhận này đã kết thúc. Cuộc trò chuyện chỉ còn đọc.</string>
+    <string name="chat_list_subtitle">Trao đổi giữa đầu mối ghi nhận và người được giao phụ trách</string>
+    <string name="chat_list_empty_title">Chưa có cuộc trò chuyện</string>
+    <string name="chat_list_empty_message">Khi một nhu cầu bạn ghi nhận được tiếp nhận, hoặc bạn được giao phụ trách, cuộc trò chuyện sẽ hiện ở đây.</string>
+
+    <!-- F12, F13 · Thẻ phối hợp -->
+    <string name="coord_step_schedule">Thống nhất lịch hẹn</string>
+    <string name="coord_step_visit">Thực hiện hỗ trợ</string>
+    <string name="coord_step_reconcile">Đối soát kết quả</string>
+    <string name="coord_step_done">Đã hoàn thành</string>
+    <string name="coord_step_closed">Đã kết thúc</string>
+    <string name="coord_pending">Đề xuất: %1$s.\n%2$s</string>
+    <string name="coord_pending_recorder">Hãy hỏi ý kiến người cao tuổi rồi xác nhận hoặc từ chối.</string>
+    <string name="coord_pending_org">Đang chờ đầu mối hỏi ý kiến người cao tuổi.</string>
+    <string name="coord_schedule_note">Ghi chú: %1$s</string>
+    <string name="coord_no_schedule_org">Chưa có lịch. Hãy trao đổi qua chat rồi đề xuất lịch hẹn.</string>
+    <string name="coord_no_schedule_other">Chưa có lịch. Tổ chức phụ trách sẽ đề xuất lịch hẹn.</string>
+    <string name="coord_declined">Đề xuất %1$s đã bị từ chối: %2$s</string>
+    <string name="coord_scheduled">Lịch đã chốt: %1$s.\n%2$s</string>
+    <string name="coord_scheduled_org">Sau buổi hỗ trợ, hãy báo kết quả để đầu mối đối soát.</string>
+    <string name="coord_scheduled_other">Đang chờ tổ chức thực hiện và báo kết quả.</string>
+    <string name="coord_delivered">%1$s báo đã hỗ trợ: %2$s</string>
+    <string name="coord_reconcile_pending">Cần đối soát thêm: %1$s</string>
+    <string name="coord_completed">Lịch: %1$s.\nKết quả: %2$s</string>
+    <string name="coord_closed">Lần tiếp nhận này đã kết thúc.</string>
+
+    <string name="coord_action_propose">Đề xuất lịch</string>
+    <string name="coord_action_propose_again">Đề xuất lịch khác</string>
+    <string name="coord_action_confirm">Xác nhận lịch</string>
+    <string name="coord_action_decline">Từ chối</string>
+    <string name="coord_action_delivered">Báo đã hỗ trợ</string>
+    <string name="coord_action_complete">Xác nhận hoàn thành</string>
+    <string name="coord_action_reconcile">Chưa thống nhất</string>
+    <string name="coord_action_save">Lưu</string>
+
+    <string name="coord_confirm_title">Xác nhận lịch hẹn</string>
+    <string name="coord_confirm_message">Lịch %1$s. Chỉ xác nhận khi người cao tuổi đã đồng ý. Sau khi xác nhận, người phụ trách được xem thông tin liên hệ cần thiết.</string>
+    <string name="coord_confirm_hint">Cách hỏi ý kiến (ví dụ: gọi điện cho cụ lúc 9h)</string>
+    <string name="coord_decline_title">Từ chối đề xuất lịch</string>
+    <string name="coord_decline_message">Ghi lý do để tổ chức đề xuất lịch khác phù hợp hơn.</string>
+    <string name="coord_decline_hint">Lý do (ví dụ: cụ bận buổi sáng)</string>
+    <string name="coord_delivered_title">Báo đã hỗ trợ</string>
+    <string name="coord_delivered_message">Mô tả ngắn việc đã làm. Đầu mối sẽ đối soát lại với người cao tuổi.</string>
+    <string name="coord_delivered_hint">Việc đã hỗ trợ</string>
+    <string name="coord_complete_title">Xác nhận hoàn thành</string>
+    <string name="coord_complete_message">Xác nhận người cao tuổi đã nhận được hỗ trợ như báo cáo. Cuộc trò chuyện sẽ chuyển sang chỉ đọc.</string>
+    <string name="coord_complete_hint">Ghi chú đối soát (không bắt buộc)</string>
+    <string name="coord_reconcile_title">Chưa thống nhất kết quả</string>
+    <string name="coord_reconcile_message">Nhu cầu vẫn ở bước chờ đối soát. Ghi rõ điểm cần làm rõ với tổ chức.</string>
+    <string name="coord_reconcile_hint">Nội dung cần đối soát</string>
+    <string name="coord_input_required">Vui lòng nhập nội dung.</string>
+    <string name="coord_input_min_length">Vui lòng nhập ít nhất %1$d ký tự.</string>
+
+    <!-- F12 · Hộp thoại đề xuất lịch -->
+    <string name="propose_title">Đề xuất lịch hẹn</string>
+    <string name="propose_message">Chọn thời gian và địa điểm. Đầu mối sẽ hỏi ý kiến người cao tuổi trước khi chốt.</string>
+    <string name="propose_pick_date">Chọn ngày</string>
+    <string name="propose_pick_time">Chọn giờ</string>
+    <string name="propose_error_time">Hãy chọn ngày và giờ trong tương lai.</string>
+    <string name="propose_place_hint">Địa điểm</string>
+    <string name="propose_place_helper">Ghi khu vực chung, không cần số nhà</string>
+    <string name="propose_error_place">Hãy ghi địa điểm hẹn.</string>
+    <string name="propose_note_hint">Ghi chú (không bắt buộc)</string>
+    <string name="propose_confirm">Gửi đề xuất</string>
+
+    <!-- Ghi chú trạng thái trên chi tiết nhu cầu -->
+    <string name="detail_note_scheduled">Lịch đã chốt: %1$s · %2$s</string>
+    <string name="detail_note_delivered">%1$s báo đã hỗ trợ: %2$s. Chờ đầu mối đối soát.</string>
+    <string name="detail_note_completed">Đã hoàn thành. Kết quả: %1$s</string>
+
+    <!-- F15 · Lịch và lịch sử -->
+    <string name="schedule_subtitle">Lịch đã thống nhất và các lần hỗ trợ của đơn vị</string>
+    <string name="schedule_tab_upcoming">Sắp tới</string>
+    <string name="schedule_tab_history">Đã thực hiện</string>
+    <string name="schedule_no_time">Chưa có thời gian</string>
+    <string name="schedule_item_title">%1$s · %2$s</string>
+    <string name="schedule_item_meta">%1$s · Phụ trách: %2$s (%3$s)</string>
+    <string name="schedule_empty_upcoming_title">Chưa có lịch hẹn</string>
+    <string name="schedule_empty_upcoming_message">Lịch đã được người cao tuổi đồng ý sẽ hiện ở đây.</string>
+    <string name="schedule_empty_history_title">Chưa có lần hỗ trợ nào</string>
+    <string name="schedule_empty_history_message">Các lần đã báo hỗ trợ hoặc đã hoàn thành sẽ hiện ở đây.</string>
+
+    <string name="history_title">Lịch sử hỗ trợ</string>
+    <string name="history_empty_title">Chưa có lịch sử</string>
+    <string name="history_empty_message">Các bước ghi nhận, tiếp nhận, lịch hẹn và kết quả sẽ hiện ở đây.</string>
+    <string name="event_submitted">Ghi nhận nhu cầu</string>
+    <string name="event_resubmitted">Sửa và gửi lại</string>
+    <string name="event_approved">Điều phối viên duyệt</string>
+    <string name="event_revision_requested">Yêu cầu bổ sung</string>
+    <string name="event_accepted">Tổ chức tiếp nhận</string>
+    <string name="event_returned">Tổ chức trả lại</string>
+    <string name="event_cancelled">Đầu mối hủy</string>
+    <string name="event_schedule_proposed">Đề xuất lịch hẹn</string>
+    <string name="event_schedule_declined">Từ chối đề xuất lịch</string>
+    <string name="event_scheduled">Đã thống nhất lịch</string>
+    <string name="event_delivered">Báo đã hỗ trợ</string>
+    <string name="event_reconcile_pending">Chưa thống nhất kết quả</string>
+    <string name="event_completed">Xác nhận hoàn thành</string>
+    <string name="event_unknown">Cập nhật</string>
+</resources>
