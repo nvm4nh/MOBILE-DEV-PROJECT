@@ -66,6 +66,18 @@ public class NeedSummary implements Serializable {
     private Date acceptedAt;
     private Date cancelledAt;
 
+    // Phối hợp sau tiếp nhận (F12, F13)
+    private String scheduleId;      // lịch đã chốt trong needs_assignments/{id}/schedules
+    private Date scheduledAt;
+    private String scheduledPlace;
+    private String deliveryReport;  // tổ chức mô tả việc đã hỗ trợ
+    private String deliveredByName;
+    private Date deliveredAt;
+    private String reconcileNote;   // nội dung đầu mối còn cần đối soát
+    private Date reconcileAt;
+    private String completionNote;
+    private Date completedAt;
+
     public NeedSummary() {}
 
     // ----- Tiện ích hiển thị -----
@@ -74,6 +86,17 @@ public class NeedSummary implements Serializable {
     @Exclude
     public long getCreatedAtMillis() {
         return createdAt != null ? createdAt.getTime() : 0L;
+    }
+
+    /** Nhu cầu đang ở một bước phối hợp sau tiếp nhận, khi chat còn gửi được. */
+    @Exclude
+    public boolean isCoordinating() {
+        return "ACCEPTED".equals(status) || "SCHEDULED".equals(status) || "DELIVERED".equals(status);
+    }
+
+    @Exclude
+    public long getScheduledAtMillis() {
+        return scheduledAt != null ? scheduledAt.getTime() : 0L;
     }
 
     @Exclude
@@ -198,4 +221,34 @@ public class NeedSummary implements Serializable {
 
     public Date getCancelledAt() { return cancelledAt; }
     public void setCancelledAt(Date cancelledAt) { this.cancelledAt = cancelledAt; }
+
+    public String getScheduleId() { return scheduleId; }
+    public void setScheduleId(String scheduleId) { this.scheduleId = scheduleId; }
+
+    public Date getScheduledAt() { return scheduledAt; }
+    public void setScheduledAt(Date scheduledAt) { this.scheduledAt = scheduledAt; }
+
+    public String getScheduledPlace() { return scheduledPlace; }
+    public void setScheduledPlace(String scheduledPlace) { this.scheduledPlace = scheduledPlace; }
+
+    public String getDeliveryReport() { return deliveryReport; }
+    public void setDeliveryReport(String deliveryReport) { this.deliveryReport = deliveryReport; }
+
+    public String getDeliveredByName() { return deliveredByName; }
+    public void setDeliveredByName(String deliveredByName) { this.deliveredByName = deliveredByName; }
+
+    public Date getDeliveredAt() { return deliveredAt; }
+    public void setDeliveredAt(Date deliveredAt) { this.deliveredAt = deliveredAt; }
+
+    public String getReconcileNote() { return reconcileNote; }
+    public void setReconcileNote(String reconcileNote) { this.reconcileNote = reconcileNote; }
+
+    public Date getReconcileAt() { return reconcileAt; }
+    public void setReconcileAt(Date reconcileAt) { this.reconcileAt = reconcileAt; }
+
+    public String getCompletionNote() { return completionNote; }
+    public void setCompletionNote(String completionNote) { this.completionNote = completionNote; }
+
+    public Date getCompletedAt() { return completedAt; }
+    public void setCompletedAt(Date completedAt) { this.completedAt = completedAt; }
 }

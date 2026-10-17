@@ -284,6 +284,11 @@ public class NeedRepository {
             update.put("acceptedAt", null);
             update.put("returnCount", FieldValue.increment(1));
             update.put("lastReturnReason", reason);
+            // Lịch đã chốt với tổ chức cũ hết hiệu lực khi trả lại
+            update.put("scheduleId", null);
+            update.put("scheduledAt", null);
+            update.put("scheduledPlace", null);
+            update.put("scheduledByUid", null);
             update.put("updatedAt", FieldValue.serverTimestamp());
             tx.update(ref, update);
 
@@ -421,7 +426,7 @@ public class NeedRepository {
         return db.collection(Constants.COL_NEEDS_PRIVATE).document(needId);
     }
 
-    private static DocumentReference newEventRef(DocumentReference needRef) {
+    static DocumentReference newEventRef(DocumentReference needRef) {
         return needRef.collection(Constants.SUB_EVENTS).document();
     }
 
@@ -457,7 +462,7 @@ public class NeedRepository {
         return m;
     }
 
-    private static Map<String, Object> endAssignment(String status, String reason, @Nullable String note, Membership me) {
+    static Map<String, Object> endAssignment(String status, String reason, @Nullable String note, Membership me) {
         Map<String, Object> m = new HashMap<>();
         m.put("status", status);
         m.put("endReason", reason);
@@ -467,7 +472,7 @@ public class NeedRepository {
         return m;
     }
 
-    private static Map<String, Object> event(String type, @Nullable String from, String to, Membership me, @Nullable String note) {
+    static Map<String, Object> event(String type, @Nullable String from, String to, Membership me, @Nullable String note) {
         Map<String, Object> m = new HashMap<>();
         m.put("type", type);
         m.put("fromStatus", from);

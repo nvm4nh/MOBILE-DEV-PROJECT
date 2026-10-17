@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- F15 · Một lịch hẹn / lần hỗ trợ trong màn hình Lịch hẹn. -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
@@ -26,20 +28,17 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="09:00 - Thứ Bảy, 26/10/2026"
                 android:textColor="@color/primary"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                android:textSize="15sp" />
+                tools:text="09:00 26/10/2026" />
 
             <TextView
                 android:id="@+id/tvStatus"
+                style="@style/Needs.StatusChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_badge"
-                android:text="Cụ đã đồng ý"
-                android:textColor="@color/status_completed"
-                android:textStyle="bold"
-                android:textSize="12sp" />
+                tools:text="Đã thống nhất lịch" />
         </LinearLayout>
 
         <TextView
@@ -47,17 +46,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Hẻm 45 đường Phạm Thế Hiển, Phường 3, Quận 8"
             android:textColor="@color/text_primary"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            tools:text="NC-0142 · Đi chợ giúp cụ cuối tuần" />
 
         <TextView
             android:id="@+id/tvNotes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Thăm hỏi sức khỏe và tặng quà bánh dinh dưỡng"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            tools:text="Phường 9, Quận 3 · Phụ trách: Trần B (Hội Chữ thập đỏ)" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
