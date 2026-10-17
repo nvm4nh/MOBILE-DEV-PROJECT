@@ -17,4 +17,9 @@
         android:icon="@drawable/ic_close"
         android:title="@string/action_cancel_need"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_need_history"
+        android:icon="@drawable/ic_time"
+        android:title="@string/history_title"
+        app:showAsAction="never" />
 </menu>

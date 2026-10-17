@@ -1,30 +1,39 @@
 package com.seniortribe.app.models;
 
-import java.io.Serializable;
+import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.IgnoreExtraProperties;
+import com.google.firebase.firestore.ServerTimestamp;
 
-public class ChatMessage implements Serializable {
+import java.util.Date;
+
+/**
+ * Một tin nhắn trong needs_assignments/{assignmentId}/messages (F11).
+ *
+ * Chat gắn theo lần tiếp nhận, không theo nhu cầu: khi nhu cầu bị trả lại và tổ chức khác
+ * nhận, luồng mới bắt đầu trống và người phụ trách cũ không đọc được (R08).
+ */
+@IgnoreExtraProperties
+public class ChatMessage {
+
+    @DocumentId
     private String messageId;
-    private String needId;
     private String senderUid;
     private String senderName;
     private String text;
-    private long timestamp;
+    @ServerTimestamp
+    private Date at;
 
     public ChatMessage() {}
 
-    public ChatMessage(String needId, String senderUid, String senderName, String text) {
-        this.needId = needId;
-        this.senderUid = senderUid;
-        this.senderName = senderName;
-        this.text = text;
-        this.timestamp = System.currentTimeMillis();
+    /** Thời điểm gửi; tin vừa gửi chưa có timestamp của máy chủ thì coi như bây giờ. */
+    @Exclude
+    public long getTimestamp() {
+        return at != null ? at.getTime() : System.currentTimeMillis();
     }
 
     public String getMessageId() { return messageId; }
     public void setMessageId(String messageId) { this.messageId = messageId; }
-
-    public String getNeedId() { return needId; }
-    public void setNeedId(String needId) { this.needId = needId; }
 
     public String getSenderUid() { return senderUid; }
     public void setSenderUid(String senderUid) { this.senderUid = senderUid; }
@@ -35,6 +44,6 @@ public class ChatMessage implements Serializable {
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
 
-    public long getTimestamp() { return timestamp; }
-    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public Date getAt() { return at; }
+    public void setAt(Date at) { this.at = at; }
 }
