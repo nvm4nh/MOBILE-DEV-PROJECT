@@ -1,6 +1,8 @@
 package com.seniortribe.app.activities;
 
-import android.content.res.Configuration;
+import android.content.Intent;
+import com.google.firebase.auth.FirebaseAuth;
+import com.seniortribe.app.SeniorTribeApplication;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,11 +19,19 @@ import com.seniortribe.app.fragments.ScheduleFragment;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean redirecting;
+    private FirebaseAuth.AuthStateListener authListener;
     private int currentNavId = R.id.nav_feed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        boolean allowed = ((SeniorTribeApplication) getApplication()).hasActiveAccess();
+        // Do not restore business fragments before the account has passed the gate.
+        super.onCreate(allowed ? savedInstanceState : null);
+        if (!allowed) {
+            openSessionGate();
+            return;
+        }
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState != null) {
@@ -33,6 +43,32 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             loadFragment(getFragmentForId(currentNavId));
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!((SeniorTribeApplication) getApplication()).hasActiveAccess()) openSessionGate();
+        authListener = auth -> {
+            if (!((SeniorTribeApplication) getApplication()).hasActiveAccess()) openSessionGate();
+        };
+        FirebaseAuth.getInstance().addAuthStateListener(authListener);
+    }
+
+    @Override
+    protected void onStop() {
+        if (authListener != null) FirebaseAuth.getInstance().removeAuthStateListener(authListener);
+        authListener = null;
+        super.onStop();
+    }
+
+    private void openSessionGate() {
+        if (redirecting) return;
+        redirecting = true;
+        Intent intent = new Intent(this, SessionGateActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @Override
