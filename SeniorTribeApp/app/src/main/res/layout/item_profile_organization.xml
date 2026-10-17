@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_marginTop="16dp" app:cardCornerRadius="16dp"
+    app:cardBackgroundColor="@color/st_auth_surface" app:cardElevation="0dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:padding="16dp" android:orientation="vertical">
+        <TextView android:id="@+id/st_org_name" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="@color/st_auth_text" android:textSize="18sp" android:textStyle="bold" />
+        <TextView android:id="@+id/st_org_id" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="6dp" android:textColor="@color/st_auth_secondary" android:textSize="14sp" />
+        <TextView android:id="@+id/st_org_membership" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" android:textColor="@color/st_auth_text" android:textSize="16sp" />
+        <com.google.android.material.chip.Chip android:id="@+id/st_org_verification"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:checkable="false" android:clickable="false" />
+        <com.google.android.material.chip.ChipGroup android:id="@+id/st_org_roles"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            app:singleSelection="false" app:singleLine="false" />
+        <TextView android:id="@+id/st_org_details" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:textColor="@color/st_auth_secondary" android:textSize="16sp" />
+        <TextView android:id="@+id/st_org_warning" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" android:textColor="@color/st_auth_secondary" android:textSize="14sp" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

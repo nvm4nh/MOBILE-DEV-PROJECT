@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="st_profile_title">Hồ sơ của tôi</string>
+    <string name="st_profile_back">Về màn hình trước</string>
+    <string name="st_profile_personal">Thông tin cá nhân</string>
+    <string name="st_profile_name">Họ và tên</string>
+    <string name="st_profile_area">Khu vực sinh hoạt / công tác</string>
+    <string name="st_profile_area_hint">Không bắt buộc, tối đa 120 ký tự. Không nhập địa chỉ riêng của người cao tuổi.</string>
+    <string name="st_profile_email_label">Email tài khoản</string>
+    <string name="st_profile_phone">Liên hệ được cấp: %1$s</string>
+    <string name="st_profile_not_provided">Chưa cung cấp</string>
+    <string name="st_profile_save">Lưu hồ sơ</string>
+    <string name="st_profile_reload">Tải lại hồ sơ</string>
+    <string name="st_profile_saved">Đã lưu hồ sơ.</string>
+    <string name="st_profile_saved_auth_warning">Đã lưu hồ sơ. Chưa cập nhật được tên hiển thị khi đăng nhập; bạn có thể thử lưu lại.</string>
+    <string name="st_profile_name_error">Họ tên cần từ 2 đến 80 ký tự và viết trên một dòng.</string>
+    <string name="st_profile_area_error">Khu vực cần viết trên một dòng, tối đa 120 ký tự.</string>
+    <string name="st_profile_security">Bảo mật tài khoản</string>
+    <string name="st_profile_password_note">Đổi mật khẩu đăng nhập bằng email bằng cách xác nhận mật khẩu hiện tại.</string>
+    <string name="st_profile_google_password_note">Tài khoản này đăng nhập qua Google. Bạn quản lý mật khẩu trong Tài khoản Google của mình.</string>
+    <string name="st_profile_change_password">Đổi mật khẩu</string>
+    <string name="st_profile_current_password">Mật khẩu hiện tại</string>
+    <string name="st_profile_next_password">Mật khẩu mới</string>
+    <string name="st_profile_repeated_password">Nhập lại mật khẩu mới</string>
+    <string name="st_profile_current_password_error">Vui lòng nhập mật khẩu hiện tại.</string>
+    <string name="st_profile_new_password_error">Mật khẩu mới cần ít nhất 8 ký tự.</string>
+    <string name="st_profile_repeat_password_error">Mật khẩu nhập lại chưa khớp.</string>
+    <string name="st_profile_password_unchanged">Vui lòng chọn mật khẩu khác mật khẩu hiện tại.</string>
+    <string name="st_profile_password_incorrect">Mật khẩu hiện tại chưa đúng. Vui lòng nhập lại.</string>
+    <string name="st_profile_password_policy">Mật khẩu mới chưa đáp ứng yêu cầu bảo mật. Vui lòng chọn mật khẩu mạnh hơn.</string>
+    <string name="st_profile_password_recent">Chưa xác nhận được phiên đăng nhập. Vui lòng đăng xuất, đăng nhập lại rồi thử đổi mật khẩu.</string>
+    <string name="st_profile_password_dialog_note">Nhập đủ ba ô. Khoảng trắng vẫn được tính là một phần của mật khẩu.</string>
+    <string name="st_profile_password_changed">Đã đổi mật khẩu. Lần đăng nhập bằng email tiếp theo, hãy dùng mật khẩu mới.</string>
+    <string name="st_profile_cancel">Hủy</string>
+    <string name="st_profile_close">Đóng</string>
+    <string name="st_profile_organizations_title">Tổ chức và vai trò</string>
+    <string name="st_profile_organizations_note">Thông tin do người phụ trách cấp. Liên hệ đơn vị nếu cần cập nhật tổ chức hoặc quyền.</string>
+    <string name="st_profile_org_reload">Tải lại tổ chức và vai trò</string>
+    <string name="st_profile_no_organizations">Tài khoản chưa được cấp quyền tổ chức. Bạn vẫn có thể cập nhật hồ sơ cá nhân.</string>
+    <string name="st_profile_org_error">Chưa tải được tổ chức và vai trò. %1$s</string>
+    <string name="st_profile_org_id">Mã tổ chức: %1$s</string>
+    <string name="st_profile_org_area">Khu vực: %1$s</string>
+    <string name="st_profile_org_address">Địa chỉ tổ chức: %1$s</string>
+    <string name="st_profile_org_phone">Liên hệ tổ chức: %1$s</string>
+    <string name="st_profile_membership_active">Quyền đang hoạt động</string>
+    <string name="st_profile_membership_inactive">Quyền đã ngừng hoạt động</string>
+    <string name="st_profile_verified">Tổ chức đã xác minh</string>
+    <string name="st_profile_unverified">Tổ chức chưa xác minh</string>
+    <string name="st_profile_verification_unknown">Chưa có thông tin xác minh</string>
+    <string name="st_profile_role_recorder">Đầu mối ghi nhận</string>
+    <string name="st_profile_role_reviewer">Điều phối viên rà soát</string>
+    <string name="st_profile_role_representative">Đại diện tổ chức hỗ trợ</string>
+    <string name="st_profile_role_unknown">Vai trò chưa xác định</string>
+    <string name="st_profile_org_unavailable">Chưa tải được hồ sơ tổ chức. Hãy kiểm tra kết nối rồi tải lại; nếu vẫn lỗi, liên hệ người phụ trách.</string>
+    <string name="st_profile_org_missing">Chưa có hồ sơ của tổ chức này. Vui lòng liên hệ người phụ trách.</string>
+    <string name="st_profile_org_invalid">Hồ sơ tổ chức chưa hợp lệ. Vui lòng liên hệ người phụ trách.</string>
+    <style name="TextAppearance.SeniorTribe.ProfileHeading" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/st_auth_text</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">@font/be_vietnam_pro_semibold</item>
+    </style>
+    <style name="ThemeOverlay.SeniorTribe.ProfileDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorSurface">@color/st_auth_surface</item>
+        <item name="colorOnSurface">@color/st_auth_text</item>
+        <item name="colorPrimary">@color/st_auth_primary</item>
+        <item name="android:textColorPrimary">@color/st_auth_text</item>
+        <item name="android:textColorSecondary">@color/st_auth_secondary</item>
+    </style>
+</resources>

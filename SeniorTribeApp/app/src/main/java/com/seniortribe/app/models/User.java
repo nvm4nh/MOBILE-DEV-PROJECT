@@ -17,6 +17,7 @@ public class User implements Serializable {
     private String orgName;
     private String phone;
     private String district;
+    private String area;
     private long createdAt;
 
     public User() { }
@@ -40,6 +41,8 @@ public class User implements Serializable {
         user.orgName = text(document, "orgName");
         user.phone = text(document, "phone");
         user.district = text(document, "district");
+        // Personal area is independent of a legacy business district when both exist.
+        user.area = document.contains("area") ? text(document, "area") : user.district;
         if (user.district.isEmpty()) user.district = text(document, "area");
         Object created = document.get("createdAt");
         if (created instanceof Timestamp) user.createdAt = ((Timestamp) created).toDate().getTime();
@@ -76,5 +79,6 @@ public class User implements Serializable {
     public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
 
     @Exclude
-    public String getArea() { return district == null ? "" : district; }
+    public String getArea() { return area == null ? (district == null ? "" : district) : area; }
+    public void setArea(String area) { this.area = area; }
 }

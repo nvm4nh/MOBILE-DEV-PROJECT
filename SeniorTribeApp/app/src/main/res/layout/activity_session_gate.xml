@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+<ScrollView android:id="@+id/st_access_content"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:fillViewport="true" android:background="@color/st_auth_background">
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -42,6 +44,12 @@
         android:text="@string/st_access_refresh" android:textAllCaps="false"
         android:textSize="16sp" />
 <com.google.android.material.button.MaterialButton
+        android:id="@+id/st_access_profile" style="@style/Widget.SeniorTribe.AuthButton"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" android:minHeight="52dp"
+        android:text="@string/st_profile_title" android:textAllCaps="false"
+        android:textSize="16sp" />
+<com.google.android.material.button.MaterialButton
         android:id="@+id/st_access_sign_out" style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:layout_marginTop="12dp" android:minHeight="48dp"
@@ -49,3 +57,8 @@
         android:textSize="16sp" />
     </LinearLayout>
 </ScrollView>
+<androidx.fragment.app.FragmentContainerView
+    android:id="@+id/st_access_profile_container"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:visibility="gone" />
+</FrameLayout>
