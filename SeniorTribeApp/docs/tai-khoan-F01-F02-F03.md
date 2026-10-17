@@ -1,57 +1,67 @@
-# Tài khoản, phân quyền, hồ sơ — F01–F03
+# Tài khoản, phân quyền, hồ sơ · F01–F03
 
-## Phạm vi bản cập nhật
+## Chặng F03 · 17/10/2026
 
-Chặng này ghép đăng nhập Google vào bản email đã chạy trên `SeniorTribeApp`, dựa trên khung nhóm `edea3c3` và checkpoint đăng ký `b2b409d`. Đây chưa phải bản hoàn thành toàn bộ F01–F03.
+Tiếp nối bản email + Google đã được chạy trên máy thành viên phụ trách. Tài khoản Google đã được xác nhận bằng provider Google và UID khớp giữa ứng dụng và Firebase Authentication. Chưa coi toàn bộ bảng kiểm thử Google, F02 hoặc luồng nhóm đã đạt.
 
-| Thành phần | Vai trò |
+### Màn hình và trách nhiệm
+
+| File | Công việc |
 |---|---|
-| `activities.LoginActivity` | Form email, nút Google, bộ chọn tài khoản và xử lý hủy/đổi Activity |
-| `auth.LoginViewModel` | Trạng thái email/Google, chặn gửi trùng, bỏ callback đã hết hiệu lực |
-| `auth.AuthRepository` | Xác thực Firebase, hồ sơ và membership; không ghi role/org từ client |
-| `auth.GoogleCredentialSession` | Credential Manager dùng chung và dọn trạng thái provider lúc đăng xuất |
-| `SeniorTribeApplication` | Cung cấp repository/session; dọn quyền RAM khi đổi tài khoản và dọn provider khi đăng xuất từ module khác |
-| `activities.SessionGateActivity` | Nạp hồ sơ và kiểm tra membership trước khi mở nghiệp vụ |
-| `models.User` | API model chung, đọc được dữ liệu hồ sơ cũ và giữ các trường nhóm |
+| `fragments/ProfileFragment` + `layout/fragment_profile.xml` | Đọc và sửa hồ sơ thật, email/UID chỉ đọc, đăng xuất, phần tổ chức/vai trò |
+| `viewmodels/AccountProfileViewModel` | Bản nháp trong RAM, trạng thái tải/lưu/lỗi, tách lỗi tổ chức khỏi lỗi hồ sơ |
+| `dialogs/ChangePasswordDialog` + `viewmodels/ChangePasswordViewModel` | Xác thực lại trước khi đổi mật khẩu; giữ form khi xoay, xóa chuỗi nhạy cảm khi kết thúc |
+| `auth/AuthRepository` | Đọc từ server, transaction cập nhật ba trường hồ sơ, gọi Firebase Auth cho đổi mật khẩu |
+| `auth/ProfileInput`, `auth/ProfileErrors` | Kiểm tra đầu vào và thông báo lỗi |
+| `models/AccountOrganization` | Projection chỉ đọc cho nhiều tổ chức, nhiều vai trò và trạng thái xác minh |
+| `models/ProfileUpdateResult` | Phân biệt lưu Firestore thành công với lỗi đồng bộ tên hiển thị Firebase Auth |
+| `models/User` | Giữ API chung; đọc riêng `area` nếu có, tương thích dữ liệu chỉ có `district` |
+| `activities/SessionGateActivity` | Mở cùng ProfileFragment bằng back stack; quay lại màn chờ bằng Back |
 
-Tên lớp dùng tiếng Anh theo chức năng như mẫu các module khác. Bộ cập nhật giữ các lớp xử lý Auth trong package `auth` đang chạy từ chặng trước; không di chuyển package của module khác. Activity ở `activities`, model người dùng dùng `models.User`.
+Các lớp mới theo package nhóm (`viewmodels`, `dialogs`, `fragments`, `models`); lớp Auth đang có vẫn giữ trong `auth`. Không tạo project hoặc Activity hồ sơ thứ hai.
 
-## Dữ liệu và quyền
+### Hợp đồng dữ liệu đang dùng
 
-- Hồ sơ mới: `uid`, `displayName`, `email`, `area`, `createdAt`, `updatedAt`; các thời điểm dùng server timestamp.
-- Hồ sơ đã có chỉ được đọc trong `ensureProfile`, không serialize `User` rồi ghi đè các trường nghiệp vụ.
-- Reader đọc cả `district` và `area`, đồng thời tương thích `createdAt` dạng Timestamp hoặc milliseconds.
-- Membership: `memberships/{uid}/organizations/{organizationId}`, đọc từ server; yêu cầu `active=true` và danh sách role hợp lệ.
-- Mã role đang kiểm tra: `RECORDER`, `REVIEWER`, `REPRESENTATIVE`. `Reporter`, `Coordinator`, `Assignee` trong Constants của khung nhóm còn cần mapping chính thức.
-- Google Authentication chỉ xác minh tài khoản; quyền tổ chức phải được cấp qua dữ liệu quản trị đáng tin cậy và được Rules bảo vệ.
-- Bộ này không triển khai hoặc thay thế `firestore.rules` chung. Chưa chốt bước vào Main cùng nhóm, chưa kiểm thử vai trò đủ quyền trên các module nghiệp vụ.
+| Đường dẫn | Đọc | Ghi từ F03 |
+|---|---|---|
+| `users/{uid}` | Chỉ hồ sơ đúng UID đang đăng nhập | `displayName`, `area`, `updatedAt` bằng server timestamp |
+| `memberships/{uid}/organizations/{orgId}` | `orgName`, `active`, `roles` của chính tài khoản | Không |
+| `organizations/{orgId}` | `name`, `area`, `verified`; `address`, `phone` nếu quản trị có cấp | Không |
+| Firebase Auth của tài khoản hiện tại | Provider mật khẩu / Google | Tên hiển thị sau khi lưu hồ sơ; mật khẩu sau khi reauthenticate thành công |
 
-## Cấu hình và phiên
+Không serialize toàn bộ `User` để lưu. Không thay đổi `uid`, `email`, `createdAt`, `district`, `role`, `orgId`, `orgName`, `phone`. `area` là trường hồ sơ đã có ở chặng trước; không thêm trường dữ liệu Firestore mới. Nếu hồ sơ cũ có đồng thời `area` và `district`, F03 sửa `area`, giữ `district` cho dữ liệu nghiệp vụ cũ.
 
-- Google Services plugin đọc Web client từ file `app/google-services.json` mới của từng project Firebase; không hard-code client ID vào Java.
-- Thêm Credentials/Play Services Auth 1.3.0 và Google ID 1.1.1; các cấu hình nền của nhóm giữ nguyên.
-- Credential picker dùng context của Activity, có cancellation và bỏ callback cũ khi Activity bị hủy.
-- Token không lưu vào field của ViewModel, Bundle hay DB. Mật khẩu không cắt khoảng trắng, không lưu vào instance state.
-- Đăng xuất Firebase không phụ thuộc vào thành công của cleanup provider; lần Google tiếp theo là thao tác chọn tài khoản rõ ràng của người dùng.
-- Cổng quyền trên app không thay thế Rules; quyền dữ liệu nghiệp vụ vẫn cần kiểm tra phía Firebase.
+Transaction yêu cầu kết nối máy chủ, không để lại một lệnh sửa hồ sơ offline rồi tự báo thành công. Nếu Firestore đã commit nhưng đồng bộ tên trong Firebase Auth lỗi, UI nói hồ sơ đã lưu và hướng dẫn lưu lại để thử đồng bộ, không báo sai là Firestore thất bại.
 
-## Kiểm tra bản cập nhật
+Mật khẩu không trim; tối thiểu 8 ký tự, xác nhận khớp, khác mật khẩu hiện tại. Chỉ provider `password` được vào form này. Người dùng chỉ dùng Google quản lý mật khẩu trên Google, không tự được gắn provider mới bởi F03.
 
-Đã kiểm tra ngày 17/10/2026 trên cây nguồn khung nhóm `edea3c3` ghép bộ email và các file Google trong bản bàn giao này.
+### Phân quyền và xác minh
 
-| Kiểm tra | Kết quả |
-|---|---|
-| Gradle `:app:assembleDebug` | Đạt; APK hợp lệ, package `com.seniortribe.app`, minSdk 24 và targetSdk 34 |
-| Gradle `:app:testDebugUnitTest` | 20 test, 0 failures, 0 errors, 0 skipped |
-| Java/API Android của màn Login Google | Biên dịch được cùng toàn bộ app; có các phương thức xử lý Google trong class đã build |
-| Java/XML/package/tham chiếu resource/trạng thái form | Đạt kiểm tra tĩnh |
-| Đối chiếu nguồn bàn giao với cây đã build | Các file app trong bộ bàn giao trùng nội dung cây build |
-| Chọn tài khoản và xác thực Google thực tế | Chưa chạy; cần cấu hình mới và thiết bị của anh |
+- Chỉ ba mã chuẩn: `RECORDER`, `REVIEWER`, `REPRESENTATIVE`. Không tự quy đổi role cũ hoặc hiển thị role lạ như quyền hợp lệ.
+- Hiển thị mọi tổ chức của tài khoản, sắp theo mã tổ chức. Membership ngừng hoạt động vẫn được mô tả rõ là không hoạt động.
+- Dấu xác minh chỉ đọc từ `organizations/{orgId}.verified` là Boolean. `"true"`, dữ liệu thiếu hoặc không đọc được không được coi là đã xác minh.
+- Dấu xác minh không tự cấp quyền, không kích hoạt membership đã tắt. Không có upload hồ sơ xác minh hay tự duyệt tổ chức.
+- Dữ liệu tổ chức thiếu/lỗi không làm mất form hồ sơ cá nhân.
+- Giao diện không thay thế Firestore Rules. Server vẫn phải chặn ghi chéo UID và mọi ghi membership/organization từ app.
 
-Unit test hiện có kiểm tra đầu vào và điều kiện membership; không phải kiểm thử giao diện hoặc máy chủ Google. Bản build tại môi trường chuẩn bị dùng cấu hình Firebase của checkpoint `b2b409d` để biên dịch; file OAuth mới trên máy anh chưa được đọc/kiểm chứng ở đây. Bộ bàn giao không kèm cấu hình Firebase hay APK/debug keystore của môi trường kiểm tra.
+### Ghép với main mới
 
-Google UI và xác thực thực tế cần kiểm thử bằng cấu hình mới trên máy anh theo bảng GG01–GG10 trong `HUONG_DAN.md`.
+Đã đối chiếu `main` commit `8e8c78c`: schema membership và `organizations` của nhóm phù hợp. `firebase/firestore.rules` trên nhánh này đã có phần owner-only `users`, đọc membership của chính mình và đọc hồ sơ tổ chức khi đăng nhập.
 
-## Chặng kế tiếp
+Bộ thay đổi F03 không chứa Manifest, Gradle, JSON cấu hình, Rules hoặc file nhu cầu/chat/lịch. Giữ cấu hình Google mới trên máy, không chép lại JSON cũ từ main. Không thay Rules chung bằng file Rules của project thử nghiệm cũ.
 
-F03, schema/Rules chung, dữ liệu tổ chức/vai trò, kiểm thử luồng tích hợp, dọn project cũ và cập nhật Git/PR bằng thao tác của anh.
+Giới hạn tích hợp còn phải kiểm thử:
+
+- Shared `MembershipRepository` của module nhu cầu hiện chọn tổ chức đầu tiên theo orgId. F03 chỉ hiển thị đầy đủ, chưa thêm luồng chuyển tổ chức làm việc.
+- Các module dùng tên trong dữ liệu đã tạo hoặc cache riêng sẽ không tự đổi tên hồi tố sau khi sửa hồ sơ. Khi ghép nhóm cần kiểm tra tải lại dữ liệu tên và quyền của phiên.
+- Rules `validProfile().hasOnly(...)` của main vẫn chỉ nhận hồ sơ sáu trường. Hồ sơ legacy có thêm trường/dạng thời gian cũ có thể đọc được nhưng bị từ chối sửa. Không tự migrate hoặc nới Rules khi chưa thống nhất với người phụ trách CSDL/Rules.
+- Chưa kiểm thử thực tế tài khoản được cấp role, nhiều tổ chức hoặc luồng nhu cầu → chat → lịch trên máy người dùng.
+- Việc dọn project đăng ký thử nghiệm cũ, ghi nhận commit và xử lý PR do người phụ trách thao tác riêng trên `feat/auth-profile`.
+
+### Nguồn API
+
+- [Firebase Authentication · Manage Users](https://firebase.google.com/docs/auth/android/manage-users): `reauthenticate`, `updatePassword`, đọc provider và cập nhật tên.
+- [Cloud Firestore · Add data](https://firebase.google.com/docs/firestore/manage-data/add-data): cập nhật trường cụ thể và server timestamp.
+- [Cloud Firestore · Transactions](https://firebase.google.com/docs/firestore/manage-data/transactions): đọc/ghi transaction yêu cầu kết nối, không tự xếp hàng như một lần ghi offline thông thường.
+
+Kết quả build, các phép thử thực tế và các mục còn chờ nằm trong [F03_KIEM_THU.md](auth/F03_KIEM_THU.md). Kết quả unit test không thay thế kiểm thử UI, Firebase Rules và tích hợp nhóm.

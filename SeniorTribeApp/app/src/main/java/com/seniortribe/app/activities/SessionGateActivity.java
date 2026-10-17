@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.seniortribe.app.R;
 import com.seniortribe.app.auth.SessionGateViewModel;
+import com.seniortribe.app.fragments.ProfileFragment;
 
 public class SessionGateActivity extends AppCompatActivity {
     private SessionGateViewModel model;
@@ -26,6 +27,18 @@ public class SessionGateActivity extends AppCompatActivity {
         findViewById(R.id.st_access_retry).setOnClickListener(v -> model.refresh());
         findViewById(R.id.st_access_sign_out).setOnClickListener(v -> model.signOut());
         findViewById(R.id.st_access_copy_uid).setOnClickListener(v -> copyUid());
+        findViewById(R.id.st_access_profile).setOnClickListener(v -> {
+            if (getSupportFragmentManager().findFragmentByTag("account_profile") != null) return;
+            getSupportFragmentManager().beginTransaction()
+                    .setReorderingAllowed(true)
+                    .replace(R.id.st_access_profile_container, new ProfileFragment(), "account_profile")
+                    .addToBackStack("account_profile").commit();
+        });
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            updateProfileVisibility();
+            if (getSupportFragmentManager().getBackStackEntryCount() == 0) model.refresh();
+        });
+        updateProfileVisibility();
         model.state().observe(this, this::render);
     }
 
@@ -35,7 +48,7 @@ public class SessionGateActivity extends AppCompatActivity {
             return;
         }
         if (state.stage == SessionGateViewModel.Stage.GRANTED) {
-            route(MainActivity.class);
+            if (getSupportFragmentManager().getBackStackEntryCount() == 0) route(MainActivity.class);
             return;
         }
         uid = state.uid;
@@ -51,6 +64,13 @@ public class SessionGateActivity extends AppCompatActivity {
         findViewById(R.id.st_access_progress).setVisibility(loading ? View.VISIBLE : View.GONE);
         findViewById(R.id.st_access_retry).setEnabled(!loading);
         findViewById(R.id.st_access_copy_uid).setEnabled(!uid.isEmpty());
+        findViewById(R.id.st_access_profile).setEnabled(!loading && !uid.isEmpty());
+    }
+
+    private void updateProfileVisibility() {
+        boolean showing = getSupportFragmentManager().getBackStackEntryCount() > 0;
+        findViewById(R.id.st_access_content).setVisibility(showing ? View.GONE : View.VISIBLE);
+        findViewById(R.id.st_access_profile_container).setVisibility(showing ? View.VISIBLE : View.GONE);
     }
 
     private void route(Class<?> destination) {

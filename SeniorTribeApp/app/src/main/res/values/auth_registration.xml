@@ -24,7 +24,8 @@
         <item name="android:navigationBarColor">@color/st_auth_background</item>
     </style>
 
-    <style name="Widget.SeniorTribe.AuthInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    <style name="Widget.SeniorTribe.AuthInput"
+        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxBackgroundColor">@color/st_auth_surface</item>
         <item name="boxCornerRadiusTopStart">12dp</item>
         <item name="boxCornerRadiusTopEnd">12dp</item>
@@ -34,7 +35,8 @@
         <item name="errorTextColor">@color/st_auth_error</item>
     </style>
 
-    <style name="Widget.SeniorTribe.AuthButton" parent="Widget.MaterialComponents.Button">
+    <style name="Widget.SeniorTribe.AuthButton"
+        parent="Widget.MaterialComponents.Button">
         <item name="android:minHeight">52dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
@@ -53,7 +55,7 @@
     <string name="st_register_password_hint">Ít nhất 8 ký tự</string>
     <string name="st_register_note">Tài khoản mới chưa có quyền tổ chức. Liên hệ người phụ trách đơn vị để được cấp quyền.</string>
     <string name="st_register_action">Tạo tài khoản</string>
-    <string name="st_register_back">← Về Đăng nhập</string>
+    <string name="st_register_back">← Quay lại</string>
     <string name="st_auth_loading">Đang xử lý</string>
     <string name="st_register_creating">Đang tạo tài khoản…</string>
     <string name="st_register_saving">Đang lưu hồ sơ…</string>
@@ -66,7 +68,7 @@
     <string name="st_register_copy_uid">Sao chép mã tài khoản</string>
     <string name="st_register_uid_copied">Đã sao chép mã tài khoản</string>
     <string name="st_register_retry">Thử lại lưu hồ sơ</string>
-    <string name="st_register_sign_out">Đăng xuất về Đăng nhập</string>
+    <string name="st_register_sign_out">Đăng xuất</string>
     <string name="st_auth_wait">Vui lòng chờ thao tác đang xử lý hoàn tất.</string>
     <string name="st_auth_error_name">Họ tên cần từ 2 đến 80 ký tự.</string>
     <string name="st_auth_error_email">Vui lòng nhập email hợp lệ.</string>
