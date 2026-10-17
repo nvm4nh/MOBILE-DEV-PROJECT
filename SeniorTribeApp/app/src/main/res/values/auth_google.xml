@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="st_google_action">Đăng nhập bằng Google</string>
+    <string name="st_google_separator">hoặc</string>
+    <string name="st_google_error_generic">Chưa đăng nhập được bằng Google. Hãy thử lại hoặc đăng nhập bằng email.</string>
+    <string name="st_google_error_no_account">Chưa lấy được tài khoản Google. Hãy thêm tài khoản Google vào thiết bị rồi thử lại.</string>
+    <string name="st_google_error_unavailable">Thiết bị chưa hỗ trợ đăng nhập Google. Hãy cập nhật Dịch vụ Google Play hoặc đăng nhập bằng email.</string>
+    <string name="st_google_error_existing_account">Email này đã có tài khoản với phương thức đăng nhập khác. Hãy đăng nhập bằng phương thức đã dùng trước đó.</string>
+    <string name="st_google_error_config">Đăng nhập Google chưa sẵn sàng trên bản ứng dụng này. Anh/chị có thể đăng nhập bằng email.</string>
+</resources>
