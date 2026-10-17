@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="F04"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.F04">
+
+        <!-- F16: Màn hình Nhu cầu -->
+        <activity
+            android:name=".NeedsActivity"
+            android:exported="false" />
+
+        <!-- F05: Màn hình chi tiết bài viết -->
+        <activity
+            android:name=".DetailActivity"
+            android:exported="false" />
+
+        <!-- F05: Màn hình tạo bài viết -->
+        <activity
+            android:name=".CreatePostActivity"
+            android:exported="false" />
+
+        <!-- F04: Màn hình chính -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+    </application>
+
+</manifest>
