@@ -62,7 +62,7 @@
     <string name="status_review_label">Chờ rà soát</string>
     <string name="status_open_label">Chờ tiếp nhận</string>
     <string name="status_accepted_label">Đã tiếp nhận</string>
-    <string name="status_scheduled_label">Đã chốt lịch</string>
+    <string name="status_scheduled_label">Đã hẹn lịch</string>
     <string name="status_delivered_label">Chờ đối soát</string>
     <string name="status_completed_label">Hoàn thành</string>
     <string name="status_cancelled_label">Đã hủy</string>

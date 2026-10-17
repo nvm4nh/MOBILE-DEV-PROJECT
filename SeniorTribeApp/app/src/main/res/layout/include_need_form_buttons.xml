@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F06 · Nút cuối form: Gửi rà soát và Lưu nháp. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="24dp"
+    android:orientation="vertical">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSubmitNeed"
+        style="@style/Needs.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/form_submit" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSaveDraft"
+        style="@style/Needs.Button.Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/form_save_draft" />
+
+    <TextView
+        android:id="@+id/tvDraftHint"
+        style="@style/Needs.Text.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/form_draft_hint"
+        android:textSize="12sp" />
+</LinearLayout>

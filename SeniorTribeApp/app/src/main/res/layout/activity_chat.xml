@@ -1,58 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- F11–F13 · Chat phối hợp theo lần tiếp nhận, kèm thẻ lịch hẹn / đối soát (bố cục dọc). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootChat"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:orientation="vertical">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/chatToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/surface"
+        app:title="@string/chat_title"
+        app:navigationIcon="@drawable/ic_arrow_back" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressBusy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/surface">
+        android:indeterminate="true"
+        android:visibility="gone" />
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/chatToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="@string/chat_title"
-            app:titleTextColor="@color/text_primary" />
-    </com.google.android.material.appbar.AppBarLayout>
+    <include layout="@layout/include_coordination_card" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvMessages"
+    <include
+        layout="@layout/include_chat_thread"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="12dp"
-        android:clipToPadding="false" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/surface"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="8dp">
-
-        <EditText
-            android:id="@+id/etMessage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/bg_badge"
-            android:hint="@string/send_message_hint"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="10dp"
-            android:textSize="14sp" />
-
-        <ImageView
-            android:id="@+id/btnSend"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:layout_marginStart="8dp"
-            android:padding="8dp"
-            android:src="@drawable/ic_send"
-            app:tint="@color/primary" />
-    </LinearLayout>
+        android:layout_weight="1" />
 </LinearLayout>

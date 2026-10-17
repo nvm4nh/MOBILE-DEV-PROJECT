@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand Primary (Teal - Nhân ái, Y tế, Bình yên) -->
-    <color name="primary">#00897B</color>
-    <color name="primary_dark">#004D40</color>
-    <color name="primary_light">#E0F2F1</color>
+    <!-- Brand Primary: theo bộ màu Figma (Bảng 3.1) -->
+    <color name="primary">#1F6F5C</color>
+    <color name="primary_dark">#17574A</color>
+    <color name="primary_light">#CDEDE0</color>
     <color name="on_primary">#FFFFFF</color>
 
     <!-- Brand Secondary (Warm Orange - Ấm áp, Thân thiện với người già) -->
@@ -12,23 +12,40 @@
     <color name="secondary_light">#FFF3E0</color>
     <color name="on_secondary">#FFFFFF</color>
 
-    <!-- Neutrals & Surfaces -->
-    <color name="background">#F8FAF9</color>
+    <!-- Neutrals & Surfaces (Figma) -->
+    <color name="background">#F1F6F3</color>
     <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#F0F4F3</color>
-    <color name="divider">#E0E5E4</color>
-    <color name="text_primary">#1C2A28</color>
-    <color name="text_secondary">#607270</color>
-    <color name="text_hint">#9EAFA9</color>
+    <color name="surface_variant">#E8EFEB</color>
+    <color name="divider">#D5DED9</color>
+    <color name="text_primary">#18201C</color>
+    <color name="text_secondary">#52615A</color>
+    <color name="text_hint">#7A8A83</color>
+    <color name="error">#B3261E</color>
+    <color name="error_container">#F9DEDC</color>
 
-    <!-- Status Workflow (6 bước quy trình SeniorTribe) -->
-    <color name="status_review">#FFA000</color>      <!-- REVIEW: Chờ rà soát -->
-    <color name="status_open">#1E88E5</color>        <!-- OPEN: Chờ tiếp nhận -->
-    <color name="status_accepted">#7E57C2</color>    <!-- ACCEPTED: Đã tiếp nhận -->
-    <color name="status_scheduled">#00ACC1</color>   <!-- SCHEDULED: Đã hẹn lịch -->
-    <color name="status_delivered">#43A047</color>   <!-- DELIVERED: Đã hỗ trợ -->
-    <color name="status_completed">#2E7D32</color>   <!-- COMPLETED: Hoàn thành -->
-    <color name="status_cancelled">#757575</color>   <!-- CANCELLED: Đã hủy -->
+    <!-- Nhãn trạng thái nhu cầu: màu chữ (Bảng 3.2) -->
+    <color name="status_review">#7A4F00</color>      <!-- REVIEW: Chờ rà soát (hổ phách) -->
+    <color name="status_open">#1F6F5C</color>        <!-- OPEN: Chờ tiếp nhận (xanh lục) -->
+    <color name="status_accepted">#1D4F91</color>    <!-- ACCEPTED: Đã tiếp nhận (xanh dương) -->
+    <color name="status_scheduled">#5B3E99</color>   <!-- SCHEDULED: Đã hẹn lịch (tím) -->
+    <color name="status_delivered">#7A4F00</color>   <!-- DELIVERED: Chờ đối soát (hổ phách) -->
+    <color name="status_completed">#256B29</color>   <!-- COMPLETED: Hoàn thành (xanh lá) -->
+    <color name="status_cancelled">#4F5551</color>   <!-- CANCELLED: Đã hủy (xám) -->
+
+    <!-- Nhãn trạng thái nhu cầu: màu nền -->
+    <color name="status_review_bg">#FCEFD3</color>
+    <color name="status_open_bg">#DDF1E8</color>
+    <color name="status_accepted_bg">#DCE8F8</color>
+    <color name="status_scheduled_bg">#ECE4F7</color>
+    <color name="status_delivered_bg">#FCEFD3</color>
+    <color name="status_completed_bg">#E0F0DD</color>
+    <color name="status_cancelled_bg">#E7EAE8</color>
+
+    <!-- Hộp ghi chú cảnh báo / thông tin -->
+    <color name="warning_bg">#FCEFD3</color>
+    <color name="warning_text">#7A4F00</color>
+    <color name="info_bg">#E3F0EA</color>
+    <color name="placeholder_bar">#DDE4E0</color>
 
     <!-- Urgency levels -->
     <color name="urgency_low">#4CAF50</color>

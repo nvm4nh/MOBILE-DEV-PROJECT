@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tùy chọn trên màn hình chat phối hợp. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_open_need"
+        android:icon="@drawable/ic_info"
+        android:title="@string/chat_action_open_need"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_history"
+        android:icon="@drawable/ic_time"
+        android:title="@string/history_title"
+        app:showAsAction="never" />
+</menu>

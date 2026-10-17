@@ -1,6 +1,7 @@
 package com.seniortribe.app.adapters;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +15,15 @@ import com.seniortribe.app.R;
 import com.seniortribe.app.models.NeedSummary;
 import com.seniortribe.app.utils.Constants;
 import com.seniortribe.app.utils.DateTimeUtils;
+import com.seniortribe.app.utils.NeedStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Thẻ nhu cầu cho danh sách (F08, F09). Chỉ hiển thị phần tóm tắt:
+ * mã trường hợp, trạng thái, tiêu đề, khu vực mức phường và thời gian mong muốn.
+ */
 public class NeedAdapter extends RecyclerView.Adapter<NeedAdapter.NeedViewHolder> {
 
     public interface OnNeedClickListener {
@@ -25,8 +31,8 @@ public class NeedAdapter extends RecyclerView.Adapter<NeedAdapter.NeedViewHolder
     }
 
     private final Context context;
-    private List<NeedSummary> needList = new ArrayList<>();
     private final OnNeedClickListener listener;
+    private List<NeedSummary> needList = new ArrayList<>();
 
     public NeedAdapter(Context context, OnNeedClickListener listener) {
         this.context = context;
@@ -34,7 +40,7 @@ public class NeedAdapter extends RecyclerView.Adapter<NeedAdapter.NeedViewHolder
     }
 
     public void setNeeds(List<NeedSummary> needs) {
-        this.needList = needs != null ? needs : new ArrayList<>();
+        this.needList = needs != null ? new ArrayList<>(needs) : new ArrayList<>();
         notifyDataSetChanged();
     }
 
@@ -48,72 +54,56 @@ public class NeedAdapter extends RecyclerView.Adapter<NeedAdapter.NeedViewHolder
     @Override
     public void onBindViewHolder(@NonNull NeedViewHolder holder, int position) {
         NeedSummary need = needList.get(position);
-        holder.tvCaseCode.setText(need.getCaseCode() != null ? need.getCaseCode() : "#ST-NEED");
+
+        holder.tvCaseCode.setText(need.getCaseCode() != null ? need.getCaseCode() : "");
         holder.tvTitle.setText(need.getTitle());
-        holder.tvCategory.setText(need.getCategory() != null ? need.getCategory() : "Hỗ trợ");
-        holder.tvDistrict.setText(need.getDistrict() != null ? need.getDistrict() : "TP.HCM");
-        holder.tvTime.setText(DateTimeUtils.formatRelativeTime(need.getCreatedAt()));
+        NeedStatus.bindChip(holder.tvStatus, need.getStatus());
 
-        // Trạng thái theo workflow chuẩn
-        bindStatus(holder.tvStatus, need.getStatus());
+        holder.tvArea.setText(TextUtils.isEmpty(need.getArea()) ? context.getString(R.string.need_area_unknown) : need.getArea());
 
-        // Mức độ cần thiết
-        bindUrgency(holder.tvUrgency, need.getUrgency());
+        if (!TextUtils.isEmpty(need.getDesiredTime())) {
+            holder.tvTime.setText(need.getDesiredTime());
+        } else if (need.getCreatedAtMillis() > 0) {
+            holder.tvTime.setText(DateTimeUtils.formatRelativeTime(need.getCreatedAtMillis()));
+        } else {
+            holder.tvTime.setText(R.string.need_time_unknown);
+        }
+
+        bindExtra(holder.tvExtra, need);
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onNeedClick(need);
         });
     }
 
-    private void bindStatus(TextView tv, String status) {
-        if (status == null) status = Constants.STATUS_OPEN;
-        int colorRes;
-        String text;
-        switch (status) {
-            case Constants.STATUS_REVIEW:
-                colorRes = R.color.status_review;
-                text = "Chờ rà soát";
-                break;
-            case Constants.STATUS_ACCEPTED:
-                colorRes = R.color.status_accepted;
-                text = "Đã tiếp nhận";
-                break;
-            case Constants.STATUS_SCHEDULED:
-                colorRes = R.color.status_scheduled;
-                text = "Đã hẹn lịch";
-                break;
-            case Constants.STATUS_DELIVERED:
-                colorRes = R.color.status_delivered;
-                text = "Chờ đối soát";
-                break;
-            case Constants.STATUS_COMPLETED:
-                colorRes = R.color.status_completed;
-                text = "Hoàn thành";
-                break;
-            case Constants.STATUS_CANCELLED:
-                colorRes = R.color.status_cancelled;
-                text = "Đã hủy";
-                break;
-            case Constants.STATUS_OPEN:
-            default:
-                colorRes = R.color.status_open;
-                text = "Chờ tiếp nhận";
-                break;
+    /** Dòng phụ: cần bổ sung, đơn vị đang phụ trách hoặc lý do hủy. */
+    private void bindExtra(TextView tv, NeedSummary need) {
+        String status = need.getStatus();
+        String text = null;
+        int color = R.color.text_secondary;
+
+        if (Constants.STATUS_REVIEW.equals(status) && need.isNeedsRevision()) {
+            text = context.getString(R.string.need_card_needs_revision);
+            color = R.color.warning_text;
+        } else if (!TextUtils.isEmpty(need.getAssignedOrgName())
+                && (Constants.STATUS_ACCEPTED.equals(status) || Constants.STATUS_SCHEDULED.equals(status)
+                || Constants.STATUS_DELIVERED.equals(status) || Constants.STATUS_COMPLETED.equals(status))) {
+            text = context.getString(R.string.need_card_assignee, safe(need.getAssigneeName()), need.getAssignedOrgName());
+        } else if (Constants.STATUS_CANCELLED.equals(status) && !TextUtils.isEmpty(need.getCancelReason())) {
+            text = context.getString(R.string.need_card_cancel_reason, need.getCancelReason());
         }
-        tv.setText(text);
-        tv.setTextColor(ContextCompat.getColor(context, colorRes));
+
+        if (text == null) {
+            tv.setVisibility(View.GONE);
+        } else {
+            tv.setVisibility(View.VISIBLE);
+            tv.setText(text);
+            tv.setTextColor(ContextCompat.getColor(context, color));
+        }
     }
 
-    private void bindUrgency(TextView tv, String urgency) {
-        if (urgency == null) urgency = Constants.URGENCY_LOW;
-        int colorRes = R.color.urgency_low;
-        if (Constants.URGENCY_HIGH.equalsIgnoreCase(urgency)) {
-            colorRes = R.color.urgency_high;
-        } else if (Constants.URGENCY_MEDIUM.equalsIgnoreCase(urgency)) {
-            colorRes = R.color.urgency_medium;
-        }
-        tv.setText(urgency);
-        tv.setTextColor(ContextCompat.getColor(context, colorRes));
+    private static String safe(String s) {
+        return s != null ? s : "";
     }
 
     @Override
@@ -122,17 +112,16 @@ public class NeedAdapter extends RecyclerView.Adapter<NeedAdapter.NeedViewHolder
     }
 
     static class NeedViewHolder extends RecyclerView.ViewHolder {
-        TextView tvCaseCode, tvStatus, tvTitle, tvCategory, tvDistrict, tvUrgency, tvTime;
+        final TextView tvCaseCode, tvStatus, tvTitle, tvArea, tvTime, tvExtra;
 
-        public NeedViewHolder(@NonNull View itemView) {
+        NeedViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCaseCode = itemView.findViewById(R.id.tvCaseCode);
             tvStatus = itemView.findViewById(R.id.tvStatus);
             tvTitle = itemView.findViewById(R.id.tvTitle);
-            tvCategory = itemView.findViewById(R.id.tvCategory);
-            tvDistrict = itemView.findViewById(R.id.tvDistrict);
-            tvUrgency = itemView.findViewById(R.id.tvUrgency);
+            tvArea = itemView.findViewById(R.id.tvArea);
             tvTime = itemView.findViewById(R.id.tvTime);
+            tvExtra = itemView.findViewById(R.id.tvExtra);
         }
     }
 }

@@ -1,32 +1,33 @@
 package com.seniortribe.app.models;
 
-import java.io.Serializable;
+import com.google.firebase.firestore.IgnoreExtraProperties;
 
-public class NeedPrivateDetails implements Serializable {
-    private String needId;
+/**
+ * Thông tin riêng của người được hỗ trợ (collection "needs_private", cùng id với bản tóm tắt).
+ *
+ * Chỉ thành viên đơn vị ghi nhận, và đại diện được giao sau khi đã chốt lịch, mới đọc được
+ * (kiểm tra bằng Security Rules trên máy chủ). Lớp này không implements Serializable
+ * và không được lưu xuống thiết bị (không đưa vào bản nháp hay SQLite).
+ */
+@IgnoreExtraProperties
+public class NeedPrivateDetails {
+
     private String elderlyName;
-    private String exactAddress;
-    private String phoneContact;
-    private String healthNotes;
-    private String consentEvidenceUrl;
+    private String contact;
+    private String address;
+    private String recorderOrgId;
 
     public NeedPrivateDetails() {}
-
-    public String getNeedId() { return needId; }
-    public void setNeedId(String needId) { this.needId = needId; }
 
     public String getElderlyName() { return elderlyName; }
     public void setElderlyName(String elderlyName) { this.elderlyName = elderlyName; }
 
-    public String getExactAddress() { return exactAddress; }
-    public void setExactAddress(String exactAddress) { this.exactAddress = exactAddress; }
+    public String getContact() { return contact; }
+    public void setContact(String contact) { this.contact = contact; }
 
-    public String getPhoneContact() { return phoneContact; }
-    public void setPhoneContact(String phoneContact) { this.phoneContact = phoneContact; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
-    public String getHealthNotes() { return healthNotes; }
-    public void setHealthNotes(String healthNotes) { this.healthNotes = healthNotes; }
-
-    public String getConsentEvidenceUrl() { return consentEvidenceUrl; }
-    public void setConsentEvidenceUrl(String consentEvidenceUrl) { this.consentEvidenceUrl = consentEvidenceUrl; }
+    public String getRecorderOrgId() { return recorderOrgId; }
+    public void setRecorderOrgId(String recorderOrgId) { this.recorderOrgId = recorderOrgId; }
 }

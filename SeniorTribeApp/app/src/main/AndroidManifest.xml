@@ -58,10 +58,15 @@
             android:name=".activities.CreateNeedActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <!-- Không khai báo configChanges: khi xoay, Activity tạo lại để dùng layout-land;
+             dữ liệu được giữ bởi ViewModel và trạng thái của các ô nhập. -->
         <activity
             android:name=".activities.NeedDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ReviewNeedActivity"
             android:exported="false"
-            android:configChanges="orientation|screenSize" />
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- Community Feed Activities -->
         <activity
@@ -71,11 +76,14 @@
             android:name=".activities.PostDetailActivity"
             android:exported="false" />
 
-        <!-- Chat Activity -->
+        <!-- Chat, lịch hẹn, đối soát (F11–F13) và lịch sử hỗ trợ (F15) -->
         <activity
             android:name=".activities.ChatActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.NeedHistoryActivity"
+            android:exported="false" />
 
     </application>
 
