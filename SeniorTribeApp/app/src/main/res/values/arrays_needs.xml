@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Chủ đề nhu cầu (F06). Đổi danh sách ở đây là đủ, không cần sửa code. -->
+    <string-array name="need_topics">
+        <item>Trò chuyện, thăm hỏi</item>
+        <item>Hỗ trợ sinh hoạt</item>
+        <item>Đi khám, mua thuốc</item>
+        <item>Nhu yếu phẩm</item>
+        <item>Hướng dẫn dùng điện thoại</item>
+        <item>Sửa chữa nhỏ trong nhà</item>
+        <item>Khác</item>
+    </string-array>
+
+    <!-- Bộ lọc thời gian ghi nhận (F09) -->
+    <string-array name="need_time_filter_labels">
+        <item>Mọi thời gian</item>
+        <item>24 giờ qua</item>
+        <item>7 ngày qua</item>
+        <item>30 ngày qua</item>
+    </string-array>
+
+    <integer-array name="need_time_filter_days">
+        <item>0</item>
+        <item>1</item>
+        <item>7</item>
+        <item>30</item>
+    </integer-array>
+</resources>

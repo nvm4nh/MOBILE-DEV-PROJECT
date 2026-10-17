@@ -1,0 +1,13 @@
+{
+  "organizations": [
+    { "id": "dtn-p7", "name": "Đoàn Thanh niên Phường 7", "area": "Phường 7, Quận 3" },
+    { "id": "ctd-q3", "name": "Hội Chữ thập đỏ Quận 3", "area": "Quận 3" }
+  ],
+  "members": [
+    { "email": "dau.moi@example.com",   "orgId": "dtn-p7", "roles": ["RECORDER", "REPRESENTATIVE"] },
+    { "email": "dieu.phoi@example.com", "orgId": "dtn-p7", "roles": ["REVIEWER"] },
+    { "email": "dai.dien1@example.com", "orgId": "ctd-q3", "roles": ["REPRESENTATIVE"] },
+    { "email": "dai.dien2@example.com", "orgId": "ctd-q3", "roles": ["REPRESENTATIVE"] }
+  ],
+  "createSampleNeeds": true
+}

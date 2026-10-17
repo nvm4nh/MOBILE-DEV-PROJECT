@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kiểu hiển thị dùng cho nhóm màn hình Nhu cầu (F06–F10, F14), theo Figma. -->
+<resources>
+
+    <!-- Kiểu gốc (rỗng) để các kiểu "Needs.Xxx" kế thừa theo tên -->
+    <style name="Needs" />
+    <style name="Needs.Text" />
+
+    <!-- Chữ -->
+    <style name="Needs.Text.ScreenTitle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <style name="Needs.Text.SectionTitle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:drawableTint">@color/text_secondary</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="Needs.Text.Label">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:layout_marginTop">14dp</item>
+        <item name="android:layout_marginBottom">6dp</item>
+    </style>
+
+    <style name="Needs.Text.Body">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+
+    <style name="Needs.Text.Secondary">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <!-- Dòng thông tin có biểu tượng: khu vực, thời gian, nguồn... -->
+    <style name="Needs.Text.Meta">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:drawableTint">@color/text_secondary</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:minHeight">24dp</item>
+    </style>
+
+    <!-- Nhãn trạng thái: chấm màu + chữ trên nền nhạt (màu đặt trong NeedStatus.bindChip) -->
+    <style name="Needs.StatusChip">
+        <item name="android:background">@drawable/bg_status_chip</item>
+        <item name="android:drawableStart">@drawable/ic_status_dot</item>
+        <item name="android:drawablePadding">6dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <!-- Hộp ghi chú -->
+    <style name="Needs.Note">
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="Needs.Note.Warning">
+        <item name="android:background">@drawable/bg_note_warning</item>
+        <item name="android:textColor">@color/warning_text</item>
+        <item name="android:drawableStart">@drawable/ic_warning</item>
+        <item name="android:drawableTint">@color/warning_text</item>
+    </style>
+
+    <style name="Needs.Note.Info">
+        <item name="android:background">@drawable/bg_note_info</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:drawableStart">@drawable/ic_info</item>
+        <item name="android:drawableTint">@color/primary</item>
+    </style>
+
+    <style name="Needs.Note.Neutral">
+        <item name="android:background">@drawable/bg_note_neutral</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:drawableStart">@drawable/ic_lock</item>
+        <item name="android:drawableTint">@color/text_secondary</item>
+    </style>
+
+    <!-- Thẻ -->
+    <style name="Needs.Card" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="strokeColor">@color/divider</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <!-- Ô nhập: nhãn đặt phía trên (TextView riêng) nên tắt hint nổi -->
+    <style name="Needs.Input" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="hintEnabled">false</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="boxBackgroundColor">@color/surface</item>
+        <item name="placeholderTextColor">@color/text_hint</item>
+        <item name="errorTextColor">@color/error</item>
+        <item name="boxStrokeErrorColor">@color/error</item>
+    </style>
+
+    <style name="Needs.InputText" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:minHeight">52dp</item>
+    </style>
+
+    <!-- Nút (vùng chạm tối thiểu 48dp) -->
+    <style name="Needs.Button.Primary" parent="Widget.Material3.Button">
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="backgroundTint">@color/primary</item>
+        <item name="android:textColor">@color/on_primary</item>
+    </style>
+
+    <style name="Needs.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="strokeColor">@color/divider</item>
+        <item name="android:textColor">@color/primary</item>
+    </style>
+
+    <style name="Needs.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/primary</item>
+    </style>
+
+    <style name="Needs.Button.Danger" parent="Widget.Material3.Button">
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="backgroundTint">@color/error_container</item>
+        <item name="android:textColor">@color/error</item>
+    </style>
+
+    <!-- Hai nút chuyển "Đơn vị ghi nhận" / "Tìm để tiếp nhận" -->
+    <style name="Needs.Segment" parent="Widget.Material3.Button.TextButton">
+        <item name="android:minHeight">44dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="backgroundTint">@color/needs_segment_bg</item>
+        <item name="android:textColor">@color/needs_segment_text</item>
+        <item name="rippleColor">@color/primary_light</item>
+    </style>
+
+    <!-- Chip lọc trạng thái và chip mở danh sách lọc -->
+    <style name="Needs.FilterChip" parent="Widget.Material3.Chip.Filter">
+        <item name="chipBackgroundColor">@color/needs_chip_bg</item>
+        <item name="chipStrokeColor">@color/needs_chip_stroke</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="checkedIconTint">@color/primary</item>
+        <item name="chipMinHeight">40dp</item>
+    </style>
+
+    <style name="Needs.DropdownChip" parent="Widget.Material3.Chip.Assist">
+        <item name="chipBackgroundColor">@color/surface</item>
+        <item name="chipStrokeColor">@color/divider</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="closeIconVisible">true</item>
+        <item name="closeIcon">@drawable/ic_arrow_drop_down</item>
+        <item name="closeIconTint">@color/text_secondary</item>
+        <item name="chipMinHeight">40dp</item>
+    </style>
+</resources>

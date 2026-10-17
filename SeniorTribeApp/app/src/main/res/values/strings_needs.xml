@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chuỗi hiển thị cho nhóm màn hình Nhu cầu (F06–F10, F14). -->
+<resources>
+
+    <!-- Dùng chung -->
+    <string name="action_back">Quay lại</string>
+    <string name="action_close">Đóng</string>
+    <string name="action_cancel">Hủy</string>
+    <string name="action_retry">Thử lại</string>
+    <string name="action_reload">Tải lại</string>
+    <string name="action_clear_filters">Xóa bộ lọc</string>
+    <string name="action_edit_need">Chỉnh sửa</string>
+    <string name="action_return_need">Trả lại nhu cầu</string>
+    <string name="action_cancel_need">Hủy nhu cầu</string>
+    <string name="action_needs_network">Thao tác này cần kết nối mạng để máy chủ xác nhận. Kiểm tra mạng rồi thử lại.</string>
+    <string name="state_error_title">Không tải được dữ liệu</string>
+
+    <!-- F08 · F09 · Danh sách nhu cầu -->
+    <string name="needs_mode_unit">Đơn vị ghi nhận</string>
+    <string name="needs_mode_search">Tìm để tiếp nhận</string>
+    <string name="needs_chip_all">Tất cả</string>
+    <string name="needs_chip_active">Đang hỗ trợ</string>
+    <string name="needs_chip_done">Đã kết thúc</string>
+    <string name="needs_chip_with_count">%1$s · %2$d</string>
+    <string name="needs_fab_record">Ghi nhận</string>
+    <string name="needs_search_hint">Tìm theo từ khóa…</string>
+    <string name="needs_filter_area">Khu vực</string>
+    <string name="needs_filter_topic">Chủ đề</string>
+    <string name="needs_filter_time">Thời gian</string>
+    <string name="needs_filter_area_title">Lọc theo khu vực</string>
+    <string name="needs_filter_topic_title">Lọc theo chủ đề</string>
+    <string name="needs_filter_time_title">Lọc theo thời gian ghi nhận</string>
+    <string name="needs_filter_all_areas">Mọi khu vực</string>
+    <string name="needs_filter_all_topics">Mọi chủ đề</string>
+    <plurals name="needs_result_count">
+        <item quantity="other">%d nhu cầu đang chờ tiếp nhận</item>
+    </plurals>
+    <string name="needs_offline_banner">Đang offline · chỉ xem dữ liệu đã tải</string>
+    <string name="needs_show_all">Xem tất cả</string>
+    <string name="needs_state_no_membership_title">Tài khoản chưa được cấp quyền</string>
+    <string name="needs_state_no_membership_message">Bạn đã đăng nhập nhưng chưa thuộc tổ chức nào. Gửi mã tài khoản cho đại diện đơn vị để được cấp quyền.</string>
+    <string name="needs_state_empty_unit_title">Chưa có nhu cầu</string>
+    <string name="needs_state_empty_unit_message">Nhu cầu do đơn vị ghi nhận hoặc đang tiếp nhận sẽ hiện ở đây.</string>
+    <string name="needs_state_empty_group_title">Không có nhu cầu ở trạng thái này</string>
+    <string name="needs_state_empty_group_message">Chọn trạng thái khác hoặc xem tất cả nhu cầu của đơn vị.</string>
+    <string name="needs_state_no_open_title">Chưa có nhu cầu chờ tiếp nhận</string>
+    <string name="needs_state_no_open_message">Nhu cầu chỉ hiện ở đây sau khi điều phối viên duyệt.</string>
+    <string name="needs_state_no_result_title">Không có nhu cầu phù hợp</string>
+    <string name="needs_state_no_result_message">Thử từ khóa khác hoặc xóa bộ lọc để xem tất cả nhu cầu đang chờ tiếp nhận.</string>
+
+    <!-- Thẻ nhu cầu -->
+    <string name="need_area_unknown">Chưa ghi khu vực</string>
+    <string name="need_time_unknown">Chưa ghi thời gian</string>
+    <string name="need_card_needs_revision">Cần bổ sung theo yêu cầu của điều phối viên</string>
+    <string name="need_card_assignee">Phụ trách: %1$s · %2$s</string>
+    <string name="need_card_cancel_reason">Lý do hủy: %1$s</string>
+
+    <!-- F06 · Ghi nhận nhu cầu -->
+    <string name="form_title_create">Ghi nhận nhu cầu</string>
+    <string name="form_title_edit">Sửa nhu cầu %1$s</string>
+    <string name="form_intro">Phần tóm tắt sẽ hiển thị cho tổ chức sau khi được duyệt. Phần thông tin riêng được lưu tách và chỉ mở cho đại diện phụ trách.</string>
+    <string name="form_section_summary">Tóm tắt nhu cầu</string>
+    <string name="form_section_private">Thông tin riêng</string>
+    <string name="form_section_consent">Sự đồng ý</string>
+    <string name="form_case_code">Mã trường hợp</string>
+    <string name="form_case_code_auto">Tự tạo khi gửi</string>
+    <string name="form_title">Tiêu đề</string>
+    <string name="form_title_placeholder">Ví dụ: Trò chuyện cuối tuần với cụ ông thích nhạc xưa</string>
+    <string name="form_topic">Chủ đề</string>
+    <string name="form_topic_placeholder">Chọn chủ đề</string>
+    <string name="form_content">Nội dung</string>
+    <string name="form_content_placeholder">Mô tả nhu cầu, không ghi tên, địa chỉ, số điện thoại</string>
+    <string name="form_area">Khu vực (mức phường)</string>
+    <string name="form_area_placeholder">Ví dụ: Phường 9, Quận 3</string>
+    <string name="form_area_helper">Chỉ ghi đến phường, không ghi số nhà hay tên đường.</string>
+    <string name="form_desired_time">Thời gian mong muốn</string>
+    <string name="form_desired_time_placeholder">Ví dụ: Chiều thứ 7 hoặc Chủ nhật</string>
+    <string name="form_source">Nguồn ghi nhận</string>
+    <string name="form_source_placeholder">Ví dụ: Thăm hộ gia đình ngày 10/10</string>
+    <string name="form_private_helper">Chỉ đơn vị ghi nhận, và đại diện được giao sau khi chốt lịch, mới xem được phần này.</string>
+    <string name="form_elderly_name">Họ tên người được hỗ trợ</string>
+    <string name="form_elderly_name_placeholder">Ví dụ: Ông Lê Văn B.</string>
+    <string name="form_contact">Liên hệ</string>
+    <string name="form_contact_placeholder">Ví dụ: Qua con gái · 09xx xxx xxx</string>
+    <string name="form_address">Địa chỉ cụ thể</string>
+    <string name="form_address_placeholder">Không bắt buộc</string>
+    <string name="form_consent_check">Người cao tuổi đã đồng ý để đơn vị chia sẻ nhu cầu này</string>
+    <string name="form_consent_method">Cách hỏi ý kiến</string>
+    <string name="form_consent_method_placeholder">Ví dụ: Hỏi trực tiếp tại nhà · 10/10/2026</string>
+    <string name="form_submit">Gửi rà soát</string>
+    <string name="form_resubmit">Gửi lại rà soát</string>
+    <string name="form_sending">Đang gửi…</string>
+    <string name="form_save_draft">Lưu nháp</string>
+    <string name="form_draft_hint">Bản nháp chỉ lưu phần tóm tắt trên máy này, không lưu thông tin riêng.</string>
+    <string name="form_draft_saved">Đã lưu nháp (không gồm thông tin riêng).</string>
+    <string name="form_draft_restored">Đã khôi phục bản nháp.</string>
+    <string name="form_draft_discard">Bỏ nháp</string>
+    <string name="form_submitted">Đã gửi %1$s cho điều phối viên rà soát.</string>
+    <string name="form_offline">Không có kết nối mạng. Bạn có thể Lưu nháp rồi gửi sau.</string>
+    <string name="form_cannot_open">Không mở được form</string>
+    <string name="form_notice_revision">Điều phối viên yêu cầu bổ sung: %1$s</string>
+    <string name="form_notice_open_edit">Nhu cầu đã được duyệt. Sau khi sửa, nhu cầu quay về Chờ rà soát và tạm ẩn khỏi danh sách tiếp nhận.</string>
+    <string name="form_error_required">Vui lòng nhập mục này.</string>
+    <string name="form_error_title">Tiêu đề cần ít nhất 5 ký tự.</string>
+    <string name="form_error_topic">Vui lòng chọn chủ đề.</string>
+    <string name="form_error_content">Nội dung cần ít nhất 10 ký tự.</string>
+    <string name="form_error_area">Vui lòng ghi khu vực mức phường.</string>
+    <string name="form_error_phone_in_summary">Không ghi số điện thoại trong phần tóm tắt. Ghi vào mục Liên hệ.</string>
+    <string name="form_error_name_in_summary">Không ghi tên người được hỗ trợ trong phần tóm tắt.</string>
+    <string name="form_error_consent">Cần có sự đồng ý của người cao tuổi trước khi gửi.</string>
+    <string name="form_error_consent_method">Ghi lại cách đã hỏi ý kiến người cao tuổi.</string>
+
+    <!-- F07 · Rà soát nhu cầu -->
+    <string name="review_title">Rà soát nhu cầu</string>
+    <string name="review_title_with_code">Rà soát · %1$s</string>
+    <string name="review_submitted_by">Gửi bởi %1$s · %2$s</string>
+    <string name="review_source">Nguồn: %1$s</string>
+    <string name="review_consent_yes">Đã ghi nhận đồng ý: %1$s</string>
+    <string name="review_consent_no">Chưa ghi nhận sự đồng ý</string>
+    <string name="review_previous_note">Lần trước đã yêu cầu bổ sung: %1$s</string>
+    <string name="review_checklist_title">Kiểm tra trước khi duyệt</string>
+    <string name="review_check_no_identity">Tóm tắt không chứa tên, địa chỉ, số điện thoại</string>
+    <string name="review_check_source">Có nguồn ghi nhận rõ ràng</string>
+    <string name="review_check_consent">Đã ghi nhận sự đồng ý và cách hỏi ý kiến</string>
+    <string name="review_check_ward">Khu vực chỉ ở mức phường</string>
+    <string name="review_internal_warning">Rà soát là kiểm tra nội bộ, không phải xác minh hoàn cảnh hay xác minh pháp lý.</string>
+    <string name="review_note_label">Ghi chú cho đầu mối (khi yêu cầu bổ sung)</string>
+    <string name="review_note_placeholder">Ví dụ: ghi rõ khung giờ cụ thể…</string>
+    <string name="review_request_revision">Yêu cầu bổ sung</string>
+    <string name="review_approve">Duyệt</string>
+    <string name="review_error_note">Ghi rõ nội dung cần bổ sung để đầu mối sửa.</string>
+    <string name="review_done">Đã lưu kết quả rà soát.</string>
+    <string name="review_not_allowed_title">Bạn không rà soát được nhu cầu này</string>
+    <string name="review_not_allowed_message">Chỉ điều phối viên của đơn vị ghi nhận mới rà soát được, và không tự duyệt nhu cầu do mình ghi nhận.</string>
+    <string name="review_already_done_title">Nhu cầu đã được xử lý</string>
+    <string name="review_already_done_message">Nhu cầu hiện ở trạng thái: %1$s.</string>
+
+    <!-- F10 · Chi tiết nhu cầu -->
+    <string name="detail_title">Chi tiết nhu cầu</string>
+    <string name="detail_info_title">Thông tin nhu cầu</string>
+    <string name="detail_recorded_by">Ghi nhận bởi %1$s · %2$s</string>
+    <string name="detail_assignment_title">Đang phụ trách</string>
+    <string name="detail_assignee">Đại diện: %1$s</string>
+    <string name="detail_accepted_at">Tiếp nhận lúc %1$s</string>
+    <string name="detail_private_hidden">Tên, địa chỉ và liên hệ chỉ mở cho đại diện được giao sau khi chốt lịch.</string>
+    <string name="detail_private_error">Không tải được thông tin riêng. Có thể tài khoản chưa có quyền xem.</string>
+    <string name="detail_private_no_address">Không ghi</string>
+    <string name="detail_note_review">Nhu cầu đang chờ điều phối viên rà soát, chưa hiển thị cho các tổ chức.</string>
+    <string name="detail_note_revision">Điều phối viên yêu cầu bổ sung: %1$s</string>
+    <string name="detail_note_cancelled">Đã hủy. Lý do: %1$s</string>
+    <string name="detail_note_cancelled_with_note">Đã hủy. Lý do: %1$s — %2$s</string>
+    <string name="detail_action_review">Rà soát nhu cầu</string>
+    <string name="detail_action_accept">Tiếp nhận nhu cầu</string>
+    <string name="detail_action_supplement">Bổ sung thông tin</string>
+    <string name="detail_action_chat">Mở chat phối hợp</string>
+
+    <!-- F10 · Hộp thoại tiếp nhận -->
+    <string name="accept_title">Xác nhận tiếp nhận</string>
+    <string name="accept_message">%1$s sẽ chuyển sang Đã tiếp nhận và được giao cho một đại diện của %2$s.</string>
+    <string name="accept_assignee_label">Đại diện phụ trách</string>
+    <string name="accept_me">%1$s (bạn)</string>
+    <string name="accept_members_fallback">Không tải được danh sách đại diện của tổ chức, tạm giao cho bạn.</string>
+    <string name="accept_network_note">Thao tác cần có mạng: hệ thống kiểm tra để hai tổ chức không cùng nhận một nhu cầu.</string>
+    <string name="accept_confirm">Tiếp nhận</string>
+
+    <!-- F14 · Trả lại / hủy -->
+    <string name="reason_return_title">Trả lại nhu cầu %1$s</string>
+    <string name="reason_return_message">Nhu cầu sẽ quay về Chờ tiếp nhận để tổ chức khác nhận. Lần tiếp nhận hiện tại vẫn được lưu trong lịch sử.</string>
+    <string name="reason_cancel_title">Hủy nhu cầu %1$s</string>
+    <string name="reason_cancel_message">Chỉ hủy khi người cao tuổi không còn cần hỗ trợ hoặc không đồng ý tiếp tục. Lý do hủy được lưu lại.</string>
+    <string name="reason_label">Lý do</string>
+    <string name="reason_return_no_staff">Không sắp xếp được người phụ trách</string>
+    <string name="reason_return_schedule">Lịch của tổ chức không phù hợp</string>
+    <string name="reason_return_capacity">Nhu cầu vượt khả năng hỗ trợ của tổ chức</string>
+    <string name="reason_cancel_no_need">Người cao tuổi không còn nhu cầu</string>
+    <string name="reason_cancel_declined">Người cao tuổi không đồng ý tiếp tục</string>
+    <string name="reason_cancel_helped">Gia đình hoặc đơn vị khác đã hỗ trợ</string>
+    <string name="reason_other">Lý do khác</string>
+    <string name="reason_note_label">Ghi chú thêm</string>
+    <string name="reason_note_placeholder">Không bắt buộc, trừ khi chọn Lý do khác</string>
+    <string name="reason_error_required">Vui lòng chọn một lý do.</string>
+    <string name="reason_error_note_required">Hãy ghi rõ lý do khi chọn Lý do khác.</string>
+</resources>
