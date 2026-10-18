@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.F04" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#1F6F5C</item>
+        <item name="colorPrimaryDark">#164E43</item>
+        <item name="colorAccent">#1F6F5C</item>
+        <item name="android:statusBarColor">#164E43</item>
+        <item name="android:navigationBarColor">#F1F6F3</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>
