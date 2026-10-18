@@ -330,6 +330,7 @@ service cloud.firestore {
       allow read: if signedIn() && (
            isMember(resource.data.recorderOrgId)
         || (get(needPath(needId)).data.assigneeUid == request.auth.uid
+            && isMember(get(needPath(needId)).data.assignedOrgId)
             && get(needPath(needId)).data.status in ['SCHEDULED', 'DELIVERED']));
 
       allow create: if hasRole(request.resource.data.recorderOrgId, 'RECORDER')
@@ -389,8 +390,10 @@ service cloud.firestore {
       // F11 · Chỉ đầu mối đã ghi nhận và đại diện được giao của lần tiếp nhận này (R08)
       function chatMember() {
         return signedIn() && (
-             request.auth.uid == assignment().assigneeUid
-          || request.auth.uid == needOfAssignment().recorderUid);
+             (request.auth.uid == assignment().assigneeUid
+              && isMember(assignment().orgId))
+          || (request.auth.uid == needOfAssignment().recorderUid
+              && isMember(assignment().recorderOrgId)));
       }
 
       // F11 · Tin nhắn: đọc được cả khi luồng đã kết thúc (chỉ đọc), chỉ gửi khi còn hiệu lực
@@ -410,8 +413,9 @@ service cloud.firestore {
       match /schedules/{scheduleId} {
         allow read: if isMember(assignment().orgId) || isMember(assignment().recorderOrgId);
 
-        allow create: if (hasRole(assignment().orgId, 'REPRESENTATIVE')
-                          || request.auth.uid == assignment().assigneeUid)
+        allow create: if isMember(assignment().orgId)
+          && (hasRole(assignment().orgId, 'REPRESENTATIVE')
+              || request.auth.uid == assignment().assigneeUid)
           && assignmentActive()
           && needOfAssignment().status == 'ACCEPTED'
           && request.resource.data.keys().hasOnly(['startAt', 'place', 'note', 'status',
