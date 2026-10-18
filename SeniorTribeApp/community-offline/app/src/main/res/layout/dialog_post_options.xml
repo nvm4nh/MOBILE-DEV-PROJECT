@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bottomSheetRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_f05_bottom_sheet"
+    android:paddingStart="30dp"
+    android:paddingEnd="30dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="30dp">
+
+    <!-- Thanh kéo -->
+    <View
+        android:layout_width="48dp"
+        android:layout_height="6dp"
+        android:layout_gravity="center_horizontal"
+        android:background="#9EAEA5" />
+
+    <!-- Tiêu đề bài đăng -->
+    <TextView
+        android:id="@+id/tvOptionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="Ngày hội thăm hỏi người cao tuổi tháng 10"
+        android:textColor="#18201C"
+        android:textSize="21sp"
+        android:textStyle="bold"
+        android:fontFamily="sans"
+        android:lineSpacingExtra="3dp" />
+
+    <!-- Mô tả quyền tùy chọn -->
+    <TextView
+        android:id="@+id/tvOptionDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Chỉ đại diện của Đoàn Thanh niên Phường 7 thấy các tùy chọn này."
+        android:textColor="#52615A"
+        android:textSize="16sp"
+        android:lineSpacingExtra="2dp" />
+
+    <!-- Sửa bài -->
+    <LinearLayout
+        android:id="@+id/btnEditPost"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginTop="22dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_edit_f05"
+            android:contentDescription="Sửa bài"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:text="Sửa bài"
+            android:textColor="#18201C"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <!-- Ẩn bài khỏi bảng tin -->
+    <LinearLayout
+        android:id="@+id/btnHidePost"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_hide_f05"
+            android:contentDescription="Ẩn bài khỏi bảng tin"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:text="Ẩn bài khỏi bảng tin"
+            android:textColor="#18201C"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <!-- Đóng bảng tùy chọn -->
+    <LinearLayout
+        android:id="@+id/btnCloseOptions"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_close_f05"
+            android:contentDescription="Đóng"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:text="Đóng"
+            android:textColor="#52615A"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+</LinearLayout>
