@@ -27,7 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="12dp" />
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp" />
 
         <TextView
             android:id="@+id/tvEmptyChat"
@@ -50,15 +51,16 @@
         android:background="@color/surface"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp">
 
         <EditText
             android:id="@+id/etMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/bg_badge"
-            android:hint="@string/send_message_hint"
+            android:background="@drawable/bg_chat_input"
+            android:hint="@string/chat_input_hint"
             android:importantForAutofill="no"
             android:inputType="textMultiLine|textCapSentences"
             android:maxLength="1000"
@@ -73,11 +75,11 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:background="@drawable/bg_send_button"
             android:contentDescription="@string/chat_send"
-            android:padding="10dp"
+            android:padding="12dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_send"
-            app:tint="@color/primary" />
+            app:tint="@color/on_primary" />
     </LinearLayout>
 </LinearLayout>

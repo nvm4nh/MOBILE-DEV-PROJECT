@@ -69,6 +69,8 @@ public class NeedSummary implements Serializable {
     // Phối hợp sau tiếp nhận (F12, F13)
     private String scheduleId;      // lịch đã chốt trong needs_assignments/{id}/schedules
     private Date scheduledAt;
+    private Date scheduledEndAt;    // hết khung giờ đã chốt
+    private String scheduledFormat; // hình thức đã chốt, ví dụ "Đến nhà · 2 đoàn viên"
     private String scheduledPlace;
     private String deliveryReport;  // tổ chức mô tả việc đã hỗ trợ
     private String deliveredByName;
@@ -97,6 +99,11 @@ public class NeedSummary implements Serializable {
     @Exclude
     public long getScheduledAtMillis() {
         return scheduledAt != null ? scheduledAt.getTime() : 0L;
+    }
+
+    @Exclude
+    public long getScheduledEndAtMillis() {
+        return scheduledEndAt != null ? scheduledEndAt.getTime() : 0L;
     }
 
     @Exclude
@@ -227,6 +234,12 @@ public class NeedSummary implements Serializable {
 
     public Date getScheduledAt() { return scheduledAt; }
     public void setScheduledAt(Date scheduledAt) { this.scheduledAt = scheduledAt; }
+
+    public Date getScheduledEndAt() { return scheduledEndAt; }
+    public void setScheduledEndAt(Date scheduledEndAt) { this.scheduledEndAt = scheduledEndAt; }
+
+    public String getScheduledFormat() { return scheduledFormat; }
+    public void setScheduledFormat(String scheduledFormat) { this.scheduledFormat = scheduledFormat; }
 
     public String getScheduledPlace() { return scheduledPlace; }
     public void setScheduledPlace(String scheduledPlace) { this.scheduledPlace = scheduledPlace; }

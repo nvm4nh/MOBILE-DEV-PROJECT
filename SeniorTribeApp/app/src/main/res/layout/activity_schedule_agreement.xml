@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F12 · Thống nhất lịch + đồng ý (Figma): màn hình riêng thay cho hộp thoại cũ.
+     Bố cục dọc: đề xuất của tổ chức rồi ghi nhận đồng ý, hai nút cố định ở cuối. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/surface"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="@string/agree_title" />
+
+    <include layout="@layout/include_coord_header" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressBusy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/frameContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ScrollView
+            android:id="@+id/scrollContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <include layout="@layout/include_schedule_proposal" />
+
+                <include layout="@layout/include_schedule_consent" />
+            </LinearLayout>
+        </ScrollView>
+
+        <include layout="@layout/view_list_state" />
+    </FrameLayout>
+
+    <include layout="@layout/include_bottom_actions" />
+</LinearLayout>
