@@ -8,7 +8,7 @@
 
     <application
         android:name=".SeniorTribeApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/ic_needs"
@@ -40,6 +40,11 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.ForgotPasswordActivity"
+            android:exported="false" />
+
+        <!-- Checks the server profile and organization membership before Main. -->
+        <activity
+            android:name=".activities.SessionGateActivity"
             android:exported="false" />
 
         <!-- Main Screen -->

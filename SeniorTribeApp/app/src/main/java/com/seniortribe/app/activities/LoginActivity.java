@@ -2,78 +2,79 @@ package com.seniortribe.app.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.auth.FirebaseAuth;
+import androidx.lifecycle.ViewModelProvider;
+import com.google.android.material.textfield.TextInputEditText;
 import com.seniortribe.app.R;
+import com.seniortribe.app.auth.AuthFields;
+import com.seniortribe.app.auth.GoogleSignInLauncher;
+import com.seniortribe.app.auth.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
+    private LoginViewModel model;
+    private boolean routed;
+    private View[] controls;
+    private GoogleSignInLauncher googleLauncher;
 
-    private EditText etEmail, etPassword;
-    private Button btnLogin, btnGoogleSignIn;
-    private TextView tvForgotPassword, tvGoToRegister;
-    private FirebaseAuth mAuth;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.Theme_SeniorTribe_Auth);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn);
-        tvForgotPassword = findViewById(R.id.tvForgotPassword);
-        tvGoToRegister = findViewById(R.id.tvGoToRegister);
-
-        try { mAuth = FirebaseAuth.getInstance(); } catch (Exception ignored) {}
-
-        btnLogin.setOnClickListener(v -> performLogin());
-
-        btnGoogleSignIn.setOnClickListener(v -> {
-            Toast.makeText(this, "Đang kết nối Google Sign-In...", Toast.LENGTH_SHORT).show();
-            // Đăng nhập demo nếu môi trường chưa kích hoạt Google Services SHA-1
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            finish();
+        model = new ViewModelProvider(this).get(LoginViewModel.class);
+        googleLauncher = new GoogleSignInLauncher(this, model);
+        TextInputEditText email = AuthFields.bind(this, R.id.st_login_email, model.email, v -> model.email = v);
+        TextInputEditText password = AuthFields.bind(this, R.id.st_login_password, model.password, v -> model.password = v);
+        View submit = findViewById(R.id.st_login_submit);
+        View register = findViewById(R.id.st_login_register);
+        View forgot = findViewById(R.id.st_login_forgot);
+        View google = findViewById(R.id.st_login_google);
+        controls = new View[]{email, password, submit, register, forgot, google};
+        submit.setOnClickListener(v -> model.login());
+        register.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
+        forgot.setOnClickListener(v -> startActivity(new Intent(this, ForgotPasswordActivity.class)));
+        google.setOnClickListener(v -> googleLauncher.launch());
+        password.setOnEditorActionListener((v, action, event) -> {
+            if (action != EditorInfo.IME_ACTION_DONE) return false;
+            model.login();
+            return true;
         });
-
-        tvForgotPassword.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, ForgotPasswordActivity.class)));
-        tvGoToRegister.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed() {
+                if (model.busy()) {
+                    Toast.makeText(LoginActivity.this, R.string.st_auth_wait, Toast.LENGTH_SHORT).show();
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
+        model.state().observe(this, state -> {
+            if (state.stage == LoginViewModel.Stage.DONE) {
+                if (!routed) {
+                    routed = true;
+                    password.setText("");
+                    Intent intent = new Intent(this, SessionGateActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+                return;
+            }
+            for (View control : controls) control.setEnabled(!model.busy());
+            findViewById(R.id.st_login_progress).setVisibility(model.busy() ? View.VISIBLE : View.GONE);
+            TextView message = findViewById(R.id.st_login_message);
+            message.setVisibility(state.message == 0 ? View.GONE : View.VISIBLE);
+            if (state.message != 0) message.setText(state.message);
+        });
     }
 
-    private void performLogin() {
-        String email = etEmail.getText().toString().trim();
-        String pass = etPassword.getText().toString().trim();
-
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(pass)) {
-            Toast.makeText(this, "Vui lòng nhập đầy đủ email và mật khẩu", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (mAuth != null) {
-            btnLogin.setEnabled(false);
-            mAuth.signInWithEmailAndPassword(email, pass)
-                    .addOnCompleteListener(task -> {
-                        btnLogin.setEnabled(true);
-                        if (task.isSuccessful()) {
-                            Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
-                        } else {
-                            // Demo fallback nếu offline hoặc sai pass
-                            Toast.makeText(this, "Đăng nhập: " + (task.getException() != null ? task.getException().getMessage() : "Lỗi xác thực"), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        } else {
-            // Chạy demo khi chưa nạp config
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            finish();
-        }
+    @Override protected void onDestroy() {
+        if (googleLauncher != null) googleLauncher.close();
+        super.onDestroy();
     }
 }

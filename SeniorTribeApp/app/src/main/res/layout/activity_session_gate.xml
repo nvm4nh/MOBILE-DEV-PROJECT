@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <ScrollView android:id="@+id/st_access_content"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:fillViewport="true" android:background="@color/st_auth_background">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="24dp">
+            <TextView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/st_auth_brand" android:textColor="@color/st_auth_text"
+                android:textSize="18sp" android:fontFamily="@font/be_vietnam_pro_semibold" />
+            <ImageView android:id="@+id/st_access_lock"
+                android:layout_width="72dp" android:layout_height="72dp"
+                android:layout_gravity="center_horizontal" android:layout_marginTop="24dp"
+                android:background="@drawable/bg_state_circle" android:padding="20dp"
+                android:src="@drawable/ic_lock" app:tint="@color/st_auth_primary"
+                android:importantForAccessibility="no" android:visibility="gone" />
+            <TextView android:id="@+id/st_access_title"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/st_access_loading_title" android:textColor="@color/st_auth_text"
+                android:textSize="28sp" android:layout_marginTop="24dp" android:fontFamily="@font/be_vietnam_pro_semibold" />
+            <TextView android:id="@+id/st_access_description"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/st_access_loading_note" android:textColor="@color/st_auth_text"
+                android:textSize="16sp" android:layout_marginTop="16dp" android:accessibilityLiveRegion="polite" />
+            <ProgressBar android:id="@+id/st_access_progress"
+                android:layout_width="48dp" android:layout_height="48dp"
+                android:layout_gravity="center_horizontal" android:layout_marginTop="16dp"
+                android:contentDescription="@string/st_auth_loading" android:visibility="gone" />
+            <TextView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/st_register_uid_label" android:textColor="@color/st_auth_text"
+                android:textSize="14sp" android:layout_marginTop="28dp" />
+            <TextView android:id="@+id/st_access_uid"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="@string/st_access_uid_initial" android:textColor="@color/st_auth_text"
+                android:textSize="16sp" android:layout_marginTop="8dp" android:textIsSelectable="true" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/st_access_copy_uid" style="@style/Widget.SeniorTribe.AuthButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:minHeight="52dp"
+                android:text="@string/st_register_copy_uid" android:textAllCaps="false"
+                android:textSize="16sp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/st_access_retry" style="@style/Widget.SeniorTribe.AuthButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:minHeight="52dp"
+                android:text="@string/st_access_refresh" android:textAllCaps="false"
+                android:textSize="16sp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/st_access_profile" style="@style/Widget.SeniorTribe.AuthButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:minHeight="52dp"
+                android:text="@string/st_profile_title" android:textAllCaps="false"
+                android:textSize="16sp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/st_access_sign_out" style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:minHeight="48dp"
+                android:text="@string/st_register_sign_out" android:textAllCaps="false"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </ScrollView>
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/st_access_profile_container"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:visibility="gone" />
+</FrameLayout>

@@ -23,7 +23,7 @@ public class SplashActivity extends AppCompatActivity {
             } catch (Exception ignored) {}
 
             if (isLoggedIn) {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                startActivity(new Intent(SplashActivity.this, SessionGateActivity.class));
             } else {
                 startActivity(new Intent(SplashActivity.this, LoginActivity.class));
             }

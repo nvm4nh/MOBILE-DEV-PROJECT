@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="st_email_change">Đổi email</string>
+    <string name="st_email_profile_label">Email đăng nhập</string>
+    <string name="st_email_profile_note">Email mới cần được xác minh trước khi dùng để đăng nhập.</string>
+
+    <string name="st_email_intro">Nhập email mới và mật khẩu hiện tại. Email đăng nhập chỉ thay đổi sau khi bạn xác minh email mới.</string>
+    <string name="st_email_new">Email mới</string>
+    <string name="st_email_send">Gửi xác minh</string>
+
+    <string name="st_email_sent">Đã gửi yêu cầu xác minh tới %1$s.\n\nMở hộp thư mới và bấm liên kết xác minh. Sau đó đăng xuất và đăng nhập bằng email mới, dùng mật khẩu hiện tại.\n\nNếu chưa nhận được thư, kiểm tra Thư rác hoặc thử một địa chỉ khác.</string>
+
+    <string name="st_email_invalid">Vui lòng nhập email hợp lệ.</string>
+    <string name="st_email_same">Email mới đang trùng với email hiện tại.</string>
+    <string name="st_email_used">Không thể dùng email này. Vui lòng chọn email khác.</string>
+    <string name="st_email_unavailable">Chưa gửi được thư xác minh. Vui lòng thử lại sau hoặc liên hệ người phụ trách.</string>
+    <string name="st_email_google">Tài khoản này chưa có phương thức đăng nhập bằng email/mật khẩu nên chưa hỗ trợ đổi email tại đây.</string>
+    <string name="st_email_unverified">Email đăng nhập chưa được xác minh. Vui lòng xác minh email rồi đăng nhập lại.</string>
+
+</resources>

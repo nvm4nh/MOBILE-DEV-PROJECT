@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="st_login_welcome">Chào mừng đến với SeniorTribe</string>
+    <string name="st_login_note">Đăng nhập để làm việc cùng tổ chức của bạn.</string>
+    <string name="st_login_action">Đăng nhập</string>
+    <string name="st_login_forgot">Quên mật khẩu?</string>
+    <string name="st_login_register">Chưa có tài khoản? Đăng ký</string>
+    <string name="st_login_error_credentials">Email hoặc mật khẩu chưa đúng. Vui lòng kiểm tra rồi thử lại.</string>
+    <string name="st_reset_title">Quên mật khẩu</string>
+    <string name="st_reset_note">Nhập email đã đăng ký để yêu cầu liên kết đặt lại mật khẩu.</string>
+    <string name="st_reset_action">Gửi yêu cầu đặt lại mật khẩu</string>
+    <string name="st_reset_initial"></string>
+    <string name="st_reset_success_note">Đã tiếp nhận yêu cầu cho %1$s. Nếu email này đã có tài khoản, bạn sẽ nhận được liên kết đặt lại mật khẩu. Hãy kiểm tra cả thư mục Spam/Thư rác.</string>
+    <string name="st_access_loading_title">Đang kiểm tra tài khoản</string>
+    <string name="st_access_loading_note">Đang tải hồ sơ và kiểm tra quyền tổ chức từ máy chủ.</string>
+    <string name="st_access_pending_title">Chờ cấp quyền tổ chức</string>
+    <string name="st_access_pending_note">Hồ sơ tài khoản đã sẵn sàng. Bạn chưa được cấp quyền tổ chức đang hoạt động. Sao chép mã tài khoản và gửi cho người phụ trách đơn vị để được hỗ trợ.</string>
+    <string name="st_access_error_title">Chưa kiểm tra được tài khoản</string>
+    <string name="st_access_error_membership">Dữ liệu phân quyền tổ chức chưa hợp lệ. Vui lòng liên hệ người phụ trách đơn vị.</string>
+    <string name="st_access_refresh">Kiểm tra lại</string>
+    <string name="st_access_uid_initial"></string>
+</resources>

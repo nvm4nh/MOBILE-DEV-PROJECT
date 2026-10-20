@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="st_google_action">Tiếp tục với Google</string>
+    <string name="st_google_separator">hoặc</string>
+    <string name="st_google_error_generic">Chưa đăng nhập được bằng Google. Hãy thử lại hoặc đăng nhập bằng email.</string>
+    <string name="st_google_error_no_account">Chưa lấy được tài khoản Google. Hãy thêm tài khoản Google vào thiết bị rồi thử lại.</string>
+    <string name="st_google_error_unavailable">Thiết bị chưa hỗ trợ đăng nhập Google. Hãy cập nhật Dịch vụ Google Play hoặc đăng nhập bằng email.</string>
+    <string name="st_google_error_existing_account">Email này đã có tài khoản với phương thức đăng nhập khác. Hãy đăng nhập bằng phương thức đã dùng trước đó.</string>
+    <string name="st_google_error_config">Đăng nhập Google chưa sẵn sàng trên bản ứng dụng này. Anh/chị có thể đăng nhập bằng email.</string>
+    <style name="Widget.SeniorTribe.GoogleButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:minHeight">52dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/st_auth_text</item>
+        <item name="backgroundTint">@color/st_auth_surface</item>
+        <item name="strokeColor">@color/divider</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="icon">@drawable/ic_google</item>
+        <item name="iconTint">@null</item>
+        <item name="iconSize">20dp</item>
+        <item name="iconPadding">12dp</item>
+        <item name="iconGravity">textStart</item>
+    </style>
+</resources>

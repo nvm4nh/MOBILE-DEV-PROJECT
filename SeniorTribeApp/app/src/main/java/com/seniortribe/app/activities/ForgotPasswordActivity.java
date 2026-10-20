@@ -1,50 +1,45 @@
 package com.seniortribe.app.activities;
 
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
-
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.auth.FirebaseAuth;
+import androidx.lifecycle.ViewModelProvider;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.seniortribe.app.R;
+import com.seniortribe.app.auth.AuthFields;
+import com.seniortribe.app.auth.PasswordResetViewModel;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
-
-    private EditText etResetEmail;
-    private Button btnSendReset;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.Theme_SeniorTribe_Auth);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
-
-        etResetEmail = findViewById(R.id.etResetEmail);
-        btnSendReset = findViewById(R.id.btnSendReset);
-
-        btnSendReset.setOnClickListener(v -> {
-            String email = etResetEmail.getText().toString().trim();
-            if (TextUtils.isEmpty(email)) {
-                Toast.makeText(this, "Vui lòng nhập địa chỉ email", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            try {
-                FirebaseAuth.getInstance().sendPasswordResetEmail(email)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(this, "Đã gửi email khôi phục mật khẩu!", Toast.LENGTH_LONG).show();
-                                finish();
-                            } else {
-                                Toast.makeText(this, "Không thể gửi email: " + (task.getException() != null ? task.getException().getMessage() : "Lỗi"), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-            } catch (Exception e) {
-                Toast.makeText(this, "Hệ thống đã ghi nhận yêu cầu đặt lại mật khẩu cho " + email, Toast.LENGTH_LONG).show();
-                finish();
-            }
+        MaterialToolbar toolbar = findViewById(R.id.st_reset_toolbar);
+        toolbar.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+        PasswordResetViewModel model = new ViewModelProvider(this).get(PasswordResetViewModel.class);
+        TextInputEditText email = AuthFields.bind(this, R.id.st_reset_email, model.email, v -> model.email = v);
+        View submit = findViewById(R.id.st_reset_submit);
+        submit.setOnClickListener(v -> model.submit());
+        findViewById(R.id.st_reset_back).setOnClickListener(v -> finish());
+        email.setOnEditorActionListener((v, action, event) -> {
+            if (action != EditorInfo.IME_ACTION_DONE) return false;
+            model.submit();
+            return true;
+        });
+        model.state().observe(this, state -> {
+            boolean done = state.stage == PasswordResetViewModel.Stage.DONE;
+            email.setEnabled(!model.busy() && !done);
+            submit.setEnabled(!model.busy() && !done);
+            findViewById(R.id.st_reset_progress).setVisibility(model.busy() ? View.VISIBLE : View.GONE);
+            TextView message = findViewById(R.id.st_reset_message);
+            message.setVisibility(state.message == 0 ? View.GONE : View.VISIBLE);
+            if (state.message != 0) message.setText(state.message);
+            TextView result = findViewById(R.id.st_reset_result);
+            result.setVisibility(done ? View.VISIBLE : View.GONE);
+            if (done) result.setText(getString(R.string.st_reset_success_note, model.maskedEmail()));
         });
     }
 }

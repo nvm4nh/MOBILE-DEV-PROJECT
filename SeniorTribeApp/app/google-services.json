@@ -12,7 +12,20 @@
           "package_name": "com.seniortribe.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "788416729054-tld8kt5iosofk53813ao7f67msedaasd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.seniortribe.app",
+            "certificate_hash": "ad1b3110eaebaf71f9b86e6c1991718b73c9e5c0"
+          }
+        },
+        {
+          "client_id": "788416729054-282tcbgg2ke5dutgq31u71sgf3hrkpf3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBJN70ET9fIL1zUpPQF63TjwA7qyvhJFDM"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "788416729054-282tcbgg2ke5dutgq31u71sgf3hrkpf3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
