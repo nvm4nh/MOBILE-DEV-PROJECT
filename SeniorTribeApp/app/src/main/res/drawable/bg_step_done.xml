@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F13 · Bước đã xong: tròn đặc màu chủ đạo (dấu tick vẽ bằng ic_check màu trắng). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/primary" />
+</shape>

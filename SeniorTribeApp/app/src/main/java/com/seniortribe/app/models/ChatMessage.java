@@ -23,6 +23,8 @@ public class ChatMessage {
     private String text;
     @ServerTimestamp
     private Date at;
+    @Exclude
+    private boolean pending;        // còn chờ máy chủ xác nhận, không lưu lên Firestore
 
     public ChatMessage() {}
 
@@ -43,6 +45,12 @@ public class ChatMessage {
 
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
+
+    @Exclude
+    public boolean isPending() { return pending; }
+
+    @Exclude
+    public void setPending(boolean pending) { this.pending = pending; }
 
     public Date getAt() { return at; }
     public void setAt(Date at) { this.at = at; }
