@@ -99,6 +99,20 @@
         <item name="android:drawableTint">@color/text_secondary</item>
     </style>
 
+    <!-- Ô hiển thị giá trị trông như ô nhập: bấm để chọn ngày / khung giờ, hoặc chỉ xem (F12) -->
+    <style name="Needs.Field">
+        <item name="android:background">@drawable/bg_readonly_field</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+    </style>
+
     <!-- Thẻ -->
     <style name="Needs.Card" parent="Widget.Material3.CardView.Outlined">
         <item name="cardBackgroundColor">@color/surface</item>

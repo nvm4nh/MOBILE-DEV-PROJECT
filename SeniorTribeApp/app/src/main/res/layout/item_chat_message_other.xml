@@ -1,39 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- F11 · Tin của bên kia: "Tên · Đầu mối", bong bóng trắng, giờ gửi (Figma). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="start"
     android:orientation="vertical"
-    android:padding="6dp">
+    android:paddingTop="6dp"
+    android:paddingEnd="48dp"
+    android:paddingBottom="6dp">
 
     <TextView
         android:id="@+id/tvSender"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:text="Đầu mối cộng đồng (Quyên)"
+        android:layout_marginBottom="4dp"
         android:textColor="@color/text_secondary"
-        android:textSize="11sp"
-        android:textStyle="bold" />
+        android:textSize="12sp"
+        tools:text="Trần Thị Mai · Đầu mối" />
 
     <TextView
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxWidth="280dp"
-        android:background="@drawable/bg_badge"
-        android:backgroundTint="@color/surface_variant"
-        android:padding="12dp"
-        android:text="Dạ được anh nhé! Em sẽ báo trước để cụ chuẩn bị tinh thần."
+        android:background="@drawable/bg_chat_bubble_other"
+        android:lineSpacingExtra="2dp"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="10dp"
         android:textColor="@color/text_primary"
-        android:textSize="14sp" />
+        android:textIsSelectable="true"
+        android:textSize="15sp"
+        tools:text="Chào em, cụ thích nghe cải lương và hay kể chuyện ngày xưa." />
 
     <TextView
         android:id="@+id/tvTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="10:32"
+        android:layout_marginTop="4dp"
         android:textColor="@color/text_hint"
-        android:textSize="10sp" />
+        android:textSize="11sp"
+        tools:text="10:12" />
 </LinearLayout>
