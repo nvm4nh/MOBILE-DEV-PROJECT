@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F13 · Kết quả tổ chức báo, ô báo hỗ trợ (tổ chức) hoặc ô đối soát (đầu mối). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- Tổ chức báo kết quả -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardReport"
+        style="@style/Needs.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvReportLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/progress_report_label"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvReport"
+                style="@style/Needs.Text.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                tools:text="Hai đoàn viên đến trò chuyện 2 tiếng, nghe cải lương cùng cụ." />
+
+            <TextView
+                android:id="@+id/tvReportBy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/text_hint"
+                android:textSize="12sp"
+                tools:text="Nguyễn Minh Khoa · 19/10 · 16:20" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/tvReconcileExisting"
+        style="@style/Needs.Note.Warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        tools:text="Chưa khớp: cụ nói buổi hẹn kết thúc sớm."
+        tools:visibility="visible" />
+
+    <!-- Ô nhập: báo kết quả (tổ chức, SCHEDULED) hoặc nội dung chưa khớp (đầu mối, DELIVERED) -->
+    <LinearLayout
+        android:id="@+id/layoutProgressInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/tvProgressInputLabel"
+            style="@style/Needs.Text.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/etProgressInput"
+            android:text="@string/progress_reconcile_input_label" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilProgressInput"
+            style="@style/Needs.Input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:counterEnabled="true"
+            app:counterMaxLength="500">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etProgressInput"
+                style="@style/Needs.InputText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLength="500"
+                android:minLines="3" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvProgressWarning"
+        style="@style/Needs.Note.Warning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/progress_complete_warning"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</LinearLayout>

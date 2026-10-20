@@ -204,7 +204,8 @@ public class NeedDetailActivity extends AppCompatActivity {
             text = getString(R.string.detail_note_review);
         } else if (Constants.STATUS_SCHEDULED.equals(status) && n.getScheduledAtMillis() > 0) {
             text = getString(R.string.detail_note_scheduled,
-                    DateTimeUtils.formatDateTime(n.getScheduledAtMillis()), nonNull(n.getScheduledPlace()));
+                    DateTimeUtils.formatSlot(n.getScheduledAtMillis(), n.getScheduledEndAtMillis()),
+                    nonNull(!TextUtils.isEmpty(n.getScheduledFormat()) ? n.getScheduledFormat() : n.getScheduledPlace()));
         } else if (Constants.STATUS_DELIVERED.equals(status)) {
             text = getString(R.string.detail_note_delivered, nonNull(n.getDeliveredByName()), nonNull(n.getDeliveryReport()));
             if (!TextUtils.isEmpty(n.getReconcileNote())) {

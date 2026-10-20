@@ -19,4 +19,9 @@
     <dimen name="avatar_size_small">40dp</dimen>
     <dimen name="avatar_size_medium">56dp</dimen>
     <dimen name="avatar_size_large">80dp</dimen>
+
+    <!-- F11–F15 -->
+    <dimen name="chat_system_icon">16dp</dimen>
+    <dimen name="step_indicator">22dp</dimen>
+    <dimen name="time_cell_width">64dp</dimen>
 </resources>

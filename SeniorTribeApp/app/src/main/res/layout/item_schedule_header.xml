@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F15 · Tiêu đề nhóm theo ngày ("Thứ 7, 19/10") hoặc "Gần đây". -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tvLabel"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:accessibilityHeading="true"
+    android:paddingTop="10dp"
+    android:paddingBottom="8dp"
+    android:textColor="@color/text_secondary"
+    android:textSize="13sp"
+    tools:text="Thứ 7, 19/10" />

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- F11–F13 · Chat phối hợp theo lần tiếp nhận, kèm thẻ lịch hẹn / đối soát (bố cục dọc). -->
+<!-- F11 · Chat phối hợp theo lần tiếp nhận (Figma "Chat · NC-0142").
+     Dải trạng thái phía trên dẫn sang màn hình Thống nhất lịch (F12) hoặc Tiến độ (F13).
+     Dùng chung cho dọc và ngang: khi xoay, Activity tạo lại, nội dung đang gõ được EditText
+     tự lưu, tin nhắn giữ trong ChatViewModel (T04). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootChat"
@@ -13,17 +16,10 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/surface"
-        app:title="@string/chat_title"
-        app:navigationIcon="@drawable/ic_arrow_back" />
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="@string/chat_title" />
 
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/progressBusy"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:visibility="gone" />
-
-    <include layout="@layout/include_coordination_card" />
+    <include layout="@layout/include_chat_header" />
 
     <include
         layout="@layout/include_chat_thread"

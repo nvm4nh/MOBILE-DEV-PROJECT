@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.seniortribe.app.data.CoordinationRepository;
 import com.seniortribe.app.data.MembershipRepository;
@@ -18,14 +17,17 @@ import com.seniortribe.app.models.ScheduleSession;
 import com.seniortribe.app.utils.Event;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
- * Màn hình chat phối hợp của một lần tiếp nhận (F11) kèm các bước lịch hẹn (F12) và
- * báo hỗ trợ / đối soát (F13). Giữ dữ liệu khi xoay màn hình (T04).
+ * Màn hình chat phối hợp của một lần tiếp nhận (F11). Ngoài tin nhắn, theo dõi các đề xuất
+ * lịch để chèn tin hệ thống "Đề xuất lịch: …" vào đúng chỗ trong luồng chat. Các bước thống
+ * nhất lịch (F12) và đối soát (F13) nằm ở màn hình riêng. Giữ dữ liệu khi xoay màn hình (T04).
  */
 public class ChatViewModel extends ViewModel {
+
+    /** Độ dài tối đa một tin nhắn, khớp với Security Rules. */
+    public static final int MAX_MESSAGE_LENGTH = 1000;
 
     public static class Ui {
         public boolean loading = true;
@@ -34,20 +36,6 @@ public class ChatViewModel extends ViewModel {
         public NeedSummary need;
         public List<ChatMessage> messages = new ArrayList<>();
         public List<ScheduleSession> schedules = new ArrayList<>();
-        public boolean busy;
-
-        /** Đề xuất lịch đang chờ đầu mối trả lời (mới nhất). */
-        @Nullable
-        public ScheduleSession pendingSchedule() {
-            for (ScheduleSession s : schedules) if (s.isPending()) return s;
-            return null;
-        }
-
-        /** Đề xuất gần nhất, để hiện lý do khi vừa bị từ chối. */
-        @Nullable
-        public ScheduleSession latestSchedule() {
-            return schedules.isEmpty() ? null : schedules.get(0);
-        }
     }
 
     private final NeedRepository needs = new NeedRepository();
@@ -55,6 +43,7 @@ public class ChatViewModel extends ViewModel {
     private final MutableLiveData<Ui> ui = new MutableLiveData<>(new Ui());
     private final MutableLiveData<Event<String>> messages = new MutableLiveData<>();
     private final MutableLiveData<Event<Boolean>> messageSent = new MutableLiveData<>();
+    private final MutableLiveData<Event<String>> sendFailed = new MutableLiveData<>();
 
     private String needId;
     private String assignmentId;
@@ -64,7 +53,11 @@ public class ChatViewModel extends ViewModel {
 
     public LiveData<Event<String>> getMessages() { return messages; }
 
+    /** Tin đã được nhận để gửi: Activity xóa ô nhập. */
     public LiveData<Event<Boolean>> getMessageSent() { return messageSent; }
+
+    /** Gửi thất bại: giá trị là nội dung vừa gõ, Activity trả lại vào ô nhập. */
+    public LiveData<Event<String>> getSendFailed() { return sendFailed; }
 
     public String getAssignmentId() { return assignmentId; }
 
@@ -136,73 +129,33 @@ public class ChatViewModel extends ViewModel {
             }
 
             @Override public void onError(Exception error) {
-                // Không đọc được lịch thì vẫn cho chat; thẻ phối hợp chỉ hiện trạng thái
+                // Không đọc được lịch thì vẫn chat bình thường, chỉ thiếu tin hệ thống về lịch
             }
         }));
     }
 
-    // ----- Thao tác -----
-
-    public void send(String text) {
+    /**
+     * Gửi tin nhắn. Ô nhập chỉ được xóa khi tin hợp lệ và đã được giao cho Firestore; nếu máy
+     * chủ từ chối (ví dụ lần tiếp nhận vừa kết thúc) thì nội dung được trả lại ô nhập, không mất.
+     */
+    public void send(@Nullable String text) {
         Membership me = membership();
         if (me == null) return;
-        if (text == null || text.trim().isEmpty()) return;
-        coordination.sendMessage(assignmentId, me, text).addOnCompleteListener(t -> {
-            if (!t.isSuccessful()) messages.setValue(new Event<>(NeedErrors.message(t.getException())));
+        final String clean = text != null ? text.trim() : "";
+        if (clean.isEmpty()) return;
+        if (clean.length() > MAX_MESSAGE_LENGTH) {
+            messages.setValue(new Event<>("Tin nhắn dài quá " + MAX_MESSAGE_LENGTH + " ký tự."));
+            return;
+        }
+        coordination.sendMessage(assignmentId, me, clean).addOnCompleteListener(t -> {
+            if (!t.isSuccessful()) {
+                sendFailed.setValue(new Event<>(clean));
+                messages.setValue(new Event<>("Chưa gửi được tin nhắn: " + NeedErrors.message(t.getException())
+                        + " Nội dung đã được giữ lại trong ô nhập."));
+            }
         });
-        // Firestore ghi vào cache trước rồi mới đồng bộ, nên xóa ô nhập ngay cho mượt
+        // Firestore ghi vào cache rồi mới đồng bộ: tin hiện ngay với nhãn "Đang gửi…"
         messageSent.setValue(new Event<>(true));
-    }
-
-    public void proposeSchedule(Date startAt, String place, String note) {
-        Membership me = membership();
-        if (me == null) return;
-        List<String> pending = new ArrayList<>();
-        Ui s = ui.getValue();
-        if (s != null) for (ScheduleSession x : s.schedules) if (x.isPending()) pending.add(x.getScheduleId());
-        run(coordination.proposeSchedule(needId, assignmentId, me, startAt, place, note, pending),
-                "Đã gửi đề xuất lịch. Chờ đầu mối hỏi ý kiến người cao tuổi.");
-    }
-
-    public void confirmSchedule(String scheduleId, String consentMethod) {
-        Membership me = membership();
-        if (me == null) return;
-        run(coordination.confirmSchedule(needId, scheduleId, me, consentMethod),
-                "Đã chốt lịch. Nhu cầu chuyển sang Đã thống nhất lịch.");
-    }
-
-    public void declineSchedule(String scheduleId, String reason) {
-        Membership me = membership();
-        if (me == null) return;
-        run(coordination.declineSchedule(needId, scheduleId, me, reason),
-                "Đã báo tổ chức đề xuất lịch khác.");
-    }
-
-    public void reportDelivered(String report) {
-        Membership me = membership();
-        if (me == null) return;
-        run(coordination.reportDelivered(needId, me, report),
-                "Đã báo hỗ trợ. Chờ đầu mối đối soát với người cao tuổi.");
-    }
-
-    public void noteReconcile(String note) {
-        Membership me = membership();
-        if (me == null) return;
-        run(coordination.noteReconcile(needId, me, note), "Đã ghi nội dung cần đối soát.");
-    }
-
-    public void complete(String note) {
-        Membership me = membership();
-        if (me == null) return;
-        run(coordination.complete(needId, me, note), "Đã xác nhận hoàn thành nhu cầu.");
-    }
-
-    private void run(Task<?> task, String successMessage) {
-        setBusy(true);
-        task.addOnCompleteListener(t -> {
-            setBusy(false);
-            messages.setValue(new Event<>(t.isSuccessful() ? successMessage : NeedErrors.message(t.getException())));
-        });
     }
 
     @Nullable
@@ -215,12 +168,6 @@ public class ChatViewModel extends ViewModel {
         return s.membership;
     }
 
-    private void setBusy(boolean busy) {
-        Ui s = copy();
-        s.busy = busy;
-        ui.setValue(s);
-    }
-
     private Ui copy() {
         Ui old = ui.getValue();
         Ui s = new Ui();
@@ -231,7 +178,6 @@ public class ChatViewModel extends ViewModel {
             s.need = old.need;
             s.messages = old.messages;
             s.schedules = old.schedules;
-            s.busy = old.busy;
         }
         return s;
     }
