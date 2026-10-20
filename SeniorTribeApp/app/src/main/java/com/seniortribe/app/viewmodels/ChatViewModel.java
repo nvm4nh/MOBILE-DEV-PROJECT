@@ -27,6 +27,9 @@ import java.util.List;
  */
 public class ChatViewModel extends ViewModel {
 
+    /** Độ dài tối đa một tin nhắn, khớp với Security Rules. */
+    public static final int MAX_MESSAGE_LENGTH = 1000;
+
     public static class Ui {
         public boolean loading = true;
         public String error;
@@ -55,6 +58,7 @@ public class ChatViewModel extends ViewModel {
     private final MutableLiveData<Ui> ui = new MutableLiveData<>(new Ui());
     private final MutableLiveData<Event<String>> messages = new MutableLiveData<>();
     private final MutableLiveData<Event<Boolean>> messageSent = new MutableLiveData<>();
+    private final MutableLiveData<Event<String>> sendFailed = new MutableLiveData<>();
 
     private String needId;
     private String assignmentId;
@@ -65,6 +69,9 @@ public class ChatViewModel extends ViewModel {
     public LiveData<Event<String>> getMessages() { return messages; }
 
     public LiveData<Event<Boolean>> getMessageSent() { return messageSent; }
+
+    /** Gửi thất bại: giá trị là nội dung vừa gõ, Activity trả lại vào ô nhập. */
+    public LiveData<Event<String>> getSendFailed() { return sendFailed; }
 
     public String getAssignmentId() { return assignmentId; }
 
@@ -143,14 +150,27 @@ public class ChatViewModel extends ViewModel {
 
     // ----- Thao tác -----
 
+    /**
+     * Gửi tin nhắn. Ô nhập chỉ được xóa khi tin hợp lệ và đã được giao cho Firestore; nếu máy
+     * chủ từ chối (ví dụ lần tiếp nhận vừa kết thúc) thì nội dung được trả lại ô nhập, không mất.
+     */
     public void send(String text) {
         Membership me = membership();
         if (me == null) return;
-        if (text == null || text.trim().isEmpty()) return;
-        coordination.sendMessage(assignmentId, me, text).addOnCompleteListener(t -> {
-            if (!t.isSuccessful()) messages.setValue(new Event<>(NeedErrors.message(t.getException())));
+        final String clean = text != null ? text.trim() : "";
+        if (clean.isEmpty()) return;
+        if (clean.length() > MAX_MESSAGE_LENGTH) {
+            messages.setValue(new Event<>("Tin nhắn dài quá " + MAX_MESSAGE_LENGTH + " ký tự."));
+            return;
+        }
+        coordination.sendMessage(assignmentId, me, clean).addOnCompleteListener(t -> {
+            if (!t.isSuccessful()) {
+                sendFailed.setValue(new Event<>(clean));
+                messages.setValue(new Event<>("Chưa gửi được tin nhắn: " + NeedErrors.message(t.getException())
+                        + " Nội dung đã được giữ lại trong ô nhập."));
+            }
         });
-        // Firestore ghi vào cache trước rồi mới đồng bộ, nên xóa ô nhập ngay cho mượt
+        // Firestore ghi vào cache rồi mới đồng bộ, nên xóa ô nhập ngay cho mượt
         messageSent.setValue(new Event<>(true));
     }
 
