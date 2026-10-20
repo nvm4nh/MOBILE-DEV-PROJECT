@@ -61,6 +61,12 @@ public final class LoginViewModel extends AndroidViewModel {
         return request;
     }
 
+    public void clearFormMessage() {
+        if (state.getValue().stage == Stage.FORM && state.getValue().message != 0) {
+            state.setValue(new State(Stage.FORM, 0));
+        }
+    }
+
     public boolean isGooglePickerActive(long request) {
         return !cleared && request == generation && state.getValue().stage == Stage.GOOGLE_PICKER;
     }

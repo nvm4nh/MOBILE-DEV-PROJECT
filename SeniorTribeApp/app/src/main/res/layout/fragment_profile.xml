@@ -1,120 +1,398 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:background="@color/st_auth_background">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/st_auth_background">
+
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/st_profile_toolbar"
-        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-        android:background="@color/st_auth_background" app:title="@string/st_profile_title"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/st_auth_background"
+        app:title="@string/st_profile_title"
         app:titleTextColor="@color/st_auth_text" />
-    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:fillViewport="true">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:orientation="vertical" android:padding="20dp">
-            <ProgressBar android:id="@+id/st_profile_progress"
-                android:layout_width="40dp" android:layout_height="40dp"
-                android:layout_gravity="center_horizontal" android:visibility="gone"
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <ProgressBar
+                android:id="@+id/st_profile_progress"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone"
                 android:contentDescription="@string/st_auth_loading" />
-            <TextView android:id="@+id/st_profile_message"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:textSize="16sp" android:layout_marginBottom="12dp"
-                android:accessibilityLiveRegion="polite" android:visibility="gone" />
-            <LinearLayout android:id="@+id/st_profile_form"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="vertical" android:visibility="gone">
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="@string/st_profile_personal" android:textAppearance="@style/TextAppearance.SeniorTribe.ProfileHeading" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" android:text="@string/st_profile_email_label"
-                    android:textColor="@color/st_auth_secondary" android:textSize="14sp" />
-                <TextView android:id="@+id/st_profile_email"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp" android:textColor="@color/st_auth_text" android:textSize="16sp"
-                    android:textIsSelectable="true" android:saveEnabled="false" />
-                <TextView android:id="@+id/st_profile_phone"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp" android:textColor="@color/st_auth_secondary" android:textSize="14sp"
-                    android:saveEnabled="false" />
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/st_profile_name_layout" style="@style/Widget.SeniorTribe.AuthInput"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp" android:hint="@string/st_profile_name">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/st_profile_name"
-                        android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:minHeight="56dp" android:inputType="textPersonName|textCapWords"
-                        android:maxLines="1" android:saveEnabled="false" android:textSize="16sp" android:textColor="@color/st_auth_text" />
-                </com.google.android.material.textfield.TextInputLayout>
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/st_profile_area_layout" style="@style/Widget.SeniorTribe.AuthInput"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" android:hint="@string/st_profile_area"
-                    app:helperText="@string/st_profile_area_hint">
-                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/st_profile_area"
-                        android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:minHeight="56dp" android:inputType="textCapSentences"
-                        android:maxLines="1" android:saveEnabled="false" android:textSize="16sp" android:textColor="@color/st_auth_text" />
-                </com.google.android.material.textfield.TextInputLayout>
-                <com.google.android.material.button.MaterialButton android:id="@+id/st_profile_save"
-                    style="@style/Widget.SeniorTribe.AuthButton"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp" android:text="@string/st_profile_save" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp" android:text="@string/st_register_uid_label"
-                    android:textColor="@color/st_auth_secondary" android:textSize="14sp" />
-                <TextView android:id="@+id/st_profile_uid"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp" android:textColor="@color/st_auth_text" android:textSize="14sp"
-                    android:textIsSelectable="true" android:saveEnabled="false" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/st_profile_copy_uid"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp" android:minHeight="52dp" android:textAllCaps="false"
-                    android:text="@string/st_register_copy_uid" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp" android:text="@string/st_profile_security"
+
+            <TextView
+                android:id="@+id/st_profile_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:textSize="16sp"
+                android:accessibilityLiveRegion="polite"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/st_profile_form"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    app:cardCornerRadius="40dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/st_auth_surface"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/st_auth_primary">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="20dp"
+                        android:contentDescription="@string/st_profile_avatar"
+                        app:srcCompat="@drawable/ic_person"
+                        app:tint="@color/st_auth_primary" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="@+id/st_profile_header_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/be_vietnam_pro_semibold"
+                    android:saveEnabled="false"
+                    android:textColor="@color/st_auth_text"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/st_profile_header_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:saveEnabled="false"
+                    android:textColor="@color/st_auth_secondary"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:text="@string/st_profile_personal"
                     android:textAppearance="@style/TextAppearance.SeniorTribe.ProfileHeading" />
-                <TextView android:id="@+id/st_profile_provider_note"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp" android:textColor="@color/st_auth_secondary" android:textSize="16sp" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/st_profile_change_password"
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:minHeight="64dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/st_profile_name"
+                            android:textColor="@color/st_auth_secondary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/st_profile_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:saveEnabled="false"
+                            android:textColor="@color/st_auth_text"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/st_profile_edit_name"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/st_profile_edit_name"
+                        android:padding="12dp"
+                        app:srcCompat="@drawable/ic_edit"
+                        app:tint="@color/st_auth_secondary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:minHeight="64dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/st_profile_area"
+                            android:textColor="@color/st_auth_secondary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/st_profile_area"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:saveEnabled="false"
+                            android:textColor="@color/st_auth_text"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/st_profile_edit_area"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/st_profile_edit_area"
+                        android:padding="12dp"
+                        app:srcCompat="@drawable/ic_edit"
+                        app:tint="@color/st_auth_secondary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:minHeight="64dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/st_profile_phone_label"
+                            android:textColor="@color/st_auth_secondary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/st_profile_phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:saveEnabled="false"
+                            android:textColor="@color/st_auth_text"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/st_profile_edit_phone"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/st_profile_edit_phone"
+                        android:padding="12dp"
+                        app:srcCompat="@drawable/ic_edit"
+                        app:tint="@color/st_auth_secondary" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:text="@string/st_profile_login_information"
+                    android:textAppearance="@style/TextAppearance.SeniorTribe.ProfileHeading" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/st_email_profile_label"
+                    android:textColor="@color/st_auth_secondary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/st_profile_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textIsSelectable="true"
+                    android:saveEnabled="false"
+                    android:textColor="@color/st_auth_text"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/st_profile_email_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/st_email_profile_note"
+                    android:textColor="@color/st_auth_secondary"
+                    android:textSize="14sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/st_profile_change_email"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp" android:minHeight="52dp" android:textAllCaps="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:minHeight="52dp"
+                    android:textAllCaps="false"
+                    android:text="@string/st_email_change" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:text="@string/st_register_uid_label"
+                    android:textColor="@color/st_auth_secondary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/st_profile_uid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textColor="@color/st_auth_text"
+                    android:textSize="14sp"
+                    android:textIsSelectable="true"
+                    android:saveEnabled="false" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/st_profile_copy_uid"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:minHeight="52dp"
+                    android:textAllCaps="false"
+                    android:text="@string/st_register_copy_uid" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:text="@string/st_profile_security"
+                    android:textAppearance="@style/TextAppearance.SeniorTribe.ProfileHeading" />
+
+                <TextView
+                    android:id="@+id/st_profile_provider_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@color/st_auth_secondary"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/st_profile_change_password"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:minHeight="52dp"
+                    android:textAllCaps="false"
                     android:text="@string/st_profile_change_password" />
+
             </LinearLayout>
-            <com.google.android.material.button.MaterialButton android:id="@+id/st_profile_reload"
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/st_profile_reload"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" android:minHeight="48dp" android:textAllCaps="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:minHeight="48dp"
+                android:textAllCaps="false"
                 android:text="@string/st_profile_reload" />
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="28dp" android:text="@string/st_profile_organizations_title"
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="@string/st_profile_organizations_title"
                 android:textAppearance="@style/TextAppearance.SeniorTribe.ProfileHeading" />
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="10dp" android:text="@string/st_profile_organizations_note"
-                android:textColor="@color/st_auth_secondary" android:textSize="16sp" />
-            <ProgressBar android:id="@+id/st_profile_org_progress"
-                android:layout_width="32dp" android:layout_height="32dp"
-                android:layout_marginTop="12dp" android:layout_gravity="center_horizontal"
-                android:visibility="gone" android:contentDescription="@string/st_auth_loading" />
-            <TextView android:id="@+id/st_profile_org_message"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" android:textColor="@color/st_auth_secondary" android:textSize="16sp"
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/st_profile_organizations_note"
+                android:textColor="@color/st_auth_secondary"
+                android:textSize="16sp" />
+
+            <ProgressBar
+                android:id="@+id/st_profile_org_progress"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="12dp"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone"
+                android:contentDescription="@string/st_auth_loading" />
+
+            <TextView
+                android:id="@+id/st_profile_org_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/st_auth_secondary"
+                android:textSize="16sp"
                 android:accessibilityLiveRegion="polite" />
-            <LinearLayout android:id="@+id/st_profile_organizations"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
+
+            <LinearLayout
+                android:id="@+id/st_profile_organizations"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical" />
-            <com.google.android.material.button.MaterialButton android:id="@+id/st_profile_org_reload"
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/st_profile_org_reload"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" android:minHeight="48dp" android:textAllCaps="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:minHeight="48dp"
+                android:textAllCaps="false"
                 android:text="@string/st_profile_org_reload" />
-            <com.google.android.material.button.MaterialButton android:id="@+id/st_profile_sign_out"
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/st_profile_sign_out"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:layout_marginTop="28dp" android:minHeight="52dp" android:textAllCaps="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:minHeight="52dp"
+                android:textAllCaps="false"
                 android:text="@string/st_register_sign_out" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
