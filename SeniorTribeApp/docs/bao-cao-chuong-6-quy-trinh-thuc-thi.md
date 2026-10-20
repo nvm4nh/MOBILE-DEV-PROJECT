@@ -83,8 +83,8 @@ Chương này mô tả cách các tác nhân dùng SeniorTribe để đưa một
 **Các bước (F11, F12):**
 1. Từ chi tiết nhu cầu `ACCEPTED`, cả hai bên mở **Chat**. Phòng chat gắn với `currentAssignmentId`; thành viên khác của tổ chức chưa được vào chat trong MVP. `[Hình 6.12: Màn hình chat – dọc]`
 2. Tin nhắn văn bản được gửi và nhận realtime qua Firestore. Khi xoay ngang, nội dung đang gõ không bị mất. `[Hình 6.13: Màn hình chat – ngang]`
-3. Đại diện tổ chức **đề xuất lịch** (ngày, giờ, người thực hiện).
-4. Đầu mối trao đổi với người cao tuổi. Nếu cụ đồng ý, đầu mối xác nhận lịch, nhu cầu chuyển sang `SCHEDULED`. Nếu không đồng ý, hai bên tiếp tục trao đổi để đề xuất lịch khác. `[Hình 6.14: Đề xuất và xác nhận lịch]`
+3. Đại diện tổ chức mở màn hình **Thống nhất lịch** và đề xuất **Ngày**, **Khung giờ** (giờ bắt đầu – kết thúc) và **Hình thức** (ví dụ "Đến nhà · 2 đoàn viên"). Luồng chat hiện tin hệ thống "Đề xuất lịch: Thứ 7, 19/10 · 14:00 – 16:00". `[Hình 6.14: Đề xuất lịch của tổ chức]`
+4. Đầu mối trao đổi với người cao tuổi. Nếu cụ đồng ý, đầu mối tick **"Cụ đồng ý với lịch hẹn này"**, ghi cách hỏi ý kiến rồi bấm **Chốt lịch**, nhu cầu chuyển sang `SCHEDULED` (Security Rules bắt buộc `elderConsent == true`). Nếu không phù hợp, đầu mối bấm **Đổi giờ khác** kèm lý do để tổ chức đề xuất lại. `[Hình 6.14b: Ghi nhận đồng ý và chốt lịch]`
 5. Khi lịch đã chốt, người phụ trách được đọc thông tin riêng cần thiết để đến hỗ trợ (Rules chỉ cho phép khi trạng thái là `SCHEDULED` hoặc `DELIVERED`).
 
 **Trả lại nhu cầu (F14):** Ở bước `ACCEPTED` hoặc `SCHEDULED`, nếu tổ chức không thực hiện được, đại diện chọn **Trả lại**, bắt buộc chọn lý do (không sắp xếp được người, lịch không phù hợp, vượt khả năng, hoặc lý do khác kèm ghi chú). Nhu cầu quay về `OPEN` để tổ chức khác nhận, `returnCount` tăng 1. Lần tiếp nhận cũ chuyển `RETURNED` nhưng vẫn lưu lại (R07), luồng chat cũ chỉ còn đọc, và lịch cũ hết hiệu lực. `[Hình 6.15: Bảng chọn lý do trả lại]`
@@ -97,11 +97,11 @@ Chương này mô tả cách các tác nhân dùng SeniorTribe để đưa một
 **Tác nhân:** Tổ chức phụ trách, đầu mối ghi nhận.
 
 **Các bước (F13, F15):**
-1. Sau buổi hỗ trợ, thành viên tổ chức phụ trách bấm **Báo đã hỗ trợ**, nhu cầu chuyển sang `DELIVERED`. `[Hình 6.16: Báo đã hỗ trợ]`
-2. Đầu mối liên hệ người cao tuổi để đối soát kết quả.
-3. Nếu thống nhất, đầu mối **Xác nhận hoàn thành**, nhu cầu chuyển sang `COMPLETED`, chat chuyển sang chỉ đọc. `[Hình 6.17: Xác nhận hoàn thành]`
-4. Nếu chưa thống nhất, nhu cầu giữ ở `DELIVERED` và đầu mối ghi nội dung cần đối soát qua chat.
-5. Lịch và lịch sử hỗ trợ (F15) cho phép xem lại lịch đã thống nhất, người phụ trách, các lần tiếp nhận (kể cả lần đã trả lại) và kết quả, theo quyền của từng người. `[Hình 6.18: Lịch sử hỗ trợ]`
+1. Màn hình **Tiến độ** hiển thị 5 bước: Đã tiếp nhận → Đã hẹn lịch → Tổ chức báo đã hỗ trợ → Đầu mối đối soát → Hoàn thành. Sau buổi hỗ trợ, thành viên tổ chức phụ trách ghi kết quả và bấm **Báo đã hỗ trợ**, nhu cầu chuyển sang `DELIVERED`. `[Hình 6.16: Tiến độ 5 bước và báo đã hỗ trợ]`
+2. Đầu mối liên hệ người cao tuổi để đối soát với phần "Tổ chức báo kết quả".
+3. Nếu thống nhất, đầu mối bấm **Hoàn thành** (có hộp thoại xác nhận), nhu cầu chuyển sang `COMPLETED`, lần tiếp nhận đóng (`CLOSED`) và chat chuyển sang chỉ đọc. `[Hình 6.17: Đối soát và hoàn thành]`
+4. Nếu chưa thống nhất, đầu mối ghi nội dung vào ô "Nội dung cần đối soát (nếu chưa khớp)" và bấm **Chưa khớp**; nhu cầu giữ ở `DELIVERED`.
+5. Màn hình **Lịch** (F15) có hai tab "Sắp tới" và "Lịch sử": lịch nhóm theo ngày, mỗi lịch có ô giờ bên trái, người phụ trách và trạng thái; bấm vào để xem tiến độ. `[Hình 6.18: Lịch]`
 
 **Hủy nhu cầu (F14):** Ở bất kỳ trạng thái nào trước `COMPLETED`, đầu mối có thể **Hủy** khi người cao tuổi không còn nhu cầu, không đồng ý tiếp tục, hoặc đã được gia đình/đơn vị khác hỗ trợ. Lý do là bắt buộc; chọn "Lý do khác" thì phải ghi chú. Nhu cầu chuyển sang `CANCELLED`, lần tiếp nhận đang chạy (nếu có) chuyển `CLOSED`. Tổ chức hỗ trợ không có quyền hủy, chỉ được trả lại, để nhu cầu chưa giải quyết không bị tự đóng. `[Hình 6.19: Bảng chọn lý do hủy]`
 
@@ -112,5 +112,5 @@ Chương này mô tả cách các tác nhân dùng SeniorTribe để đưa một
 ## Ghi chú cho nhóm (xóa khi ghép vào báo cáo)
 
 - **6.1:** Trên `main` hiện tại, nút Google Sign-In trong `LoginActivity` đang vào thẳng `MainActivity` ở chế độ demo, chưa xác thực thật. Cần bản của Trường (`feat/auth-profile`) trước khi chụp Hình 6.3.
-- **6.4, 6.5:** `ChatActivity` và `ScheduleFragment` trên `main` vẫn còn dữ liệu mẫu. Các bước trên viết theo phạm vi F11–F13 và hàm `coordinationStep()` trong `firestore.rules`. Khi Quyên merge `feat/chat-schedule`, cần sửa tên nút, field Firestore cho khớp rồi mới chụp hình.
+- **6.4, 6.5:** Các bước trên khớp với nhánh `feat/coordination-figma` (màn hình Thống nhất lịch, Tiến độ, Lịch theo Figma). Chụp Hình 6.12–6.18 sau khi nhánh này được merge vào `main`.
 - Ảnh chụp nên dùng dữ liệu tạo bằng `firebase/seed/seed-demo.js` để không lộ thông tin thật.
