@@ -75,7 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:labelFor="@id/etProgressInput"
-            tools:text="Nội dung cần đối soát (nếu chưa khớp)" />
+            android:text="@string/progress_reconcile_input_label" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilProgressInput"
