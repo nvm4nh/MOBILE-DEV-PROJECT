@@ -124,6 +124,10 @@ public class ChatActivity extends AppCompatActivity {
         viewModel.getMessageSent().observe(this, event -> {
             if (event.getIfNotHandled() != null) etMessage.setText("");
         });
+        viewModel.getSendFailed().observe(this, event -> {
+            String failed = event.getIfNotHandled();
+            if (failed != null) restoreDraft(failed);
+        });
         viewModel.start(needId, assignmentId);
     }
 
@@ -144,6 +148,18 @@ public class ChatActivity extends AppCompatActivity {
         etMessage = findViewById(R.id.etMessage);
         btnSend = findViewById(R.id.btnSend);
         stateView = new StateView(findViewById(R.id.frameMessages));
+    }
+
+    /**
+     * Gửi thất bại thì trả nội dung về ô nhập. Nếu người dùng đã gõ tiếp tin khác, nội dung cũ
+     * được đặt lên trước để không ghi đè phần đang gõ.
+     */
+    private void restoreDraft(String failed) {
+        String typing = etMessage.getText().toString();
+        String restored = typing.trim().isEmpty() ? failed : failed + "\n" + typing;
+        etMessage.setText(restored);
+        etMessage.setSelection(etMessage.length());
+        etMessage.requestFocus();
     }
 
     /** Kết quả từ các hộp thoại; đăng ký trước khi hộp thoại được khôi phục sau xoay màn hình. */
