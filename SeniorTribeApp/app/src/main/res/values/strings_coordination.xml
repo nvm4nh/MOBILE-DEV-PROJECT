@@ -123,13 +123,13 @@
     <string name="detail_note_delivered">%1$s báo đã hỗ trợ: %2$s. Chờ đầu mối đối soát.</string>
     <string name="detail_note_completed">Đã hoàn thành. Kết quả: %1$s</string>
 
-    <!-- F15 · Lịch và lịch sử -->
-    <string name="schedule_subtitle">Lịch đã thống nhất và các lần hỗ trợ của đơn vị</string>
+    <!-- F15 · Lịch (Figma) -->
     <string name="schedule_tab_upcoming">Sắp tới</string>
-    <string name="schedule_tab_history">Đã thực hiện</string>
+    <string name="schedule_tab_history">Lịch sử</string>
+    <string name="schedule_group_recent">Gần đây</string>
     <string name="schedule_no_time">Chưa có thời gian</string>
-    <string name="schedule_item_title">%1$s · %2$s</string>
-    <string name="schedule_item_meta">%1$s · Phụ trách: %2$s (%3$s)</string>
+    <string name="schedule_item_assignee">Phụ trách: %1$s</string>
+    <string name="schedule_empty_upcoming_inline">Chưa có lịch sắp tới</string>
     <string name="schedule_empty_upcoming_title">Chưa có lịch hẹn</string>
     <string name="schedule_empty_upcoming_message">Lịch đã được người cao tuổi đồng ý sẽ hiện ở đây.</string>
     <string name="schedule_empty_history_title">Chưa có lần hỗ trợ nào</string>

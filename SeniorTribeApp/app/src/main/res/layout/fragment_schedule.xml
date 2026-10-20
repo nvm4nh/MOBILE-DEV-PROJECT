@@ -1,27 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- F15 · Lịch hẹn sắp tới và lịch sử các lần hỗ trợ của đơn vị. -->
+<!-- F15 · Lịch (Figma): tab "Sắp tới" / "Lịch sử", lịch nhóm theo ngày, ô giờ bên trái. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="16dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:accessibilityHeading="true"
         android:text="@string/schedule_title"
         android:textColor="@color/text_primary"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="@string/schedule_subtitle"
-        android:textColor="@color/text_secondary"
-        android:textSize="13sp" />
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggleSchedule"
@@ -55,12 +50,14 @@
         android:id="@+id/frameSchedules"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="4dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSchedules"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp" />
 
         <include layout="@layout/view_list_state" />
     </FrameLayout>
