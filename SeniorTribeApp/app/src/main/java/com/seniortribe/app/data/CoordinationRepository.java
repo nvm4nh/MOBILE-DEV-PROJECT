@@ -12,6 +12,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.WriteBatch;
 import com.seniortribe.app.models.ChatMessage;
@@ -19,6 +20,7 @@ import com.seniortribe.app.models.Membership;
 import com.seniortribe.app.models.NeedEvent;
 import com.seniortribe.app.models.ScheduleSession;
 import com.seniortribe.app.utils.Constants;
+import com.seniortribe.app.utils.DateTimeUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +46,9 @@ public class CoordinationRepository {
     public static final String EVENT_RECONCILE_PENDING = "RECONCILE_PENDING";
     public static final String EVENT_COMPLETED = "COMPLETED";
 
+    /** Khung giờ hẹn dài tối đa 12 tiếng, khớp với rule tạo schedules. */
+    public static final long MAX_SLOT_MILLIS = 12L * 60 * 60 * 1000;
+
     private final FirebaseFirestore db;
 
     public CoordinationRepository() {
@@ -59,9 +64,10 @@ public class CoordinationRepository {
     // =====================================================================
 
     public ListenerRegistration listenMessages(String assignmentId, NeedRepository.Callback<List<ChatMessage>> callback) {
+        // INCLUDE để biết tin nào còn chờ máy chủ xác nhận (hiện "Đang gửi…")
         return assignmentRef(assignmentId).collection(Constants.COL_MESSAGES)
                 .orderBy("at", Query.Direction.ASCENDING)
-                .addSnapshotListener((snap, error) -> {
+                .addSnapshotListener(MetadataChanges.INCLUDE, (snap, error) -> {
                     if (error != null) {
                         callback.onError(error);
                         return;
@@ -70,7 +76,9 @@ public class CoordinationRepository {
                     List<ChatMessage> list = new ArrayList<>();
                     for (DocumentSnapshot doc : snap.getDocuments()) {
                         ChatMessage m = doc.toObject(ChatMessage.class);
-                        if (m != null) list.add(m);
+                        if (m == null) continue;
+                        m.setPending(doc.getMetadata().hasPendingWrites());
+                        list.add(m);
                     }
                     callback.onData(list, snap.getMetadata().isFromCache());
                 });
@@ -113,19 +121,28 @@ public class CoordinationRepository {
     }
 
     /**
-     * Tổ chức phụ trách đề xuất lịch khi nhu cầu đang ACCEPTED. Đề xuất đang chờ cũ (nếu có)
-     * được rút lại trong cùng một lần ghi để đầu mối chỉ thấy một đề xuất cần trả lời.
+     * Tổ chức phụ trách đề xuất lịch (ngày, khung giờ, hình thức) khi nhu cầu đang ACCEPTED.
+     * Địa điểm lấy theo khu vực chung của nhu cầu, địa chỉ chính xác chỉ mở sau khi chốt (R03).
+     * Đề xuất đang chờ cũ (nếu có) được rút lại trong cùng một lần ghi để đầu mối chỉ thấy
+     * một đề xuất cần trả lời.
      */
-    public Task<Void> proposeSchedule(String needId, String assignmentId, Membership me, Date startAt,
-                                      String place, @Nullable String note, List<String> pendingIds) {
+    public Task<Void> proposeSchedule(String needId, String assignmentId, Membership me, Date startAt, Date endAt,
+                                      String format, String place, List<String> pendingIds) {
         if (startAt == null || startAt.getTime() <= System.currentTimeMillis()) {
-            return Tasks.forException(new NeedActionException("Hãy chọn thời gian hẹn trong tương lai."));
+            return Tasks.forException(new NeedActionException("Hãy chọn ngày và giờ bắt đầu trong tương lai."));
+        }
+        if (endAt == null || endAt.getTime() <= startAt.getTime()) {
+            return Tasks.forException(new NeedActionException("Giờ kết thúc phải sau giờ bắt đầu."));
+        }
+        if (endAt.getTime() - startAt.getTime() > MAX_SLOT_MILLIS) {
+            return Tasks.forException(new NeedActionException("Khung giờ hẹn dài tối đa 12 tiếng."));
+        }
+        String cleanFormat = format != null ? format.trim() : "";
+        if (cleanFormat.length() < 2 || cleanFormat.length() > 120) {
+            return Tasks.forException(new NeedActionException("Hãy ghi hình thức hỗ trợ (ví dụ: Đến nhà · 2 đoàn viên)."));
         }
         String cleanPlace = place != null ? place.trim() : "";
-        if (cleanPlace.length() < 2) {
-            return Tasks.forException(new NeedActionException("Hãy ghi địa điểm hẹn (khu vực chung, không cần số nhà)."));
-        }
-        String cleanNote = note != null && !note.trim().isEmpty() ? note.trim() : null;
+        if (cleanPlace.length() < 2) cleanPlace = "Theo khu vực của nhu cầu";
 
         DocumentReference needRef = needRef(needId);
         WriteBatch batch = db.batch();
@@ -140,8 +157,9 @@ public class CoordinationRepository {
 
         Map<String, Object> s = new HashMap<>();
         s.put("startAt", new Timestamp(startAt));
+        s.put("endAt", new Timestamp(endAt));
+        s.put("format", cleanFormat);
         s.put("place", cleanPlace);
-        s.put("note", cleanNote);
         s.put("status", ScheduleSession.PROPOSED);
         s.put("proposedByUid", me.getUid());
         s.put("proposedByName", me.getDisplayName());
@@ -149,7 +167,8 @@ public class CoordinationRepository {
         batch.set(assignmentRef(assignmentId).collection(Constants.COL_SCHEDULES).document(), s);
 
         batch.set(NeedRepository.newEventRef(needRef), NeedRepository.event(EVENT_SCHEDULE_PROPOSED,
-                Constants.STATUS_ACCEPTED, Constants.STATUS_ACCEPTED, me, describe(startAt, cleanPlace)));
+                Constants.STATUS_ACCEPTED, Constants.STATUS_ACCEPTED, me,
+                describe(startAt, endAt, cleanFormat)));
         return batch.commit();
     }
 
@@ -157,7 +176,11 @@ public class CoordinationRepository {
      * Đầu mối đã hỏi ý kiến người cao tuổi và họ đồng ý: xác nhận lịch, nhu cầu sang SCHEDULED.
      * Từ đây người phụ trách được đọc thông tin riêng cần để đến hỗ trợ (R03).
      */
-    public Task<Void> confirmSchedule(String needId, String scheduleId, Membership me, String consentMethod) {
+    public Task<Void> confirmSchedule(String needId, String scheduleId, Membership me, boolean elderAgreed,
+                                      String consentMethod) {
+        if (!elderAgreed) {
+            return Tasks.forException(new NeedActionException("Chỉ chốt lịch khi người cao tuổi đã đồng ý."));
+        }
         String consent = consentMethod != null ? consentMethod.trim() : "";
         if (consent.isEmpty()) {
             return Tasks.forException(new NeedActionException("Hãy ghi cách người cao tuổi đã đồng ý lịch hẹn."));
@@ -179,10 +202,16 @@ public class CoordinationRepository {
                 throw new NeedActionException("Đề xuất lịch này đã được thay đổi. Vui lòng xem lại.");
             }
             Timestamp startAt = schedule.getTimestamp("startAt");
+            Timestamp endAt = schedule.getTimestamp("endAt");
+            String format = schedule.getString("format");
             String place = schedule.getString("place");
+            if (startAt == null || endAt == null || format == null) {
+                throw new NeedActionException("Đề xuất này thiếu khung giờ hoặc hình thức. Hãy nhờ tổ chức đề xuất lại.");
+            }
 
             Map<String, Object> decided = new HashMap<>();
             decided.put("status", ScheduleSession.CONFIRMED);
+            decided.put("elderConsent", true);
             decided.put("consentMethod", consent);
             decided.put("decidedByUid", me.getUid());
             decided.put("decidedByName", me.getDisplayName());
@@ -192,6 +221,8 @@ public class CoordinationRepository {
             update.put("status", Constants.STATUS_SCHEDULED);
             update.put("scheduleId", scheduleId);
             update.put("scheduledAt", startAt);
+            update.put("scheduledEndAt", endAt);
+            update.put("scheduledFormat", format);
             update.put("scheduledPlace", place);
             update.put("scheduledByUid", me.getUid());
             update.put("updatedAt", FieldValue.serverTimestamp());
@@ -200,7 +231,7 @@ public class CoordinationRepository {
             tx.update(ref, update);
             tx.set(NeedRepository.newEventRef(ref), NeedRepository.event(EVENT_SCHEDULED,
                     Constants.STATUS_ACCEPTED, Constants.STATUS_SCHEDULED, me,
-                    describe(startAt != null ? startAt.toDate() : null, place) + " · Đồng ý: " + consent));
+                    describe(startAt.toDate(), endAt.toDate(), format) + " · Đồng ý: " + consent));
             return null;
         });
     }
@@ -382,8 +413,9 @@ public class CoordinationRepository {
         }
     }
 
-    private static String describe(@Nullable Date startAt, @Nullable String place) {
-        String time = startAt != null ? com.seniortribe.app.utils.DateTimeUtils.formatDateTime(startAt.getTime()) : "";
-        return TextUtils.isEmpty(place) ? time : time + " · " + place;
+    /** "Thứ 7, 19/10 · 14:00 – 16:00 · Đến nhà · 2 đoàn viên" cho lịch sử thay đổi. */
+    private static String describe(Date startAt, Date endAt, @Nullable String format) {
+        String slot = DateTimeUtils.formatSlot(startAt.getTime(), endAt.getTime());
+        return TextUtils.isEmpty(format) ? slot : slot + " · " + format;
     }
 }

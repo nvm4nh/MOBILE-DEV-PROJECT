@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Tùy chọn trên màn hình chat phối hợp. -->
+<!-- Tùy chọn trên màn hình chat phối hợp (F11): mở F12, F13, chi tiết và lịch sử. -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_schedule"
+        android:icon="@drawable/ic_schedule"
+        android:title="@string/agree_title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_progress"
+        android:icon="@drawable/ic_check"
+        android:title="@string/progress_menu"
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_open_need"
         android:icon="@drawable/ic_info"

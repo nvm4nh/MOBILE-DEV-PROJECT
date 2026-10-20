@@ -52,4 +52,6 @@ public class Constants {
 
     // Lần tiếp nhận hiện tại; chat theo từng lần tiếp nhận nên dùng id này (quy tắc R08)
     public static final String EXTRA_ASSIGNMENT_ID = "extra_assignment_id";
+    /** Mã hồ sơ NC-xxxx, để màn hình F12 / F13 hiện tiêu đề ngay khi chưa tải xong. */
+    public static final String EXTRA_CASE_CODE = "extra_case_code";
 }

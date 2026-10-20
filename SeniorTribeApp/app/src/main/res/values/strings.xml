@@ -68,7 +68,7 @@
     <string name="status_cancelled_label">Đã hủy</string>
 
     <!-- Chat & Schedule -->
-    <string name="chat_title">Trao đổi phối hợp</string>
+    <string name="chat_title">Chat</string>
     <string name="send_message_hint">Nhập tin nhắn...</string>
     <string name="schedule_title">Lịch hẹn thăm hỏi</string>
     <string name="btn_propose">Gửi đề xuất lịch</string>
