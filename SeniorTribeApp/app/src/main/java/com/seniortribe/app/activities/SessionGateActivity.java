@@ -54,6 +54,7 @@ public class SessionGateActivity extends AppCompatActivity {
         uid = state.uid;
         boolean loading = state.stage == SessionGateViewModel.Stage.LOADING;
         boolean error = state.stage == SessionGateViewModel.Stage.ERROR;
+        findViewById(R.id.st_access_lock).setVisibility(!loading && !error ? View.VISIBLE : View.GONE);
         ((TextView) findViewById(R.id.st_access_uid)).setText(uid);
         ((TextView) findViewById(R.id.st_access_title)).setText(loading
                 ? R.string.st_access_loading_title : error

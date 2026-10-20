@@ -7,6 +7,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.seniortribe.app.R;
 import com.seniortribe.app.auth.AuthFields;
 import com.seniortribe.app.auth.PasswordResetViewModel;
@@ -16,6 +17,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         setTheme(R.style.Theme_SeniorTribe_Auth);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
+        MaterialToolbar toolbar = findViewById(R.id.st_reset_toolbar);
+        toolbar.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
         PasswordResetViewModel model = new ViewModelProvider(this).get(PasswordResetViewModel.class);
         TextInputEditText email = AuthFields.bind(this, R.id.st_reset_email, model.email, v -> model.email = v);
         View submit = findViewById(R.id.st_reset_submit);

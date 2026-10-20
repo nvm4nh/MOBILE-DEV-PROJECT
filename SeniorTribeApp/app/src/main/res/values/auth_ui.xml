@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="st_auth_back">Quay lại</string>
+    <string name="st_auth_logo">Logo SeniorTribe</string>
+    <string name="st_register_login">Đã có tài khoản? Đăng nhập</string>
+    <string name="st_reset_login">Về đăng nhập</string>
+</resources>

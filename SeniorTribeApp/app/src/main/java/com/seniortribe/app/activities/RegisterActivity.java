@@ -21,6 +21,9 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.seniortribe.app.auth.GoogleSignInLauncher;
+import com.seniortribe.app.auth.LoginViewModel;
 import com.seniortribe.app.auth.RegistrationViewModel;
 
 import java.util.function.Consumer;
@@ -29,6 +32,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     private boolean routed;
     private RegistrationViewModel model;
+    private LoginViewModel googleModel;
+    private GoogleSignInLauncher googleLauncher;
     private TextInputEditText password;
     private TextInputEditText confirmation;
     private View[] formControls;
@@ -40,6 +45,10 @@ public class RegisterActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         setContentView(R.layout.activity_register);
         model = new ViewModelProvider(this).get(RegistrationViewModel.class);
+        googleModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        googleLauncher = new GoogleSignInLauncher(this, googleModel);
+        MaterialToolbar toolbar = findViewById(R.id.st_register_toolbar);
+        toolbar.setNavigationOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
 
         TextInputEditText name = bind(R.id.st_register_name, model.name,
                 value -> model.name = value);
@@ -52,26 +61,32 @@ public class RegisterActivity extends AppCompatActivity {
 
         View submit = findViewById(R.id.st_register_submit);
         View back = findViewById(R.id.btnGoToLogin);
-        formControls = new View[] {name, email, password, confirmation, submit, back};
-        submit.setOnClickListener(view -> model.register());
+        View google = findViewById(R.id.st_register_google);
+        formControls = new View[] {name, email, password, confirmation, submit, back, google};
+        submit.setOnClickListener(view -> submitEmail());
+        google.setOnClickListener(view -> {
+            if (!model.busy() && model.state().getValue().stage == RegistrationViewModel.Stage.FORM) {
+                googleLauncher.launch();
+            }
+        });
         back.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
         findViewById(R.id.st_register_retry).setOnClickListener(view -> model.retryProfile());
         findViewById(R.id.st_register_copy_uid).setOnClickListener(view -> copyUid());
         findViewById(R.id.st_register_sign_out).setOnClickListener(view -> {
-            if (model.busy()) return;
+            if (busy()) return;
             model.signOut();
             finish();
         });
         confirmation.setOnEditorActionListener((view, action, event) -> {
             if (action != EditorInfo.IME_ACTION_DONE) return false;
-            model.register();
+            submitEmail();
             return true;
         });
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (model.busy()) {
+                if (busy()) {
                     Toast.makeText(RegisterActivity.this,
                             R.string.st_auth_wait, Toast.LENGTH_SHORT).show();
                     return;
@@ -82,6 +97,33 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
         model.state().observe(this, this::render);
+        googleModel.state().observe(this, state -> {
+            if (state.stage == LoginViewModel.Stage.DONE) {
+                // Existing email accounts recovering profile creation stay in the registration flow.
+                if (model.state().getValue().stage == RegistrationViewModel.Stage.FORM) routeToGate();
+            } else {
+                render(model.state().getValue());
+            }
+        });
+    }
+
+    private boolean busy() { return model.busy() || googleModel.busy(); }
+
+    private void submitEmail() {
+        if (googleModel.busy()) return;
+        googleModel.clearFormMessage();
+        model.register();
+    }
+
+    private void routeToGate() {
+        if (routed) return;
+        routed = true;
+        password.setText("");
+        confirmation.setText("");
+        Intent intent = new Intent(this, SessionGateActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private TextInputEditText bind(int id, String initial, Consumer<String> changed) {
@@ -104,16 +146,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void render(RegistrationViewModel.State state) {
         if (state.stage == RegistrationViewModel.Stage.DONE) {
-            if (!routed) {
-                routed = true;
-                Intent intent = new Intent(this, SessionGateActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
-            }
+            routeToGate();
             return;
         }
-        boolean busy = model.busy();
+        boolean busy = busy();
         boolean showForm = state.stage == RegistrationViewModel.Stage.FORM
                 || state.stage == RegistrationViewModel.Stage.REGISTERING;
         findViewById(R.id.st_register_form).setVisibility(showForm ? View.VISIBLE : View.GONE);
@@ -128,8 +164,10 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         TextView message = findViewById(R.id.st_register_message);
-        message.setVisibility(state.message == 0 ? View.GONE : View.VISIBLE);
-        if (state.message != 0) message.setText(state.message);
+        int googleMessage = googleModel.state().getValue().message;
+        int messageResource = googleModel.busy() ? 0 : googleMessage != 0 ? googleMessage : state.message;
+        message.setVisibility(messageResource == 0 ? View.GONE : View.VISIBLE);
+        if (messageResource != 0) message.setText(messageResource);
         message.setTextColor(ContextCompat.getColor(this,
                 busy ? R.color.st_auth_secondary : R.color.st_auth_error));
 
@@ -163,5 +201,10 @@ public class RegisterActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             Toast.makeText(this, R.string.st_register_uid_copied, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override protected void onDestroy() {
+        if (googleLauncher != null) googleLauncher.close();
+        super.onDestroy();
     }
 }
