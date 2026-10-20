@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F11 · Tin hệ thống giữa luồng chat, ví dụ "Đề xuất lịch: Thứ 7, 19/10 · 14:00 – 16:00".
+     Bấm vào để mở màn hình Thống nhất lịch (F12). Màu tô trong ChatAdapter. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <TextView
+        android:id="@+id/tvLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_pill"
+        android:drawablePadding="6dp"
+        android:gravity="center"
+        android:minHeight="32dp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
+        android:textSize="12sp"
+        tools:drawableStart="@drawable/ic_schedule"
+        tools:text="Đề xuất lịch: Thứ 7, 19/10 · 14:00 – 16:00" />
+</FrameLayout>

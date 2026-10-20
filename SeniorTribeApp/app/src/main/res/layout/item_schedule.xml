@@ -1,62 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- F15 · Một lịch hẹn / lần hỗ trợ trong màn hình Lịch hẹn. -->
+<!-- F15 · Một lịch hẹn: ô giờ bên trái (bắt đầu / kết thúc), bên phải tên việc · khu vực,
+     người phụ trách và trạng thái (Figma "Lịch"). -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Needs.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardCornerRadius="@dimen/card_corner_radius"
-    app:cardElevation="@dimen/card_elevation"
-    app:strokeColor="@color/divider"
-    app:strokeWidth="1dp">
+    android:layout_marginBottom="10dp"
+    android:clickable="true"
+    android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:padding="12dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/layoutTimeCell"
+            android:layout_width="@dimen/time_cell_width"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:background="@drawable/bg_time_cell"
+            android:gravity="center"
+            android:minHeight="64dp"
+            android:orientation="vertical"
+            android:paddingVertical="8dp">
 
             <TextView
-                android:id="@+id/tvDateTime"
-                android:layout_width="0dp"
+                android:id="@+id/tvStartTime"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:textColor="@color/primary"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tools:text="14:00" />
+
+            <TextView
+                android:id="@+id/tvEndTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                tools:text="16:00" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvScheduleTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/text_primary"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                tools:text="09:00 26/10/2026" />
+                tools:text="Trò chuyện với cụ bà · Phường 7" />
+
+            <TextView
+                android:id="@+id/tvScheduleAssignee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                tools:text="Phụ trách: Nguyễn Minh Khoa" />
 
             <TextView
                 android:id="@+id/tvStatus"
                 style="@style/Needs.StatusChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="Đã thống nhất lịch" />
+                android:layout_marginTop="8dp"
+                tools:text="Đã hẹn lịch" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvLocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="@color/text_primary"
-            android:textSize="14sp"
-            tools:text="NC-0142 · Đi chợ giúp cụ cuối tuần" />
-
-        <TextView
-            android:id="@+id/tvNotes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp"
-            tools:text="Phường 9, Quận 3 · Phụ trách: Trần B (Hội Chữ thập đỏ)" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

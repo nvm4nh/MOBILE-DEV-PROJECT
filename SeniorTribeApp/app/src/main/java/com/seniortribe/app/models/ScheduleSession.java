@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * Một đề xuất lịch hẹn trong needs_assignments/{assignmentId}/schedules (F12).
  *
- * Tổ chức phụ trách đề xuất (PROPOSED). Đầu mối hỏi ý kiến người cao tuổi rồi xác nhận
+ * Tổ chức phụ trách đề xuất ngày, khung giờ và hình thức (PROPOSED). Đầu mối hỏi ý kiến người cao tuổi rồi xác nhận
  * (CONFIRMED, nhu cầu sang SCHEDULED) hoặc từ chối kèm lý do (DECLINED). Khi tổ chức gửi
  * đề xuất mới, đề xuất đang chờ cũ chuyển WITHDRAWN.
  */
@@ -24,12 +24,15 @@ public class ScheduleSession {
     @DocumentId
     private String scheduleId;
     private Date startAt;
-    private String place;           // địa điểm chung, địa chỉ chính xác nằm ở thông tin riêng
+    private Date endAt;             // hết khung giờ hẹn, ví dụ 14:00 – 16:00
+    private String format;          // hình thức, ví dụ "Đến nhà · 2 đoàn viên"
+    private String place;           // khu vực chung của nhu cầu, địa chỉ chính xác nằm ở thông tin riêng
     private String note;
     private String status;
     private String proposedByUid;
     private String proposedByName;
     private Date createdAt;
+    private boolean elderConsent;   // đầu mối đã tick "Cụ đồng ý với lịch hẹn này"
     private String consentMethod;   // cách đầu mối hỏi ý kiến người cao tuổi khi xác nhận
     private String declineReason;
     private String decidedByName;
@@ -43,11 +46,31 @@ public class ScheduleSession {
     @Exclude
     public long getStartAtMillis() { return startAt != null ? startAt.getTime() : 0L; }
 
+    /** Hết khung giờ; đề xuất cũ chưa có khung giờ thì trả 0. */
+    @Exclude
+    public long getEndAtMillis() { return endAt != null ? endAt.getTime() : 0L; }
+
+    /** Thời điểm đề xuất, dùng để xếp tin hệ thống vào đúng chỗ trong luồng chat. */
+    @Exclude
+    public long getCreatedAtMillis() { return createdAt != null ? createdAt.getTime() : System.currentTimeMillis(); }
+
+    @Exclude
+    public long getDecidedAtMillis() { return decidedAt != null ? decidedAt.getTime() : 0L; }
+
     public String getScheduleId() { return scheduleId; }
     public void setScheduleId(String scheduleId) { this.scheduleId = scheduleId; }
 
     public Date getStartAt() { return startAt; }
     public void setStartAt(Date startAt) { this.startAt = startAt; }
+
+    public Date getEndAt() { return endAt; }
+    public void setEndAt(Date endAt) { this.endAt = endAt; }
+
+    public String getFormat() { return format; }
+    public void setFormat(String format) { this.format = format; }
+
+    public boolean isElderConsent() { return elderConsent; }
+    public void setElderConsent(boolean elderConsent) { this.elderConsent = elderConsent; }
 
     public String getPlace() { return place; }
     public void setPlace(String place) { this.place = place; }
