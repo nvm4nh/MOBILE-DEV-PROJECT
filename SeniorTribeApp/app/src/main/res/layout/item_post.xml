@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- F04 · Thẻ bài đăng theo Figma: avatar tổ chức, tên + tích xác minh, thời gian, nút ⋮ (chỉ đại diện
+     của tổ chức đăng bài mới thấy), tiêu đề, nội dung. Nội dung mẫu chỉ hiện trong bản xem trước. -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/surface"
     app:cardCornerRadius="@dimen/card_corner_radius"
-    app:cardElevation="@dimen/card_elevation"
+    app:cardElevation="0dp"
     app:strokeColor="@color/divider"
-    app:strokeWidth="1dp"
-    app:cardBackgroundColor="@color/surface">
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="4dp"
+        android:paddingBottom="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -23,71 +29,81 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tvAuthorOrg"
+                android:id="@+id/tvAvatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_avatar_circle"
+                android:gravity="center"
+                android:importantForAccessibility="no"
+                android:textColor="@color/primary_dark"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="ĐT" />
+
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
                 android:layout_weight="1"
-                android:text="DNXH Vầng Trăng Khuyết"
-                android:textColor="@color/primary"
-                android:textStyle="bold"
-                android:textSize="14sp" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvOfflineBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_badge"
-                android:text="Offline Cache"
-                android:textColor="@color/primary"
-                android:textSize="11sp"
-                android:visibility="gone" />
+                <TextView
+                    android:id="@+id/tvAuthorOrg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="4dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:drawableEnd="@drawable/ic_verified_small"
+                    tools:text="Đoàn Thanh niên Phường 7" />
 
-            <TextView
-                android:id="@+id/tvTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="2 giờ trước"
-                android:textColor="@color/text_hint"
-                android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    tools:text="2 giờ trước" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnPostMenu"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/post_options"
+                android:src="@drawable/ic_more_vert"
+                android:visibility="gone"
+                tools:visibility="visible" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Chuyến thăm các cụ neo đơn tại Quận 8 cuối tuần"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:lineSpacingExtra="2dp"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Ngày hội thăm hỏi người cao tuổi tháng 10" />
 
         <TextView
             android:id="@+id/tvContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:maxLines="3"
-            android:ellipsize="end"
-            android:text="Đoàn tình nguyện viên đã trao 20 phần quà sinh hoạt và tổ chức buổi trò chuyện ấm cúng cùng các cụ..."
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp"
-            android:lineSpacingExtra="3dp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="12dp"
-            android:background="@color/divider" />
-
-        <TextView
-            android:id="@+id/tvLikes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="15 quan tâm"
-            android:textColor="@color/secondary_dark"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
+            android:lineSpacingExtra="4dp"
+            android:maxLines="5"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            tools:text="Sáng Chủ nhật 20/10, đoàn viên phường 7 đến thăm và trò chuyện cùng 15 cụ trong khu phố. Đơn vị muốn phối hợp vui lòng nhắn đại diện qua ứng dụng." />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

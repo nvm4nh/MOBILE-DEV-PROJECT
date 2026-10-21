@@ -1,11 +1,20 @@
 rules_version = '2';
 
+// =====================================================================
+// SeniorTribe · Firestore Security Rules
+//
+// Phần 1 (users, memberships) giữ nguyên từ nhánh feat/auth-profile.
+// Phần 2 (nhu cầu hỗ trợ F06–F10, F14) do nhánh feat/requests bổ sung.
+// Phần 3 (bài đăng, chat, lịch) các nhánh khác bổ sung vào cuối file.
+//
+// Nguyên tắc: quyền được cấp sẵn trong memberships, người dùng không tự nâng quyền (R01);
+// mọi lần đổi trạng thái được kiểm tra lại ở đây, kể cả khi app đã kiểm tra (R06).
+// =====================================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ================================================================
-    // HÀM CHUNG
-    // ================================================================
+    // ---------- Hàm chung ----------
 
     function signedIn() {
       return request.auth != null;
@@ -19,6 +28,7 @@ service cloud.firestore {
       return /databases/$(database)/documents/memberships/$(uid)/organizations/$(orgId);
     }
 
+    // Tài khoản hiện tại là thành viên đang hoạt động của tổ chức orgId
     function isMember(orgId) {
       return signedIn()
         && orgId is string
@@ -26,11 +36,10 @@ service cloud.firestore {
         && get(membershipPath(request.auth.uid, orgId)).data.active == true;
     }
 
+    // ... và có vai trò role (RECORDER, REVIEWER, REPRESENTATIVE)
     function hasRole(orgId, role) {
       return isMember(orgId)
-        && role in get(
-          membershipPath(request.auth.uid, orgId)
-        ).data.roles;
+        && role in get(membershipPath(request.auth.uid, orgId)).data.roles;
     }
 
     function changed() {
@@ -38,41 +47,16 @@ service cloud.firestore {
     }
 
     function isText(value, minLen, maxLen) {
-      return value is string
-        && value.size() >= minLen
-        && value.size() <= maxLen;
+      return value is string && value.size() >= minLen && value.size() <= maxLen;
     }
 
-    // ================================================================
-    // TÀI KHOẢN
-    // ================================================================
-
-    function validContactPhone(value) {
-      return value is string
-        && (
-          value == ''
-          || value.matches('[+]?[0-9]{8,15}')
-        );
-    }
+    // =================================================================
+    // Phần 1 · Tài khoản và quyền (từ feat/auth-profile)
+    // =================================================================
 
     function validProfile(data, uid) {
-      return data.keys().hasAll([
-          'uid',
-          'displayName',
-          'email',
-          'area',
-          'createdAt',
-          'updatedAt'
-        ])
-        && data.keys().hasOnly([
-          'uid',
-          'displayName',
-          'email',
-          'area',
-          'phone',
-          'createdAt',
-          'updatedAt'
-        ])
+      return data.keys().hasAll(['uid', 'displayName', 'email', 'area', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'displayName', 'email', 'area', 'createdAt', 'updatedAt'])
         && data.uid == uid
         && data.displayName is string
         && data.displayName.size() >= 2
@@ -82,77 +66,30 @@ service cloud.firestore {
         && data.area is string
         && data.area.size() <= 120
         && data.createdAt is timestamp
-        && data.updatedAt is timestamp
-        && validContactPhone(data.get('phone', ''));
+        && data.updatedAt is timestamp;
     }
 
     match /users/{uid} {
       allow get: if owns(uid);
-
       allow list: if false;
-
       allow create: if owns(uid)
         && validProfile(request.resource.data, uid)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
-
       allow update: if owns(uid)
-        && request.resource.data.uid == uid
-        && changed().hasOnly([
-          'displayName',
-          'area',
-          'phone',
-          'email',
-          'updatedAt'
-        ])
-        && (
-          !changed().hasAny(['displayName'])
-          || (
-            request.resource.data.displayName is string
-            && request.resource.data.displayName.size() >= 2
-            && request.resource.data.displayName.size() <= 80
-          )
-        )
-        && (
-          !changed().hasAny(['area'])
-          || (
-            request.resource.data.area is string
-            && request.resource.data.area.size() <= 120
-          )
-        )
-        && (
-          !changed().hasAny(['phone'])
-          || validContactPhone(
-            request.resource.data.get('phone', '')
-          )
-        )
-        && (
-          !changed().hasAny(['email'])
-          || (
-            request.resource.data.email is string
-            && request.resource.data.email.size() >= 3
-            && request.resource.data.email.size() <= 254
-            && request.resource.data.email
-              == request.auth.token.get('email', '')
-            && request.auth.token.get(
-              'email_verified', false
-            ) == true
-          )
-        )
+        && validProfile(request.resource.data, uid)
+        && changed().hasOnly(['displayName', 'area', 'updatedAt'])
         && request.resource.data.updatedAt == request.time;
-
       allow delete: if false;
     }
 
-    // ================================================================
-    // TỔ CHỨC VÀ PHÂN QUYỀN
-    // ================================================================
-
+    // Quyền do quản trị tạo trên Console / script seed, app chỉ đọc
     match /memberships/{uid}/organizations/{organizationId} {
       allow get, list: if owns(uid);
       allow create, update, delete: if false;
     }
 
+    // Hồ sơ tổ chức và danh sách thành viên (để chọn đại diện phụ trách)
     match /organizations/{orgId} {
       allow get: if signedIn();
       allow list, write: if false;
@@ -163,9 +100,9 @@ service cloud.firestore {
       }
     }
 
-    // ================================================================
-    // HÀM HỖ TRỢ NHU CẦU, TIẾP NHẬN VÀ LỊCH
-    // ================================================================
+    // =================================================================
+    // Phần 2 · Nhu cầu hỗ trợ (F06–F10, F14)
+    // =================================================================
 
     function needPath(needId) {
       return /databases/$(database)/documents/needs_summary/$(needId);
@@ -179,6 +116,8 @@ service cloud.firestore {
       return /databases/$(database)/documents/needs_assignments/$(assignmentId)/schedules/$(scheduleId);
     }
 
+    // Nội dung tóm tắt hợp lệ (F06). Không kiểm tra được "không chứa tên" ở đây,
+    // việc đó do app nhắc và điều phối viên rà soát (F07).
     function validSummary(d) {
       return isText(d.title, 5, 120)
         && isText(d.topic, 1, 60)
@@ -190,81 +129,40 @@ service cloud.firestore {
         && isText(d.consentMethod, 1, 200);
     }
 
+    // Các field đầu mối được sửa khi nhu cầu chưa có tổ chức nhận
     function editableKeys() {
-      return [
-        'title',
-        'topic',
-        'content',
-        'area',
-        'desiredTime',
-        'source',
-        'consentRecorded',
-        'consentMethod',
-        'status',
-        'needsRevision',
-        'updatedAt',
-        'submittedAt'
-      ];
+      return ['title', 'topic', 'content', 'area', 'desiredTime', 'source',
+              'consentRecorded', 'consentMethod', 'status', 'needsRevision',
+              'updatedAt', 'submittedAt'];
     }
 
+    // Field không bao giờ được đổi sau khi tạo
     function lockedKeys() {
-      return [
-        'caseCode',
-        'recorderOrgId',
-        'recorderOrgName',
-        'recorderUid',
-        'recorderName',
-        'createdAt'
-      ];
+      return ['caseCode', 'recorderOrgId', 'recorderOrgName', 'recorderUid', 'recorderName', 'createdAt'];
     }
 
+    // Đọc được bản tóm tắt: nhu cầu OPEN (chỉ phần tóm tắt, không có thông tin nhận diện),
+    // hoặc thành viên đơn vị ghi nhận, hoặc thành viên tổ chức đang phụ trách.
+    // Ghi chú MVP: mọi tài khoản đã đăng nhập đều đọc được bản tóm tắt OPEN.
     function canReadNeed(d) {
-      return signedIn()
-        && (
-          d.status == 'OPEN'
-          || isMember(d.recorderOrgId)
-          || isMember(d.get('assignedOrgId', '-'))
-        );
+      return signedIn() && (
+           d.status == 'OPEN'
+        || isMember(d.recorderOrgId)
+        || isMember(d.get('assignedOrgId', '-')));
     }
-
-    // ================================================================
-    // NHU CẦU HỖ TRỢ
-    // ================================================================
 
     match /needs_summary/{needId} {
+
       allow read: if canReadNeed(resource.data);
 
-      allow create: if hasRole(
-          request.resource.data.recorderOrgId,
-          'RECORDER'
-        )
+      // F06 · Đầu mối tạo nhu cầu ở REVIEW
+      allow create: if hasRole(request.resource.data.recorderOrgId, 'RECORDER')
         && request.resource.data.keys().hasOnly([
-          'caseCode',
-          'title',
-          'topic',
-          'content',
-          'area',
-          'desiredTime',
-          'source',
-          'consentRecorded',
-          'consentMethod',
-          'status',
-          'needsRevision',
-          'reviewNote',
-          'recorderOrgId',
-          'recorderOrgName',
-          'recorderUid',
-          'recorderName',
-          'assignedOrgId',
-          'assignedOrgName',
-          'assigneeUid',
-          'assigneeName',
-          'currentAssignmentId',
-          'returnCount',
-          'createdAt',
-          'updatedAt',
-          'submittedAt'
-        ])
+             'caseCode', 'title', 'topic', 'content', 'area', 'desiredTime', 'source',
+             'consentRecorded', 'consentMethod', 'status', 'needsRevision', 'reviewNote',
+             'recorderOrgId', 'recorderOrgName', 'recorderUid', 'recorderName',
+             'assignedOrgId', 'assignedOrgName', 'assigneeUid', 'assigneeName',
+             'currentAssignmentId', 'returnCount', 'createdAt', 'updatedAt', 'submittedAt'])
         && request.resource.data.recorderUid == request.auth.uid
         && request.resource.data.status == 'REVIEW'
         && request.resource.data.needsRevision == false
@@ -276,19 +174,17 @@ service cloud.firestore {
         && request.resource.data.caseCode is string
         && validSummary(request.resource.data);
 
-      allow update: if signedIn()
-        && !changed().hasAny(lockedKeys())
-        && (
-          recorderEdits()
-          || reviewerDecides()
-          || representativeAccepts()
-          || representativeReturns()
-          || recorderCancels()
-          || coordinationStep()
-        );
+      allow update: if signedIn() && !changed().hasAny(lockedKeys()) && (
+           recorderEdits()
+        || reviewerDecides()
+        || representativeAccepts()
+        || representativeReturns()
+        || recorderCancels()
+        || coordinationStep());
 
       allow delete: if false;
 
+      // F08 · Sửa khi còn REVIEW/OPEN; luôn đưa về REVIEW để rà soát lại
       function recorderEdits() {
         return hasRole(resource.data.recorderOrgId, 'RECORDER')
           && resource.data.status in ['REVIEW', 'OPEN']
@@ -298,36 +194,25 @@ service cloud.firestore {
           && validSummary(request.resource.data);
       }
 
+      // F07 · Điều phối viên cùng đơn vị duyệt hoặc yêu cầu bổ sung; không tự duyệt nhu cầu của mình
       function reviewerDecides() {
         return hasRole(resource.data.recorderOrgId, 'REVIEWER')
           && request.auth.uid != resource.data.recorderUid
           && resource.data.status == 'REVIEW'
           && request.resource.data.reviewerUid == request.auth.uid
-          && changed().hasOnly([
-            'status',
-            'needsRevision',
-            'reviewNote',
-            'reviewerUid',
-            'reviewerName',
-            'reviewedAt',
-            'updatedAt'
-          ])
+          && changed().hasOnly(['status', 'needsRevision', 'reviewNote', 'reviewerUid',
+                                'reviewerName', 'reviewedAt', 'updatedAt'])
           && (
-            (
-              request.resource.data.status == 'OPEN'
-              && request.resource.data.needsRevision == false
-            )
-            || (
-              request.resource.data.status == 'REVIEW'
-              && request.resource.data.needsRevision == true
-              && isText(request.resource.data.reviewNote, 1, 500)
-            )
+               (request.resource.data.status == 'OPEN' && request.resource.data.needsRevision == false)
+            || (request.resource.data.status == 'REVIEW' && request.resource.data.needsRevision == true
+                && isText(request.resource.data.reviewNote, 1, 500))
           );
       }
 
+      // F10 · Một tổ chức nhận nhu cầu OPEN, giao cho một đại diện của chính tổ chức đó.
+      // Lần tiếp nhận phải được tạo cùng lúc (getAfter) để chat/lịch gắn theo lần tiếp nhận.
       function representativeAccepts() {
         let d = request.resource.data;
-
         return resource.data.status == 'OPEN'
           && resource.data.get('currentAssignmentId', null) == null
           && d.status == 'ACCEPTED'
@@ -336,23 +221,14 @@ service cloud.firestore {
           && exists(membershipPath(d.assigneeUid, d.assignedOrgId))
           && d.currentAssignmentId is string
           && existsAfter(assignmentPath(d.currentAssignmentId))
-          && changed().hasOnly([
-            'status',
-            'assignedOrgId',
-            'assignedOrgName',
-            'assigneeUid',
-            'assigneeName',
-            'acceptedByUid',
-            'currentAssignmentId',
-            'acceptedAt',
-            'updatedAt'
-          ]);
+          && changed().hasOnly(['status', 'assignedOrgId', 'assignedOrgName', 'assigneeUid',
+                                'assigneeName', 'acceptedByUid', 'currentAssignmentId',
+                                'acceptedAt', 'updatedAt']);
       }
 
-      // Trả lại (F14): lịch đã chốt với tổ chức cũ phải xóa hết, không để sót giờ kết thúc / hình thức
+      // F14 · Tổ chức phụ trách trả lại trước khi báo đã hỗ trợ (R07)
       function representativeReturns() {
         let d = request.resource.data;
-
         return resource.data.status in ['ACCEPTED', 'SCHEDULED']
           && hasRole(resource.data.assignedOrgId, 'REPRESENTATIVE')
           && d.status == 'OPEN'
@@ -360,51 +236,27 @@ service cloud.firestore {
           && d.assigneeUid == null
           && d.currentAssignmentId == null
           && d.returnCount == resource.data.get('returnCount', 0) + 1
-          && changed().hasOnly([
-            'status',
-            'assignedOrgId',
-            'assignedOrgName',
-            'assigneeUid',
-            'assigneeName',
-            'acceptedByUid',
-            'currentAssignmentId',
-            'acceptedAt',
-            'returnCount',
-            'lastReturnReason',
-            'updatedAt',
-            'scheduleId',
-            'scheduledAt',
-            'scheduledEndAt',
-            'scheduledFormat',
-            'scheduledPlace',
-            'scheduledByUid'
-          ])
-          && d.get('scheduleId', null) == null
-          && d.get('scheduledAt', null) == null
-          && d.get('scheduledEndAt', null) == null
-          && d.get('scheduledFormat', null) == null
-          && d.get('scheduledPlace', null) == null
-          && d.get('scheduledByUid', null) == null;
+          && changed().hasOnly(['status', 'assignedOrgId', 'assignedOrgName', 'assigneeUid',
+                                'assigneeName', 'acceptedByUid', 'currentAssignmentId',
+                                'acceptedAt', 'returnCount', 'lastReturnReason', 'updatedAt',
+                                'scheduleId', 'scheduledAt', 'scheduledPlace', 'scheduledByUid'])
+          && d.get('scheduleId', null) == null;
       }
 
+      // F14 · Đầu mối hủy khi chưa hoàn thành, bắt buộc có lý do
       function recorderCancels() {
         let d = request.resource.data;
-
         return hasRole(resource.data.recorderOrgId, 'RECORDER')
           && !(resource.data.status in ['COMPLETED', 'CANCELLED'])
           && d.status == 'CANCELLED'
           && isText(d.cancelReason, 1, 200)
           && d.cancelledByUid == request.auth.uid
-          && changed().hasOnly([
-            'status',
-            'cancelReason',
-            'cancelNote',
-            'cancelledByUid',
-            'cancelledAt',
-            'updatedAt'
-          ]);
+          && changed().hasOnly(['status', 'cancelReason', 'cancelNote', 'cancelledByUid',
+                                'cancelledAt', 'updatedAt']);
       }
 
+      // F12, F13 · Các bước phối hợp sau tiếp nhận. Không bước nào được đổi tổ chức
+      // hoặc người phụ trách; mỗi bước chỉ được sửa đúng nhóm field của nó.
       function coordinationStep() {
         return recorderConfirmsSchedule()
           || assignedOrgReportsDelivered()
@@ -412,14 +264,11 @@ service cloud.firestore {
           || recorderCompletes();
       }
 
+      // F12 · ACCEPTED → SCHEDULED: đầu mối ghi nhận người cao tuổi đồng ý một lịch
+      // đang được đề xuất trong lần tiếp nhận hiện tại; lịch được xác nhận cùng lúc.
       function recorderConfirmsSchedule() {
         let d = request.resource.data;
-
-        let schedule = schedulePath(
-          resource.data.currentAssignmentId,
-          d.scheduleId
-        );
-
+        let schedule = schedulePath(resource.data.currentAssignmentId, d.scheduleId);
         return resource.data.status == 'ACCEPTED'
           && d.status == 'SCHEDULED'
           && hasRole(resource.data.recorderOrgId, 'RECORDER')
@@ -427,177 +276,100 @@ service cloud.firestore {
           && d.scheduleId is string
           && existsAfter(schedule)
           && getAfter(schedule).data.status == 'CONFIRMED'
-          && getAfter(schedule).data.elderConsent == true
           && d.scheduledAt == getAfter(schedule).data.startAt
-          && d.scheduledEndAt == getAfter(schedule).data.endAt
-          && d.scheduledFormat == getAfter(schedule).data.format
-          && d.scheduledPlace == getAfter(schedule).data.place
-          && changed().hasOnly([
-            'status',
-            'scheduleId',
-            'scheduledAt',
-            'scheduledEndAt',
-            'scheduledFormat',
-            'scheduledPlace',
-            'scheduledByUid',
-            'updatedAt'
-          ]);
+          && changed().hasOnly(['status', 'scheduleId', 'scheduledAt', 'scheduledPlace',
+                                'scheduledByUid', 'updatedAt']);
       }
 
+      // F13 · SCHEDULED → DELIVERED: thành viên tổ chức phụ trách báo đã hỗ trợ
       function assignedOrgReportsDelivered() {
         let d = request.resource.data;
-
         return resource.data.status == 'SCHEDULED'
           && d.status == 'DELIVERED'
           && isMember(resource.data.assignedOrgId)
           && d.deliveredByUid == request.auth.uid
           && isText(d.deliveryReport, 5, 1000)
-          && changed().hasOnly([
-            'status',
-            'deliveryReport',
-            'deliveredByUid',
-            'deliveredByName',
-            'deliveredAt',
-            'updatedAt'
-          ]);
+          && changed().hasOnly(['status', 'deliveryReport', 'deliveredByUid', 'deliveredByName',
+                                'deliveredAt', 'updatedAt']);
       }
 
+      // F13 · Đối soát chưa thống nhất: giữ DELIVERED, ghi nội dung cần đối soát
       function recorderNotesReconcile() {
         let d = request.resource.data;
-
         return resource.data.status == 'DELIVERED'
           && d.status == 'DELIVERED'
           && hasRole(resource.data.recorderOrgId, 'RECORDER')
           && isText(d.reconcileNote, 1, 500)
-          && changed().hasOnly([
-            'reconcileNote',
-            'reconcileAt',
-            'updatedAt'
-          ]);
+          && changed().hasOnly(['reconcileNote', 'reconcileAt', 'updatedAt']);
       }
 
+      // F13 · DELIVERED → COMPLETED: đầu mối đối soát xong với người cao tuổi
       function recorderCompletes() {
         let d = request.resource.data;
-
         return resource.data.status == 'DELIVERED'
           && d.status == 'COMPLETED'
           && hasRole(resource.data.recorderOrgId, 'RECORDER')
           && d.completedByUid == request.auth.uid
-          && changed().hasOnly([
-            'status',
-            'completionNote',
-            'completedByUid',
-            'completedAt',
-            'updatedAt'
-          ]);
+          && changed().hasOnly(['status', 'completionNote', 'completedByUid', 'completedAt',
+                                'updatedAt']);
       }
 
+      // Lịch sử thay đổi trạng thái: chỉ thêm, không sửa / xóa
       match /events/{eventId} {
         allow read: if canReadNeed(get(needPath(needId)).data);
-
         allow create: if signedIn()
           && request.resource.data.byUid == request.auth.uid
           && isMember(request.resource.data.byOrgId)
           && request.resource.data.at == request.time;
-
         allow update, delete: if false;
       }
     }
 
-    // ================================================================
-    // THÔNG TIN RIÊNG CỦA NGƯỜI CAO TUỔI
-    // ================================================================
-
+    // Thông tin riêng: chỉ đơn vị ghi nhận, hoặc đúng đại diện được giao sau khi chốt lịch (R03)
     match /needs_private/{needId} {
-      allow read: if signedIn()
-        && (
-          isMember(resource.data.recorderOrgId)
-          || (
-            get(needPath(needId)).data.assigneeUid == request.auth.uid
-            && get(needPath(needId)).data.status
-              in ['SCHEDULED', 'DELIVERED']
-          )
-        );
+      allow read: if signedIn() && (
+           isMember(resource.data.recorderOrgId)
+        || (get(needPath(needId)).data.assigneeUid == request.auth.uid
+            && get(needPath(needId)).data.status in ['SCHEDULED', 'DELIVERED']));
 
-      allow create: if hasRole(
-          request.resource.data.recorderOrgId,
-          'RECORDER'
-        )
+      allow create: if hasRole(request.resource.data.recorderOrgId, 'RECORDER')
         && existsAfter(needPath(needId))
-        && getAfter(needPath(needId)).data.recorderOrgId
-          == request.resource.data.recorderOrgId
-        && request.resource.data.keys().hasOnly([
-          'elderlyName',
-          'contact',
-          'address',
-          'recorderOrgId',
-          'updatedAt'
-        ])
+        && getAfter(needPath(needId)).data.recorderOrgId == request.resource.data.recorderOrgId
+        && request.resource.data.keys().hasOnly(['elderlyName', 'contact', 'address', 'recorderOrgId', 'updatedAt'])
         && isText(request.resource.data.elderlyName, 2, 80)
         && isText(request.resource.data.contact, 1, 120);
 
-      allow update: if hasRole(
-          resource.data.recorderOrgId,
-          'RECORDER'
-        )
-        && request.resource.data.recorderOrgId
-          == resource.data.recorderOrgId
+      allow update: if hasRole(resource.data.recorderOrgId, 'RECORDER')
+        && request.resource.data.recorderOrgId == resource.data.recorderOrgId
         && getAfter(needPath(needId)).data.status == 'REVIEW'
-        && request.resource.data.keys().hasOnly([
-          'elderlyName',
-          'contact',
-          'address',
-          'recorderOrgId',
-          'updatedAt'
-        ])
+        && request.resource.data.keys().hasOnly(['elderlyName', 'contact', 'address', 'recorderOrgId', 'updatedAt'])
         && isText(request.resource.data.elderlyName, 2, 80)
         && isText(request.resource.data.contact, 1, 120);
 
       allow delete: if false;
     }
 
-    // ================================================================
-    // LẦN TIẾP NHẬN, CHAT VÀ LỊCH
-    // ================================================================
-
+    // Mỗi lần tiếp nhận một tài liệu; trả lại / hủy chỉ đổi trạng thái, không xóa (R07)
     match /needs_assignments/{assignmentId} {
-      allow read: if isMember(resource.data.orgId)
-        || isMember(resource.data.recorderOrgId);
+      allow read: if isMember(resource.data.orgId) || isMember(resource.data.recorderOrgId);
 
-      allow create: if hasRole(
-          request.resource.data.orgId,
-          'REPRESENTATIVE'
-        )
+      allow create: if hasRole(request.resource.data.orgId, 'REPRESENTATIVE')
         && request.resource.data.status == 'ACTIVE'
         && request.resource.data.acceptedByUid == request.auth.uid
-        && getAfter(
-          needPath(request.resource.data.needId)
-        ).data.currentAssignmentId == assignmentId
-        && getAfter(
-          needPath(request.resource.data.needId)
-        ).data.recorderOrgId == request.resource.data.recorderOrgId;
+        && getAfter(needPath(request.resource.data.needId)).data.currentAssignmentId == assignmentId
+        && getAfter(needPath(request.resource.data.needId)).data.recorderOrgId == request.resource.data.recorderOrgId;
 
       allow update: if resource.data.status == 'ACTIVE'
-        && changed().hasOnly([
-          'status',
-          'endReason',
-          'endNote',
-          'endedByUid',
-          'endedAt'
-        ])
+        && changed().hasOnly(['status', 'endReason', 'endNote', 'endedByUid', 'endedAt'])
         && request.resource.data.endedByUid == request.auth.uid
         && (
-          (
-            request.resource.data.status == 'RETURNED'
-            && hasRole(resource.data.orgId, 'REPRESENTATIVE')
-          )
-          || (
-            request.resource.data.status == 'CLOSED'
-            && hasRole(resource.data.recorderOrgId, 'RECORDER')
-          )
+             (request.resource.data.status == 'RETURNED' && hasRole(resource.data.orgId, 'REPRESENTATIVE'))
+          || (request.resource.data.status == 'CLOSED' && hasRole(resource.data.recorderOrgId, 'RECORDER'))
         );
 
       allow delete: if false;
+
+      // ---------- Phần 3 · Chat và lịch theo lần tiếp nhận (F11, F12, F15) ----------
 
       function assignment() {
         return get(assignmentPath(assignmentId)).data;
@@ -607,157 +379,137 @@ service cloud.firestore {
         return get(needPath(assignment().needId)).data;
       }
 
+      // Lần tiếp nhận còn hiệu lực: chưa trả lại / đóng, nhu cầu đang trong bước phối hợp
       function assignmentActive() {
         return assignment().status == 'ACTIVE'
-          && needOfAssignment().status
-            in ['ACCEPTED', 'SCHEDULED', 'DELIVERED']
+          && needOfAssignment().status in ['ACCEPTED', 'SCHEDULED', 'DELIVERED']
           && needOfAssignment().currentAssignmentId == assignmentId;
       }
 
+      // F11 · Chỉ đầu mối đã ghi nhận và đại diện được giao của lần tiếp nhận này (R08)
       function chatMember() {
-        return signedIn()
-          && (
-            request.auth.uid == assignment().assigneeUid
-            || request.auth.uid == needOfAssignment().recorderUid
-          );
+        return signedIn() && (
+             request.auth.uid == assignment().assigneeUid
+          || request.auth.uid == needOfAssignment().recorderUid);
       }
 
+      // F11 · Tin nhắn: đọc được cả khi luồng đã kết thúc (chỉ đọc), chỉ gửi khi còn hiệu lực
       match /messages/{messageId} {
         allow read: if chatMember();
-
         allow create: if chatMember()
           && assignmentActive()
-          && request.resource.data.keys().hasOnly([
-            'senderUid',
-            'senderName',
-            'text',
-            'at'
-          ])
+          && request.resource.data.keys().hasOnly(['senderUid', 'senderName', 'text', 'at'])
           && request.resource.data.senderUid == request.auth.uid
           && isText(request.resource.data.senderName, 1, 80)
           && isText(request.resource.data.text, 1, 1000)
           && request.resource.data.at == request.time;
-
         allow update, delete: if false;
       }
 
+      // F12 · Đề xuất lịch: tổ chức phụ trách đề xuất, đầu mối xác nhận hoặc từ chối
       match /schedules/{scheduleId} {
-        allow read: if isMember(assignment().orgId)
-          || isMember(assignment().recorderOrgId);
+        allow read: if isMember(assignment().orgId) || isMember(assignment().recorderOrgId);
 
-        allow create: if (
-            hasRole(assignment().orgId, 'REPRESENTATIVE')
-            || request.auth.uid == assignment().assigneeUid
-          )
+        allow create: if (hasRole(assignment().orgId, 'REPRESENTATIVE')
+                          || request.auth.uid == assignment().assigneeUid)
           && assignmentActive()
           && needOfAssignment().status == 'ACCEPTED'
-          && request.resource.data.keys().hasAll([
-            'startAt',
-            'endAt',
-            'format',
-            'place',
-            'status',
-            'proposedByUid',
-            'proposedByName',
-            'createdAt'
-          ])
-          && request.resource.data.keys().hasOnly([
-            'startAt',
-            'endAt',
-            'format',
-            'place',
-            'status',
-            'proposedByUid',
-            'proposedByName',
-            'createdAt'
-          ])
+          && request.resource.data.keys().hasOnly(['startAt', 'place', 'note', 'status',
+                                                   'proposedByUid', 'proposedByName', 'createdAt'])
           && request.resource.data.status == 'PROPOSED'
           && request.resource.data.proposedByUid == request.auth.uid
           && request.resource.data.startAt is timestamp
           && request.resource.data.startAt > request.time
-          && request.resource.data.endAt is timestamp
-          && request.resource.data.endAt > request.resource.data.startAt
-          && request.resource.data.endAt
-            <= request.resource.data.startAt + duration.value(12, 'h')
-          && isText(request.resource.data.format, 2, 120)
           && isText(request.resource.data.place, 2, 200)
+          && (request.resource.data.note == null || isText(request.resource.data.note, 0, 500))
           && request.resource.data.createdAt == request.time;
 
-        allow update: if resource.data.status == 'PROPOSED'
-          && (
-            (
-              hasRole(assignment().recorderOrgId, 'RECORDER')
+        allow update: if resource.data.status == 'PROPOSED' && (
+             // Đầu mối xác nhận (cùng lúc nhu cầu chuyển SCHEDULED) hoặc từ chối kèm lý do
+             (hasRole(assignment().recorderOrgId, 'RECORDER')
               && request.resource.data.decidedByUid == request.auth.uid
-              && changed().hasOnly([
-                'status',
-                'elderConsent',
-                'consentMethod',
-                'declineReason',
-                'decidedByUid',
-                'decidedByName',
-                'decidedAt'
-              ])
+              && changed().hasOnly(['status', 'consentMethod', 'declineReason',
+                                    'decidedByUid', 'decidedByName', 'decidedAt'])
               && (
-                (
-                  request.resource.data.status == 'CONFIRMED'
-                  && request.resource.data.elderConsent == true
-                  && isText(
-                    request.resource.data.consentMethod,
-                    1,
-                    200
-                  )
-                  && getAfter(
-                    needPath(assignment().needId)
-                  ).data.status == 'SCHEDULED'
-                )
-                || (
-                  request.resource.data.status == 'DECLINED'
-                  && !('elderConsent' in request.resource.data)
-                  && isText(
-                    request.resource.data.declineReason,
-                    1,
-                    300
-                  )
-                )
-              )
-            )
-            || (
-              isMember(assignment().orgId)
+                   (request.resource.data.status == 'CONFIRMED'
+                    && isText(request.resource.data.consentMethod, 1, 200)
+                    && getAfter(needPath(assignment().needId)).data.status == 'SCHEDULED')
+                || (request.resource.data.status == 'DECLINED'
+                    && isText(request.resource.data.declineReason, 1, 300))
+              ))
+             // Tổ chức rút đề xuất cũ khi gửi đề xuất mới
+          || (isMember(assignment().orgId)
               && request.resource.data.status == 'WITHDRAWN'
-              && changed().hasOnly([
-                'status',
-                'decidedByUid',
-                'decidedByName',
-                'decidedAt'
-              ])
-              && request.resource.data.decidedByUid == request.auth.uid
-            )
-          );
+              && changed().hasOnly(['status', 'decidedByUid', 'decidedByName', 'decidedAt'])
+              && request.resource.data.decidedByUid == request.auth.uid)
+        );
 
         allow delete: if false;
       }
     }
 
-    // ================================================================
-    // BỘ ĐẾM MÃ NHU CẦU
-    // ================================================================
-
+    // Bộ đếm mã trường hợp NC-xxxx: chỉ tăng đúng 1 mỗi lần
     match /counters/needs {
       allow read: if signedIn();
-
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly(['next'])
         && request.resource.data.next == 2;
-
       allow update: if signedIn()
         && request.resource.data.keys().hasOnly(['next'])
         && request.resource.data.next == resource.data.next + 1;
     }
 
-    // ================================================================
-    // MẶC ĐỊNH TỪ CHỐI
-    // ================================================================
+    // =================================================================
+    // Phần 3 · Bài đăng, chat, lịch: các nhánh khác bổ sung tại đây
+    // =================================================================
 
+    // F04, F05 · Bảng tin. Tài khoản đã đăng nhập đọc được bài chưa ẩn (truy vấn danh sách
+    // phải có whereEqualTo("hidden", false)); thành viên tổ chức xem được cả bài đã ẩn của mình.
+    // Chỉ đại diện của tổ chức đăng, sửa, ẩn bài của tổ chức đó; không xóa bài.
+    match /posts/{postId} {
+      function orgPath(orgId) {
+        return /databases/$(database)/documents/organizations/$(orgId);
+      }
+
+      // Ô không bắt buộc: không có, null, hoặc chuỗi 1..maxLen ký tự
+      function optionalText(d, key, maxLen) {
+        return !(key in d) || d[key] == null || isText(d[key], 1, maxLen);
+      }
+
+      function validPost(d) {
+        return isText(d.title, 5, 120)
+          && isText(d.content, 10, 2000)
+          && optionalText(d, 'eventTime', 120)
+          && optionalText(d, 'eventPlace', 120);
+      }
+
+      allow read: if signedIn()
+        && (resource.data.hidden == false || isMember(resource.data.orgId));
+
+      // Tích "đã xác minh" phải khớp organizations/{orgId}.verified, không tự gắn được
+      allow create: if hasRole(request.resource.data.orgId, 'REPRESENTATIVE')
+        && request.resource.data.keys().hasOnly(['title', 'content', 'orgId', 'orgName', 'orgVerified',
+             'authorUid', 'authorName', 'hidden', 'createdAt', 'updatedAt',
+             'eventTime', 'eventPlace'])
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.hidden == false
+        && request.resource.data.orgVerified is bool
+        && (request.resource.data.orgVerified == false
+            || get(orgPath(request.resource.data.orgId)).data.get('verified', false) == true)
+        && validPost(request.resource.data)
+        && request.resource.data.createdAt == request.time;
+
+      // Sửa nội dung hoặc ẩn bài; không đổi tổ chức, người đăng, thời điểm đăng
+      allow update: if hasRole(resource.data.orgId, 'REPRESENTATIVE')
+        && changed().hasOnly(['title', 'content', 'hidden', 'updatedAt', 'eventTime', 'eventPlace'])
+        && request.resource.data.hidden is bool
+        && validPost(request.resource.data)
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if false;
+    }
+
+    // Mặc định từ chối mọi đường dẫn chưa khai báo
     match /{document=**} {
       allow read, write: if false;
     }

@@ -57,6 +57,7 @@ public class NeedListFragment extends Fragment implements NeedAdapter.OnNeedClic
     private SwipeRefreshLayout swipeRefresh;
     private RecyclerView rvNeeds;
     private ExtendedFloatingActionButton fabCreate;
+    private View btnHeaderSearch;
 
     private NeedListUiState lastState;
 
@@ -103,6 +104,7 @@ public class NeedListFragment extends Fragment implements NeedAdapter.OnNeedClic
         swipeRefresh = v.findViewById(R.id.swipeRefreshNeeds);
         rvNeeds = v.findViewById(R.id.rvNeeds);
         fabCreate = v.findViewById(R.id.fabCreateNeed);
+        btnHeaderSearch = v.findViewById(R.id.btnHeaderSearch);
     }
 
     private void setupListeners(View v) {
@@ -124,6 +126,11 @@ public class NeedListFragment extends Fragment implements NeedAdapter.OnNeedClic
         });
 
         TextView etSearch = v.findViewById(R.id.etSearch);
+        // Nút tìm trên tiêu đề (Figma F08) mở thẳng chế độ "Tìm để tiếp nhận"
+        btnHeaderSearch.setOnClickListener(x -> {
+            viewModel.setMode(NeedListViewModel.MODE_SEARCH);
+            etSearch.requestFocus();
+        });
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -154,6 +161,7 @@ public class NeedListFragment extends Fragment implements NeedAdapter.OnNeedClic
         int wantedButton = search ? R.id.btnModeSearch : R.id.btnModeUnit;
         if (toggleMode.getCheckedButtonId() != wantedButton) toggleMode.check(wantedButton);
 
+        btnHeaderSearch.setVisibility(search ? View.INVISIBLE : View.VISIBLE);
         scrollStatusChips.setVisibility(search ? View.GONE : View.VISIBLE);
         layoutSearch.setVisibility(search ? View.VISIBLE : View.GONE);
 
