@@ -8,7 +8,7 @@
 
     <application
         android:name=".SeniorTribeApplication"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/ic_needs"
@@ -42,16 +42,10 @@
             android:name=".activities.ForgotPasswordActivity"
             android:exported="false" />
 
-        <!-- Checks the server profile and organization membership before Main. -->
-        <activity
-            android:name=".activities.SessionGateActivity"
-            android:exported="false" />
-
         <!-- Main Screen -->
         <activity
             android:name=".activities.MainActivity"
-            android:exported="false"
-            android:configChanges="orientation|screenSize" />
+            android:exported="false" />
 
         <!-- Needs Management Activities -->
         <activity
@@ -79,14 +73,6 @@
         <!-- Chat, lịch hẹn, đối soát (F11–F13) và lịch sử hỗ trợ (F15) -->
         <activity
             android:name=".activities.ChatActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".activities.ScheduleAgreementActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".activities.NeedProgressActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
