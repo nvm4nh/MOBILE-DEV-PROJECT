@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kiểu hiển thị cho nhóm màn hình Bảng tin (F04, F05), theo Figma. -->
+<resources>
+
+    <!-- Kiểu gốc (rỗng) để các kiểu "Post.Xxx" kế thừa theo tên -->
+    <style name="Post" />
+
+    <!-- Một dòng trong bảng Tùy chọn bài: biểu tượng + chữ, cả dòng bấm được -->
+    <style name="Post.SheetOption">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:drawablePadding">20dp</item>
+        <item name="android:drawableTint">@color/text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <!-- Avatar chữ viết tắt của tổ chức -->
+    <style name="Post.Avatar">
+        <item name="android:background">@drawable/bg_avatar_circle</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/primary_dark</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:importantForAccessibility">no</item>
+    </style>
+</resources>

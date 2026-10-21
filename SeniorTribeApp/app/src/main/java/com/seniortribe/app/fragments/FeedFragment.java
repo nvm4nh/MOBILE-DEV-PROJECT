@@ -1,133 +1,224 @@
 package com.seniortribe.app.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.seniortribe.app.R;
 import com.seniortribe.app.activities.CreatePostActivity;
 import com.seniortribe.app.activities.PostDetailActivity;
 import com.seniortribe.app.adapters.PostAdapter;
-import com.seniortribe.app.database.AppDatabaseHelper;
+import com.seniortribe.app.dialogs.PostOptionsSheet;
 import com.seniortribe.app.models.Post;
 import com.seniortribe.app.utils.Constants;
 import com.seniortribe.app.utils.NetworkUtils;
+import com.seniortribe.app.utils.StateView;
+import com.seniortribe.app.viewmodels.FeedViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Tab Bảng tin.
+ *  - F04: danh sách bài của các tổ chức trong mạng lưới, lọc "Tất cả" / "Đơn vị của tôi", xem chi tiết.
+ *  - F05: đại diện tổ chức đăng bài (nút "Đăng bài"), sửa / ẩn bài của tổ chức mình (nút ⋮).
+ *  - F16: đang tải, rỗng, lỗi có nút Thử lại; mất mạng thì xem bài đã lưu trong SQLite;
+ *    xoay màn hình không tải lại vì dữ liệu nằm trong FeedViewModel.
+ */
 public class FeedFragment extends Fragment implements PostAdapter.OnPostClickListener {
 
-    private SwipeRefreshLayout swipeRefresh;
-    private RecyclerView rvPosts;
-    private TextView tvOfflineNotice;
-    private FloatingActionButton fabCreatePost;
-
+    private FeedViewModel viewModel;
     private PostAdapter adapter;
-    private AppDatabaseHelper dbHelper;
-    private FirebaseFirestore firestore;
+    private StateView stateView;
+    private SwipeRefreshLayout swipeRefresh;
+    private TextView tvOfflineNotice;
+    private ChipGroup chipGroup;
+    private ExtendedFloatingActionButton fabCreatePost;
+    private RecyclerView rvPosts;
+
+    /** Đăng / sửa / xem chi tiết xong (có thay đổi) thì tải lại bảng tin. */
+    private ActivityResultLauncher<Intent> postLauncher;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        postLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK && viewModel != null) viewModel.refresh();
+        });
+        // Kết quả từ bảng Tùy chọn bài; đăng ký ở đây để vẫn nhận được sau khi xoay màn hình
+        getChildFragmentManager().setFragmentResultListener(PostOptionsSheet.RESULT_KEY, this, (key, bundle) -> {
+            Post post = findPost(bundle.getString(PostOptionsSheet.RESULT_POST_ID));
+            if (post == null) return;
+            if (PostOptionsSheet.ACTION_EDIT.equals(bundle.getString(PostOptionsSheet.RESULT_ACTION))) {
+                openEdit(post);
+            } else {
+                confirmHide(post);
+            }
+        });
+    }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_feed, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_feed, container, false);
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        stateView = new StateView(view);
         swipeRefresh = view.findViewById(R.id.swipeRefresh);
-        rvPosts = view.findViewById(R.id.rvPosts);
         tvOfflineNotice = view.findViewById(R.id.tvOfflineNotice);
+        chipGroup = view.findViewById(R.id.chipGroupFeed);
         fabCreatePost = view.findViewById(R.id.fabCreatePost);
-
-        dbHelper = AppDatabaseHelper.getInstance(requireContext());
-        try { firestore = FirebaseFirestore.getInstance(); } catch (Exception ignored) {}
+        rvPosts = view.findViewById(R.id.rvPosts);
 
         adapter = new PostAdapter(requireContext(), this);
         rvPosts.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvPosts.setAdapter(adapter);
 
-        swipeRefresh.setOnRefreshListener(this::loadPosts);
-        fabCreatePost.setOnClickListener(v -> startActivity(new Intent(requireContext(), CreatePostActivity.class)));
+        viewModel = new ViewModelProvider(this).get(FeedViewModel.class);
 
-        loadPosts();
-        return view;
+        swipeRefresh.setColorSchemeResources(R.color.primary);
+        swipeRefresh.setOnRefreshListener(viewModel::refresh);
+        fabCreatePost.setOnClickListener(v -> openCreate());
+        chipGroup.setOnCheckedStateChangeListener((group, ids) -> {
+            if (ids.isEmpty()) return;
+            viewModel.setFilter(ids.get(0) == R.id.chipFeedMyOrg
+                    ? FeedViewModel.FILTER_MY_ORG : FeedViewModel.FILTER_ALL);
+        });
+
+        viewModel.getUi().observe(getViewLifecycleOwner(), this::render);
+        viewModel.getMessages().observe(getViewLifecycleOwner(), event -> {
+            String msg = event.getIfNotHandled();
+            if (msg != null) Snackbar.make(rvPosts, msg, Snackbar.LENGTH_LONG).show();
+        });
+        viewModel.start();
     }
 
-    private void loadPosts() {
-        swipeRefresh.setRefreshing(true);
-        if (!NetworkUtils.isNetworkAvailable(requireContext()) || firestore == null) {
-            // Tải từ SQLite bộ nhớ đệm ngoại tuyến (Offline Caching - F16, T05)
-            loadFromOfflineCache();
-            return;
+    private void render(FeedViewModel.Ui s) {
+        List<Post> visible = s.visiblePosts();
+        adapter.setPosts(visible, s.membership);
+        swipeRefresh.setRefreshing(s.refreshing || s.busy);
+        swipeRefresh.setEnabled(!s.loading);
+
+        int wantedChip = s.filter == FeedViewModel.FILTER_MY_ORG ? R.id.chipFeedMyOrg : R.id.chipFeedAll;
+        if (chipGroup.getCheckedChipId() != wantedChip) chipGroup.check(wantedChip);
+
+        // Dòng báo offline chỉ hiện khi đang thật sự xem bài đã lưu
+        boolean showNotice = s.isFromCache() && !s.posts.isEmpty();
+        tvOfflineNotice.setVisibility(showNotice ? View.VISIBLE : View.GONE);
+        if (showNotice) {
+            tvOfflineNotice.setText(s.source == FeedViewModel.SOURCE_CACHE_OFFLINE
+                    ? R.string.feed_offline_notice : R.string.feed_stale_notice);
         }
 
-        firestore.collection(Constants.COL_POSTS)
-                .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Post> posts = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        Post p = doc.toObject(Post.class);
-                        p.setId(doc.getId());
-                        posts.add(p);
-                    }
-                    if (posts.isEmpty()) {
-                        posts = getSamplePosts();
-                    }
-                    // Tự động lưu cache bài viết vào SQLite
-                    dbHelper.savePosts(posts);
+        // Đăng bài cần máy chủ xác nhận, nên chỉ mở khi đang có dữ liệu mới từ máy chủ
+        boolean showFab = s.canPost() && !s.loading && !s.isFromCache();
+        fabCreatePost.setVisibility(showFab ? View.VISIBLE : View.GONE);
 
-                    adapter.setPosts(posts);
-                    tvOfflineNotice.setVisibility(View.GONE);
-                    swipeRefresh.setRefreshing(false);
-                })
-                .addOnFailureListener(e -> loadFromOfflineCache());
-    }
-
-    private void loadFromOfflineCache() {
-        List<Post> cached = dbHelper.getAllCachedPosts();
-        if (cached.isEmpty()) {
-            cached = getSamplePosts();
-            dbHelper.savePosts(cached);
+        if (s.loading) {
+            stateView.showLoading();
+        } else if (s.offlineNoCache) {
+            stateView.showMessage(R.drawable.ic_cloud_off, getString(R.string.feed_offline_empty_title),
+                    getString(R.string.feed_offline_empty_message),
+                    getString(R.string.action_retry), v -> viewModel.refresh());
+        } else if (s.error != null) {
+            stateView.showError(getString(R.string.state_error_title), s.error,
+                    getString(R.string.action_retry), v -> viewModel.refresh());
+        } else if (visible.isEmpty()) {
+            showEmpty(s);
+        } else {
+            stateView.hide();
         }
-        adapter.setPosts(cached);
-        tvOfflineNotice.setVisibility(View.VISIBLE);
-        swipeRefresh.setRefreshing(false);
     }
 
-    private List<Post> getSamplePosts() {
-        List<Post> list = new ArrayList<>();
-        Post p1 = new Post("1", "Chuyến thăm và tặng quà các cụ già neo đơn tại Quận 8",
-                "Đoàn thiện nguyện đã đến thăm, tặng 30 suất quà dinh dưỡng và trò chuyện thân mật cùng các cụ có hoàn cảnh khó khăn tại địa bàn Phường 3.",
-                "DNXH Vầng Trăng Khuyết", "admin_01");
-        p1.setLikesCount(28);
-        list.add(p1);
-
-        Post p2 = new Post("2", "Kêu gọi tình nguyện viên hỗ trợ chăm sóc sức khỏe người cao tuổi",
-                "Dự án kết hợp cùng HelpAge Việt Nam nhằm mở rộng mạng lưới chăm sóc sức khỏe, hỗ trợ việc nhà và kiểm tra y tế định kỳ cho người già neo đơn.",
-                "Hội Chữ thập đỏ TP.HCM", "admin_02");
-        p2.setLikesCount(45);
-        list.add(p2);
-        return list;
+    private void showEmpty(FeedViewModel.Ui s) {
+        if (s.filter != FeedViewModel.FILTER_MY_ORG) {
+            stateView.showMessage(R.drawable.ic_feed, getString(R.string.feed_empty_title),
+                    getString(R.string.feed_empty_message), null, null);
+        } else if (s.membership == null) {
+            stateView.showMessage(R.drawable.ic_lock, getString(R.string.feed_no_org_title),
+                    getString(R.string.feed_no_org_message), null, null);
+        } else if (s.canPost() && !s.isFromCache()) {
+            stateView.showMessage(R.drawable.ic_feed, getString(R.string.feed_empty_my_org_title),
+                    getString(R.string.feed_empty_my_org_message),
+                    getString(R.string.btn_create_post), v -> openCreate());
+        } else {
+            stateView.showMessage(R.drawable.ic_feed, getString(R.string.feed_empty_my_org_title),
+                    getString(R.string.feed_empty_message), null, null);
+        }
     }
+
+    // =====================================================================
+    // Thao tác
+    // =====================================================================
 
     @Override
     public void onPostClick(Post post) {
+        // Truyền cả bài để xem chi tiết được cả khi offline
         Intent intent = new Intent(requireContext(), PostDetailActivity.class);
         intent.putExtra(Constants.EXTRA_POST, post);
-        startActivity(intent);
+        postLauncher.launch(intent);
+    }
+
+    @Override
+    public void onPostMenu(Post post) {
+        if (getChildFragmentManager().findFragmentByTag("post_options") != null) return;
+        PostOptionsSheet.newInstance(post.getId(), post.getTitle(), post.getOrgName())
+                .show(getChildFragmentManager(), "post_options");
+    }
+
+    private void openCreate() {
+        if (!NetworkUtils.isNetworkAvailable(requireContext())) {
+            Snackbar.make(rvPosts, R.string.feed_offline_cannot_post, Snackbar.LENGTH_LONG).show();
+            return;
+        }
+        postLauncher.launch(new Intent(requireContext(), CreatePostActivity.class));
+    }
+
+    private void openEdit(Post post) {
+        if (!NetworkUtils.isNetworkAvailable(requireContext())) {
+            Snackbar.make(rvPosts, R.string.action_needs_network, Snackbar.LENGTH_LONG).show();
+            return;
+        }
+        Intent intent = new Intent(requireContext(), CreatePostActivity.class);
+        intent.putExtra(Constants.EXTRA_POST, post);
+        postLauncher.launch(intent);
+    }
+
+    private void confirmHide(Post post) {
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.post_hide_confirm_title)
+                .setMessage(R.string.post_hide_confirm_message)
+                .setNegativeButton(R.string.action_cancel, null)
+                .setPositiveButton(R.string.post_action_hide, (d, w) -> viewModel.hide(post))
+                .show();
+    }
+
+    @Nullable
+    private Post findPost(@Nullable String postId) {
+        FeedViewModel.Ui s = viewModel != null ? viewModel.getUi().getValue() : null;
+        if (s == null || postId == null) return null;
+        for (Post p : s.posts) if (postId.equals(p.getId())) return p;
+        return null;
     }
 }

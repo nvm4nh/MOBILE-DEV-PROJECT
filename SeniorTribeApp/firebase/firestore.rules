@@ -755,9 +755,58 @@ service cloud.firestore {
     }
 
     // ================================================================
-    // MẶC ĐỊNH TỪ CHỐI
+    // BẢNG TIN (F04, F05)
     // ================================================================
 
+    // F04, F05 · Bảng tin. Tài khoản đã đăng nhập đọc được bài chưa ẩn (truy vấn danh sách
+    // phải có whereEqualTo("hidden", false)); thành viên tổ chức xem được cả bài đã ẩn của mình.
+    // Chỉ đại diện của tổ chức đăng, sửa, ẩn bài của tổ chức đó; không xóa bài.
+    match /posts/{postId} {
+      function orgPath(orgId) {
+        return /databases/$(database)/documents/organizations/$(orgId);
+      }
+
+      // Ô không bắt buộc: không có, null, hoặc chuỗi 1..maxLen ký tự
+      function optionalText(d, key, maxLen) {
+        return !(key in d) || d[key] == null || isText(d[key], 1, maxLen);
+      }
+
+      function validPost(d) {
+        return isText(d.title, 5, 120)
+          && isText(d.content, 10, 2000)
+          && optionalText(d, 'eventTime', 120)
+          && optionalText(d, 'eventPlace', 120);
+      }
+
+      allow read: if signedIn()
+        && (resource.data.hidden == false || isMember(resource.data.orgId));
+
+      // Tích "đã xác minh" phải khớp organizations/{orgId}.verified, không tự gắn được
+      allow create: if hasRole(request.resource.data.orgId, 'REPRESENTATIVE')
+        && request.resource.data.keys().hasOnly(['title', 'content', 'orgId', 'orgName', 'orgVerified',
+             'authorUid', 'authorName', 'hidden', 'createdAt', 'updatedAt',
+             'eventTime', 'eventPlace'])
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.hidden == false
+        && request.resource.data.orgVerified is bool
+        && (request.resource.data.orgVerified == false
+            || get(orgPath(request.resource.data.orgId)).data.get('verified', false) == true)
+        && validPost(request.resource.data)
+        && request.resource.data.createdAt == request.time;
+
+      // Sửa nội dung hoặc ẩn bài; không đổi tổ chức, người đăng, thời điểm đăng
+      allow update: if hasRole(resource.data.orgId, 'REPRESENTATIVE')
+        && changed().hasOnly(['title', 'content', 'hidden', 'updatedAt', 'eventTime', 'eventPlace'])
+        && request.resource.data.hidden is bool
+        && validPost(request.resource.data)
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if false;
+    }
+
+    // ================================================================
+    // MẶC ĐỊNH TỪ CHỐI
+    // ================================================================
     match /{document=**} {
       allow read, write: if false;
     }

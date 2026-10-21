@@ -1,4 +1,5 @@
 // Kiểm thử Security Rules cho phần phối hợp sau tiếp nhận:
+//   F04, F05 · bảng tin: đọc bài, đăng / sửa / ẩn bài của tổ chức (posts)
 //   F11 · chat theo lần tiếp nhận (needs_assignments/{id}/messages)
 //   F12 · đề xuất / thống nhất lịch (needs_assignments/{id}/schedules + needs_summary)
 //   F13 · báo hỗ trợ và đối soát (needs_summary)
@@ -466,5 +467,95 @@ describe('F14 · Trả lại xóa hết lịch đã chốt', () => {
   test('thành viên không phải đại diện không trả lại được', async () => {
     await seedScheduled();
     await assertFails(need(ASSIGNEE).update(returnUpdate()));
+  });
+});
+
+// =====================================================================
+// F04, F05 · Bảng tin
+// =====================================================================
+
+describe('F04, F05 · Bảng tin (posts)', () => {
+  const posts = (uid) => db(uid).collection('posts');
+
+  /** Bài đăng đúng như PostRepository.createPost ghi. */
+  function post(overrides = {}) {
+    return {
+      title: 'Ngày hội thăm hỏi người cao tuổi',
+      content: 'Đoàn viên phường 7 đến thăm và trò chuyện cùng các cụ trong khu phố.',
+      orgId: ORG, orgName: 'Đoàn TN Phường 7', orgVerified: true,
+      authorUid: REP, authorName: 'Đại diện Đoàn TN',
+      eventTime: null, eventPlace: null, hidden: false,
+      createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
+      ...overrides,
+    };
+  }
+
+  /** Thành viên, tổ chức (ORG đã xác minh, OTHER_ORG chưa) và 2 bài có sẵn: một bài hiện, một bài đã ẩn. */
+  async function seedPosts() {
+    await seed();
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const d = ctx.firestore();
+      await d.doc(`organizations/${ORG}`).set({ name: 'Đoàn TN Phường 7', verified: true });
+      await d.doc(`organizations/${OTHER_ORG}`).set({ name: 'Tổ chức khác', verified: false });
+      const saved = { ...post(), createdAt: Timestamp.now(), updatedAt: Timestamp.now() };
+      await d.doc('posts/p-visible').set(saved);
+      await d.doc('posts/p-hidden').set({ ...saved, hidden: true });
+    });
+  }
+
+  test('đại diện đăng bài cho tổ chức của mình', async () => {
+    await seedPosts();
+    await assertSucceeds(posts(REP).add(post()));
+  });
+
+  test('không tự gắn tích xác minh khi tổ chức chưa được xác minh', async () => {
+    await seedPosts();
+    const other = { orgId: OTHER_ORG, orgName: 'Tổ chức khác', authorUid: OUTSIDER };
+    await assertFails(posts(OUTSIDER).add(post({ ...other, orgVerified: true })));
+    await assertSucceeds(posts(OUTSIDER).add(post({ ...other, orgVerified: false })));
+  });
+
+  test('thành viên không phải đại diện không đăng được; không đăng thay tổ chức khác', async () => {
+    await seedPosts();
+    await assertFails(posts(ASSIGNEE).add(post({ authorUid: ASSIGNEE })));
+    await assertFails(posts(REP).add(post({ orgId: OTHER_ORG, orgVerified: false })));
+  });
+
+  test('không giả danh người đăng, không đăng bài đã ẩn, nội dung phải đủ dài', async () => {
+    await seedPosts();
+    await assertFails(posts(REP).add(post({ authorUid: ASSIGNEE })));
+    await assertFails(posts(REP).add(post({ hidden: true })));
+    await assertFails(posts(REP).add(post({ title: 'Hi' })));
+    await assertFails(posts(REP).add(post({ createdAt: Timestamp.fromMillis(0) })));
+    await assertFails(posts(REP).add(post({ phone: '0909000000' })));
+  });
+
+  test('tài khoản đăng nhập đọc được bài đang hiện; bài đã ẩn chỉ thành viên tổ chức xem', async () => {
+    await seedPosts();
+    await assertSucceeds(posts(RECORDER).doc('p-visible').get());
+    await assertFails(posts(RECORDER).doc('p-hidden').get());
+    await assertSucceeds(posts(ASSIGNEE).doc('p-hidden').get());
+    await assertFails(env.unauthenticatedContext().firestore().doc('posts/p-visible').get());
+  });
+
+  test('danh sách bảng tin phải lọc hidden == false', async () => {
+    await seedPosts();
+    await assertSucceeds(posts(RECORDER).where('hidden', '==', false).get());
+    await assertFails(posts(RECORDER).get());
+  });
+
+  test('đại diện sửa và ẩn bài của tổ chức mình', async () => {
+    await seedPosts();
+    await assertSucceeds(posts(REP).doc('p-visible').update({ title: 'Ngày hội thăm hỏi tháng 11', updatedAt: FieldValue.serverTimestamp() }));
+    await assertSucceeds(posts(REP).doc('p-visible').update({ hidden: true, updatedAt: FieldValue.serverTimestamp() }));
+  });
+
+  test('không sửa bài của tổ chức khác, không đổi tổ chức / người đăng, không xóa bài', async () => {
+    await seedPosts();
+    await assertFails(posts(OUTSIDER).doc('p-visible').update({ hidden: true, updatedAt: FieldValue.serverTimestamp() }));
+    await assertFails(posts(ASSIGNEE).doc('p-visible').update({ hidden: true, updatedAt: FieldValue.serverTimestamp() }));
+    await assertFails(posts(REP).doc('p-visible').update({ orgId: OTHER_ORG, updatedAt: FieldValue.serverTimestamp() }));
+    await assertFails(posts(REP).doc('p-visible').update({ authorUid: ASSIGNEE, updatedAt: FieldValue.serverTimestamp() }));
+    await assertFails(posts(REP).doc('p-visible').delete());
   });
 });
