@@ -284,9 +284,12 @@ public class NeedRepository {
             update.put("acceptedAt", null);
             update.put("returnCount", FieldValue.increment(1));
             update.put("lastReturnReason", reason);
-            // Lịch đã chốt với tổ chức cũ hết hiệu lực khi trả lại
+            // Lịch đã chốt với tổ chức cũ hết hiệu lực khi trả lại: xóa đủ các field
+            // CoordinationRepository.confirmSchedule đã ghi, kể cả giờ kết thúc và hình thức
             update.put("scheduleId", null);
             update.put("scheduledAt", null);
+            update.put("scheduledEndAt", null);
+            update.put("scheduledFormat", null);
             update.put("scheduledPlace", null);
             update.put("scheduledByUid", null);
             update.put("updatedAt", FieldValue.serverTimestamp());

@@ -64,7 +64,7 @@ Danh sách sắp xếp ở máy nên **không cần tạo composite index**.
 | Xem trong "Tìm để tiếp nhận" | Nhu cầu `OPEN`, chỉ phần tóm tắt |
 | Tiếp nhận | `REPRESENTATIVE`; `OPEN → ACCEPTED`; transaction chặn hai tổ chức nhận cùng lúc |
 | Xem thông tin riêng | Thành viên đơn vị ghi nhận, hoặc đúng người phụ trách khi đã `SCHEDULED` / `DELIVERED` |
-| Trả lại | `REPRESENTATIVE` của tổ chức đang phụ trách; khi `ACCEPTED` / `SCHEDULED`; về `OPEN`, lần tiếp nhận cũ thành `RETURNED` |
+| Trả lại | `REPRESENTATIVE` của tổ chức đang phụ trách; khi `ACCEPTED` / `SCHEDULED`; về `OPEN`, lần tiếp nhận cũ thành `RETURNED`; xóa hết lịch đã chốt (`scheduleId`, `scheduledAt`, `scheduledEndAt`, `scheduledFormat`, `scheduledPlace`, `scheduledByUid`) |
 | Hủy | `RECORDER` của đơn vị ghi nhận; khi chưa `COMPLETED` / `CANCELLED`; bắt buộc lý do |
 
 ## 5. Kiểm thử (T06)
@@ -80,6 +80,7 @@ Danh sách sắp xếp ở máy nên **không cần tạo composite index**.
 - [ ] Tắt mạng rồi bấm Tiếp nhận / Duyệt / Trả lại → báo cần mạng, trạng thái không đổi.
 - [ ] Đại diện xem chi tiết nhu cầu đã nhận nhưng chưa chốt lịch → thông tin riêng vẫn bị che.
 - [ ] Trả lại → nhu cầu về `OPEN`, tổ chức khác nhận lại được; `needs_assignments` còn bản `RETURNED`.
+- [ ] Trả lại một nhu cầu đã chốt lịch → trên nhu cầu không còn ngày giờ, giờ kết thúc, hình thức, địa điểm của lịch cũ.
 - [ ] Hủy → bắt buộc chọn lý do; "Lý do khác" bắt buộc ghi chú.
 
 ## 6. Ghi chú cho các bạn trong nhóm

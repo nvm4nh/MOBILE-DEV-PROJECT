@@ -2,6 +2,7 @@
 //   F11 · chat theo lần tiếp nhận (needs_assignments/{id}/messages)
 //   F12 · đề xuất / thống nhất lịch (needs_assignments/{id}/schedules + needs_summary)
 //   F13 · báo hỗ trợ và đối soát (needs_summary)
+//   F14 · trả lại nhu cầu phải xóa hết lịch đã chốt (needs_summary)
 // Chạy: npm test (Firebase Emulator, không đụng tới project thật).
 
 import { readFileSync } from 'node:fs';
@@ -412,5 +413,58 @@ describe('F13 · Báo hỗ trợ và đối soát', () => {
       endedAt: FieldValue.serverTimestamp(),
     });
     await assertSucceeds(b.commit());
+  });
+});
+
+// =====================================================================
+// F14 · Trả lại nhu cầu sau khi đã hẹn lịch
+// =====================================================================
+
+describe('F14 · Trả lại xóa hết lịch đã chốt', () => {
+  const need = (uid) => db(uid).doc(`needs_summary/${NEED}`);
+
+  /** Nhu cầu đã chốt lịch như sau CoordinationRepository.confirmSchedule. */
+  async function seedScheduled() {
+    await seed({ needStatus: 'SCHEDULED' });
+    await env.withSecurityRulesDisabled((ctx) => ctx.firestore().doc(`needs_summary/${NEED}`).update({
+      scheduleId: 'p1', scheduledAt: START, scheduledEndAt: END,
+      scheduledFormat: 'Đến nhà · 2 đoàn viên', scheduledPlace: 'Phường 7, Quận 3',
+      scheduledByUid: RECORDER,
+    }));
+  }
+
+  /** Đúng các field NeedRepository.returnNeed ghi vào needs_summary. */
+  function returnUpdate(overrides = {}) {
+    return {
+      status: 'OPEN', assignedOrgId: null, assignedOrgName: null, assigneeUid: null,
+      assigneeName: null, acceptedByUid: null, currentAssignmentId: null, acceptedAt: null,
+      returnCount: FieldValue.increment(1), lastReturnReason: 'Không đủ người tham gia',
+      scheduleId: null, scheduledAt: null, scheduledEndAt: null, scheduledFormat: null,
+      scheduledPlace: null, scheduledByUid: null, updatedAt: FieldValue.serverTimestamp(),
+      ...overrides,
+    };
+  }
+
+  test('đại diện trả lại ca đã hẹn lịch: về OPEN, xóa hết lịch cũ', async () => {
+    await seedScheduled();
+    await assertSucceeds(need(REP).update(returnUpdate()));
+  });
+
+  test('trả lại ca chưa hẹn lịch (ACCEPTED) vẫn được', async () => {
+    await seed({ needStatus: 'ACCEPTED' });
+    await assertSucceeds(need(REP).update(returnUpdate()));
+  });
+
+  test('trả lại mà còn giữ giờ kết thúc hoặc hình thức của lịch cũ thì bị chặn', async () => {
+    await seedScheduled();
+    const { scheduledEndAt, ...keepEnd } = returnUpdate();
+    const { scheduledFormat, ...keepFormat } = returnUpdate();
+    await assertFails(need(REP).update(keepEnd));
+    await assertFails(need(REP).update(keepFormat));
+  });
+
+  test('thành viên không phải đại diện không trả lại được', async () => {
+    await seedScheduled();
+    await assertFails(need(ASSIGNEE).update(returnUpdate()));
   });
 });
