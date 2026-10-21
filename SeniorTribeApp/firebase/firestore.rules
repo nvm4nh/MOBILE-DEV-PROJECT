@@ -349,6 +349,7 @@ service cloud.firestore {
           ]);
       }
 
+      // Trả lại (F14): lịch đã chốt với tổ chức cũ phải xóa hết, không để sót giờ kết thúc / hình thức
       function representativeReturns() {
         let d = request.resource.data;
 
@@ -373,10 +374,17 @@ service cloud.firestore {
             'updatedAt',
             'scheduleId',
             'scheduledAt',
+            'scheduledEndAt',
+            'scheduledFormat',
             'scheduledPlace',
             'scheduledByUid'
           ])
-          && d.get('scheduleId', null) == null;
+          && d.get('scheduleId', null) == null
+          && d.get('scheduledAt', null) == null
+          && d.get('scheduledEndAt', null) == null
+          && d.get('scheduledFormat', null) == null
+          && d.get('scheduledPlace', null) == null
+          && d.get('scheduledByUid', null) == null;
       }
 
       function recorderCancels() {
