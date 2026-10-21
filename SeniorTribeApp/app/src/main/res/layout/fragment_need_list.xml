@@ -12,42 +12,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Tiêu đề tab như Figma F08: "Nhu cầu" + nút tìm (chuyển sang "Tìm để tiếp nhận") -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:minHeight="56dp"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="4dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:accessibilityHeading="true"
-                android:text="@string/nav_needs"
-                style="@style/Needs.Text.ScreenTitle" />
-
-            <ImageButton
-                android:id="@+id/btnHeaderSearch"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/ui_search_needs"
-                android:src="@drawable/ic_search"
-                app:tint="@color/text_primary" />
-        </LinearLayout>
-
         <!-- Chuyển giữa hai chế độ -->
         <com.google.android.material.button.MaterialButtonToggleGroup
             android:id="@+id/toggleMode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/bg_segment_container"
             android:padding="4dp"

@@ -6,9 +6,7 @@
         <item name="colorSecondary">@color/secondary</item>
         <item name="colorSecondaryVariant">@color/secondary_dark</item>
         <item name="colorOnSecondary">@color/on_secondary</item>
-        <!-- Thanh trạng thái sáng, cùng màu nền như Figma (các tab không còn thanh tiêu đề màu) -->
-        <item name="android:statusBarColor">@color/background</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
         <item name="android:windowBackground">@color/background</item>
         <!-- Bổ sung thuộc tính Material 3 theo Figma để chip, ô nhập, hộp thoại dùng đúng màu -->
         <item name="colorPrimaryContainer">@color/primary_light</item>

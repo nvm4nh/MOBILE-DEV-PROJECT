@@ -2,12 +2,12 @@
     <string name="app_name">SeniorTribe</string>
     <string name="app_slogan">Mạng xã hội hỗ trợ &amp; bầu bạn cùng người cao tuổi neo đơn</string>
 
-    <!-- Navigation Tabs (đúng tên trong Figma) -->
+    <!-- Navigation Tabs -->
     <string name="nav_feed">Bảng tin</string>
     <string name="nav_needs">Nhu cầu</string>
-    <string name="nav_chat">Chat</string>
+    <string name="nav_chat">Tin nhắn</string>
     <string name="nav_schedule">Lịch</string>
-    <string name="nav_profile">Tôi</string>
+    <string name="nav_profile">Hồ sơ</string>
 
     <!-- Auth -->
     <string name="login_title">Đăng nhập SeniorTribe</string>
@@ -35,8 +35,8 @@
 
     <!-- Feed -->
     <string name="feed_title">Bảng tin cộng đồng</string>
-    <string name="feed_offline_notice">Đang offline · chỉ xem bài đã tải</string>
-    <string name="btn_create_post">Đăng bài</string>
+    <string name="feed_offline_notice">Đang xem dữ liệu ngoại tuyến đã lưu (SQLite cache)</string>
+    <string name="btn_create_post">Đăng bài viết mới</string>
     <string name="post_title_hint">Tiêu đề bài viết hoạt động</string>
     <string name="post_content_hint">Chia sẻ hoạt động thăm hỏi, hỗ trợ người cao tuổi...</string>
 
@@ -68,9 +68,9 @@
     <string name="status_cancelled_label">Đã hủy</string>
 
     <!-- Chat & Schedule -->
-    <string name="chat_title">Trao đổi phối hợp</string>
+    <string name="chat_title">Chat</string>
     <string name="send_message_hint">Nhập tin nhắn...</string>
-    <string name="schedule_title">Lịch hẹn thăm hỏi</string>
+    <string name="schedule_title">Lịch</string>
     <string name="btn_propose">Gửi đề xuất lịch</string>
     <string name="btn_agree">Người cao tuổi đồng ý</string>
 

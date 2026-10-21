@@ -11,8 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:background="@color/surface"
-        app:labelVisibilityMode="labeled"
-        app:menuGravity="center"
+        app:itemIconTint="@color/primary"
+        app:itemTextColor="@color/primary"
         app:menu="@menu/bottom_nav_menu" />
 
     <View

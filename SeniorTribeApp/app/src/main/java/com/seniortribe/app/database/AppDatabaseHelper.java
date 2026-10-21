@@ -9,35 +9,26 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.seniortribe.app.models.Post;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
- * Bộ nhớ đệm SQLite cho Bảng tin (F16, T05): lưu bản sao các bài đăng đã tải để xem lại khi mất mạng.
- *
- * Chỉ lưu bài đăng công khai trong mạng lưới. Không lưu thông tin riêng của người cao tuổi
- * (needs_private), tin nhắn chat hay hồ sơ tài khoản xuống máy.
+ * Quản lý SQLite Offline Caching theo tiêu chí T05 & Chương 5.2/5.3 của Đồ án SeniorTribe.
+ * Lưu trữ bộ nhớ đệm bài viết cộng đồng để người dùng đọc được khi mất kết nối mạng.
  */
 public class AppDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "seniortribe_offline.db";
-    // v2: đổi cột theo schema posts mới (tổ chức, người đăng, thông tin hoạt động), bỏ ảnh và lượt quan tâm
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
 
-    /** Giữ tối đa chừng này bài mới nhất để file đệm luôn nhỏ. */
-    public static final int MAX_CACHED_POSTS = 100;
-
+    // Table: cached_posts
     public static final String TABLE_POSTS = "cached_posts";
     public static final String COL_ID = "id";
     public static final String COL_SERVER_ID = "server_id";
     public static final String COL_TITLE = "title";
     public static final String COL_CONTENT = "content";
-    public static final String COL_ORG_ID = "org_id";
-    public static final String COL_ORG_NAME = "org_name";
-    public static final String COL_AUTHOR_NAME = "author_name";
-    public static final String COL_ORG_VERIFIED = "org_verified";
-    public static final String COL_EVENT_TIME = "event_time";
-    public static final String COL_EVENT_PLACE = "event_place";
+    public static final String COL_AUTHOR_ORG = "author_org";
+    public static final String COL_IMAGE_URL = "image_url";
+    public static final String COL_LIKES = "likes_count";
     public static final String COL_CREATED_AT = "created_at";
     public static final String COL_CACHED_AT = "cached_at";
 
@@ -56,54 +47,44 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_POSTS + " ("
+        String createTable = "CREATE TABLE " + TABLE_POSTS + " ("
                 + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + COL_SERVER_ID + " TEXT UNIQUE NOT NULL, "
+                + COL_SERVER_ID + " TEXT UNIQUE, "
                 + COL_TITLE + " TEXT, "
                 + COL_CONTENT + " TEXT, "
-                + COL_ORG_ID + " TEXT, "
-                + COL_ORG_NAME + " TEXT, "
-                + COL_AUTHOR_NAME + " TEXT, "
-                + COL_ORG_VERIFIED + " INTEGER DEFAULT 0, "
-                + COL_EVENT_TIME + " TEXT, "
-                + COL_EVENT_PLACE + " TEXT, "
+                + COL_AUTHOR_ORG + " TEXT, "
+                + COL_IMAGE_URL + " TEXT, "
+                + COL_LIKES + " INTEGER DEFAULT 0, "
                 + COL_CREATED_AT + " INTEGER, "
-                + COL_CACHED_AT + " INTEGER)");
+                + COL_CACHED_AT + " INTEGER)";
+        db.execSQL(createTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Chỉ là bộ nhớ đệm, tải lại được từ Firestore nên xóa đi tạo lại cho đơn giản
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_POSTS);
         onCreate(db);
     }
 
     /**
-     * Thay toàn bộ bộ đệm bằng danh sách vừa tải từ Firestore (đã lọc bài ẩn).
-     * Thay hết thay vì cộng dồn để bài đã bị ẩn hoặc xóa trên máy chủ không còn hiện khi offline.
+     * Lưu danh sách bài viết từ Firestore vào SQLite cache
      */
-    public void replaceAllPosts(List<Post> posts) {
-        SQLiteDatabase db = getWritableDatabase();
-        long now = System.currentTimeMillis();
+    public void savePosts(List<Post> posts) {
+        if (posts == null || posts.isEmpty()) return;
+        SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
         try {
-            db.delete(TABLE_POSTS, null, null);
-            int count = 0;
             for (Post p : posts) {
-                if (p.getId() == null || p.isHidden()) continue;
-                if (count++ >= MAX_CACHED_POSTS) break;
                 ContentValues values = new ContentValues();
                 values.put(COL_SERVER_ID, p.getId());
                 values.put(COL_TITLE, p.getTitle());
                 values.put(COL_CONTENT, p.getContent());
-                values.put(COL_ORG_ID, p.getOrgId());
-                values.put(COL_ORG_NAME, p.getOrgName());
-                values.put(COL_AUTHOR_NAME, p.getAuthorName());
-                values.put(COL_ORG_VERIFIED, p.isOrgVerified() ? 1 : 0);
-                values.put(COL_EVENT_TIME, p.getEventTime());
-                values.put(COL_EVENT_PLACE, p.getEventPlace());
-                values.put(COL_CREATED_AT, p.getCreatedAtMillis());
-                values.put(COL_CACHED_AT, now);
+                values.put(COL_AUTHOR_ORG, p.getAuthorOrg());
+                values.put(COL_IMAGE_URL, p.getImageUrl());
+                values.put(COL_LIKES, p.getLikesCount());
+                values.put(COL_CREATED_AT, p.getCreatedAt());
+                values.put(COL_CACHED_AT, System.currentTimeMillis());
+
                 db.insertWithOnConflict(TABLE_POSTS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
             }
             db.setTransactionSuccessful();
@@ -112,33 +93,34 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /** Các bài đã lưu, mới nhất trước. Mỗi bài được đánh dấu {@link Post#isCached()}. */
+    /**
+     * Lấy danh sách bài viết đã lưu đệm khi offline
+     */
     public List<Post> getAllCachedPosts() {
         List<Post> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        try (Cursor cursor = db.query(TABLE_POSTS, null, null, null, null, null,
-                COL_CREATED_AT + " DESC", String.valueOf(MAX_CACHED_POSTS))) {
-            while (cursor.moveToNext()) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_POSTS, null, null, null, null, null, COL_CREATED_AT + " DESC");
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
                 Post post = new Post();
                 post.setId(cursor.getString(cursor.getColumnIndexOrThrow(COL_SERVER_ID)));
                 post.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(COL_TITLE)));
                 post.setContent(cursor.getString(cursor.getColumnIndexOrThrow(COL_CONTENT)));
-                post.setOrgId(cursor.getString(cursor.getColumnIndexOrThrow(COL_ORG_ID)));
-                post.setOrgName(cursor.getString(cursor.getColumnIndexOrThrow(COL_ORG_NAME)));
-                post.setAuthorName(cursor.getString(cursor.getColumnIndexOrThrow(COL_AUTHOR_NAME)));
-                post.setOrgVerified(cursor.getInt(cursor.getColumnIndexOrThrow(COL_ORG_VERIFIED)) == 1);
-                post.setEventTime(cursor.getString(cursor.getColumnIndexOrThrow(COL_EVENT_TIME)));
-                post.setEventPlace(cursor.getString(cursor.getColumnIndexOrThrow(COL_EVENT_PLACE)));
-                post.setCreatedAt(new Date(cursor.getLong(cursor.getColumnIndexOrThrow(COL_CREATED_AT))));
+                post.setAuthorOrg(cursor.getString(cursor.getColumnIndexOrThrow(COL_AUTHOR_ORG)));
+                post.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(COL_IMAGE_URL)));
+                post.setLikesCount(cursor.getInt(cursor.getColumnIndexOrThrow(COL_LIKES)));
+                post.setCreatedAt(cursor.getLong(cursor.getColumnIndexOrThrow(COL_CREATED_AT)));
                 post.setCached(true);
                 list.add(post);
-            }
+            } while (cursor.moveToNext());
+            cursor.close();
         }
         return list;
     }
 
-    /** Xóa bộ đệm, ví dụ khi đăng xuất. */
     public void clearCache() {
-        getWritableDatabase().delete(TABLE_POSTS, null, null);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_POSTS, null, null);
     }
 }
