@@ -2,12 +2,12 @@
     <string name="app_name">SeniorTribe</string>
     <string name="app_slogan">Mạng xã hội hỗ trợ &amp; bầu bạn cùng người cao tuổi neo đơn</string>
 
-    <!-- Navigation Tabs -->
+    <!-- Navigation Tabs (đúng tên trong Figma) -->
     <string name="nav_feed">Bảng tin</string>
     <string name="nav_needs">Nhu cầu</string>
-    <string name="nav_chat">Tin nhắn</string>
+    <string name="nav_chat">Chat</string>
     <string name="nav_schedule">Lịch</string>
-    <string name="nav_profile">Hồ sơ</string>
+    <string name="nav_profile">Tôi</string>
 
     <!-- Auth -->
     <string name="login_title">Đăng nhập SeniorTribe</string>
@@ -35,8 +35,8 @@
 
     <!-- Feed -->
     <string name="feed_title">Bảng tin cộng đồng</string>
-    <string name="feed_offline_notice">Đang xem dữ liệu ngoại tuyến đã lưu (SQLite cache)</string>
-    <string name="btn_create_post">Đăng bài viết mới</string>
+    <string name="feed_offline_notice">Đang offline · chỉ xem bài đã tải</string>
+    <string name="btn_create_post">Đăng bài</string>
     <string name="post_title_hint">Tiêu đề bài viết hoạt động</string>
     <string name="post_content_hint">Chia sẻ hoạt động thăm hỏi, hỗ trợ người cao tuổi...</string>
 

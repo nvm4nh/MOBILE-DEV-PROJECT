@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chuỗi cho giao diện chung (F16), Bảng tin (F04), đăng / sửa / ẩn bài (F05) -->
+<resources>
+    <string name="ui_search_needs">Tìm nhu cầu để tiếp nhận</string>
+
+    <!-- F04 · Bảng tin -->
+    <string name="feed_chip_all">Tất cả</string>
+    <string name="feed_chip_my_org">Đơn vị của tôi</string>
+    <string name="feed_empty_title">Chưa có bài đăng</string>
+    <string name="feed_empty_message">Bài hoạt động của các tổ chức trong mạng lưới sẽ hiện ở đây.</string>
+    <string name="feed_empty_my_org_title">Đơn vị của bạn chưa có bài đăng</string>
+    <string name="feed_empty_my_org_message">Chia sẻ hoạt động của đơn vị để các tổ chức khác cùng phối hợp.</string>
+    <string name="feed_no_org_title">Chưa thuộc tổ chức nào</string>
+    <string name="feed_no_org_message">Tài khoản chưa được cấp quyền tổ chức nên chưa có bài của đơn vị.</string>
+
+    <!-- F16 · Trạng thái dữ liệu -->
+    <string name="feed_offline_empty_title">Đang offline</string>
+    <string name="feed_offline_empty_message">Chưa có bài nào được tải trước đó. Kết nối mạng rồi thử lại.</string>
+    <string name="feed_stale_notice">Chưa tải được bài mới · đang xem bài đã tải</string>
+    <string name="feed_offline_cannot_post">Đang offline nên chưa đăng bài được. Kết nối mạng rồi thử lại.</string>
+
+    <!-- F04 · Chi tiết bài -->
+    <string name="post_detail_title">Bài đăng</string>
+    <string name="post_posted_at">Đăng lúc %1$s</string>
+    <string name="post_updated_suffix">%1$s · đã sửa</string>
+    <string name="post_event_info">Thông tin hoạt động</string>
+    <string name="post_representative">Đại diện: %1$s</string>
+    <string name="post_privacy_detail">Bài đăng không chứa tên, địa chỉ hay số điện thoại của người được hỗ trợ.</string>
+    <string name="post_org_verified_cd">%1$s, tổ chức đã xác minh</string>
+    <string name="post_cached_notice">Đang xem bản đã lưu khi offline</string>
+
+    <!-- F05 · Tùy chọn bài -->
+    <string name="post_options">Tùy chọn bài đăng</string>
+    <string name="post_options_note">Chỉ đại diện của %1$s thấy các tùy chọn này.</string>
+    <string name="post_action_edit">Sửa bài</string>
+    <string name="post_action_hide">Ẩn bài khỏi bảng tin</string>
+    <string name="post_hide_confirm_title">Ẩn bài khỏi bảng tin?</string>
+    <string name="post_hide_confirm_message">Các tổ chức trong mạng lưới sẽ không còn thấy bài này.</string>
+    <string name="post_hidden">Đã ẩn bài khỏi bảng tin.</string>
+
+    <!-- F05 · Đăng / sửa bài -->
+    <string name="post_edit_title">Sửa bài</string>
+    <string name="post_post_as">Đăng với tư cách</string>
+    <string name="post_label_title">Tiêu đề</string>
+    <string name="post_label_content">Nội dung</string>
+    <string name="post_label_event_time">Thời gian hoạt động (không bắt buộc)</string>
+    <string name="post_label_event_place">Địa điểm (không bắt buộc)</string>
+    <string name="post_event_time_hint">Ví dụ: Chủ nhật 20/10 · 08:00–11:00</string>
+    <string name="post_event_place_hint">Ví dụ: Nhà văn hóa Phường 7, Quận 3</string>
+    <string name="post_visibility">Hiển thị cho các tổ chức trong mạng lưới</string>
+    <string name="post_privacy_note">Không đăng tên, địa chỉ, số điện thoại hay ảnh của người được hỗ trợ.</string>
+    <string name="post_publishing">Đang đăng…</string>
+    <string name="post_saving">Đang lưu…</string>
+    <string name="post_save_changes">Lưu thay đổi</string>
+    <string name="post_published">Đã đăng bài lên Bảng tin.</string>
+    <string name="post_saved">Đã lưu thay đổi.</string>
+    <string name="post_error_title_length">Tiêu đề cần từ 5 đến 120 ký tự.</string>
+    <string name="post_error_content_length">Nội dung cần từ 10 đến 2000 ký tự.</string>
+    <string name="post_error_event_length">Tối đa 120 ký tự.</string>
+    <string name="post_error_phone">Bài đăng không được chứa số điện thoại. Hãy xóa số điện thoại rồi đăng lại.</string>
+    <string name="post_error_not_representative">Chỉ đại diện tổ chức mới đăng được bài.</string>
+    <string name="post_error_not_owner">Chỉ đại diện của tổ chức đã đăng mới sửa được bài này.</string>
+    <string name="post_checking_permission">Đang kiểm tra quyền đăng bài…</string>
+</resources>
