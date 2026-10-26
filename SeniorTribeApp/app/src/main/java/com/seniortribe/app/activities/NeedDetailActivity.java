@@ -86,7 +86,6 @@ public class NeedDetailActivity extends AppCompatActivity {
             else if (id == R.id.action_return_need) openReasonSheet(NeedReasonSheet.MODE_RETURN);
             else if (id == R.id.action_cancel_need) openReasonSheet(NeedReasonSheet.MODE_CANCEL);
             else if (id == R.id.action_need_history) openHistory();
-            else if (id == R.id.action_need_sos) openSos();
             else return false;
             return true;
         });
@@ -296,15 +295,6 @@ public class NeedDetailActivity extends AppCompatActivity {
         setMenuVisible(canEdit && primary != ACTION_EDIT && secondary != ACTION_EDIT, canReturn, canCancel);
         MenuItem history = toolbar.getMenu().findItem(R.id.action_need_history);
         if (history != null) history.setVisible(recorderOrg || assignedOrg);
-        // E09 · SOS cho hai người đang phối hợp (đầu mối đã ghi nhận / người được giao)
-        MenuItem sos = toolbar.getMenu().findItem(R.id.action_need_sos);
-        if (sos != null) sos.setVisible(canChat && n.isCoordinating());
-    }
-
-    /** E09 · Màn hình Khẩn cấp, chọn sẵn nhu cầu này để báo cho bên cùng phối hợp. */
-    private void openSos() {
-        startActivity(new android.content.Intent(this, SosActivity.class)
-                .putExtra(Constants.EXTRA_NEED_ID, needId));
     }
 
     private void setupButton(MaterialButton button, int action, NeedSummary n, boolean busy) {
