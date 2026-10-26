@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.seniortribe.app.data.CallRepository;
 import com.seniortribe.app.data.MembershipRepository;
 import com.seniortribe.app.data.NeedRepository;
 import com.seniortribe.app.models.Membership;
@@ -45,6 +46,7 @@ public final class NotificationCenter {
     private final List<ListenerRegistration> base = new ArrayList<>();
     private final Map<String, ListenerRegistration> eventListeners = new HashMap<>();
     private final Map<String, ListenerRegistration> messageListeners = new HashMap<>();
+    private final Map<String, ListenerRegistration> callListeners = new HashMap<>();
     private final Map<String, NeedSummary> recorded = new LinkedHashMap<>();
     private final Map<String, NeedSummary> assigned = new LinkedHashMap<>();
     private boolean recordedLoaded, assignedLoaded;
@@ -97,6 +99,8 @@ public final class NotificationCenter {
         eventListeners.clear();
         for (ListenerRegistration r : messageListeners.values()) r.remove();
         messageListeners.clear();
+        for (ListenerRegistration r : callListeners.values()) r.remove();
+        callListeners.clear();
         recorded.clear();
         assigned.clear();
         recordedLoaded = assignedLoaded = false;
@@ -166,10 +170,12 @@ public final class NotificationCenter {
                 String a = n.getCurrentAssignmentId();
                 wantChats.add(a);
                 if (!messageListeners.containsKey(a)) messageListeners.put(a, listenMessages(n.getNeedId(), a));
+                if (!callListeners.containsKey(a)) callListeners.put(a, listenCalls(n.getNeedId(), a));
             }
         }
         removeOthers(eventListeners, wantEvents);
         removeOthers(messageListeners, wantChats);
+        removeOthers(callListeners, wantChats);
         e.syncReminders(new ArrayList<>(all.values()));
     }
 
@@ -196,6 +202,21 @@ public final class NotificationCenter {
                     if (request != generation || snap == null || engine == null) return;
                     NeedSummary n = current(needId);
                     if (n != null) engine.onMessages(n, assignmentId, snap.getDocuments(), visibleChat);
+                });
+    }
+
+    /** E06 · Cuộc gọi đến (đang đổ chuông, gọi cho mình) của luồng chat. */
+    private ListenerRegistration listenCalls(String needId, String assignmentId) {
+        final long request = generation;
+        return db.collection(Constants.COL_ASSIGNMENTS).document(assignmentId).collection(CallRepository.SUB_CALLS)
+                .whereEqualTo("calleeUid", uid)
+                .whereEqualTo("status", "RINGING")
+                .addSnapshotListener((snap, error) -> {
+                    if (request != generation || snap == null || engine == null) return;
+                    // Đang mở chat này thì ChatActivity tự mở màn hình nghe máy
+                    if (assignmentId.equals(visibleChat)) return;
+                    NeedSummary n = current(needId);
+                    if (n != null) engine.onIncomingCalls(n, assignmentId, snap.getDocuments());
                 });
     }
 

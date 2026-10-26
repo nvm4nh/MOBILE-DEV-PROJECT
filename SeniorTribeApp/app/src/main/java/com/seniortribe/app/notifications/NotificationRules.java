@@ -37,7 +37,7 @@ public final class NotificationRules {
     public static final String RESCHEDULED = "RESCHEDULED";
 
     /** Màn hình mở khi bấm thông báo. */
-    public enum Target { NEED, CHAT, SCHEDULE, RESCHEDULE, PROGRESS }
+    public enum Target { NEED, CHAT, SCHEDULE, RESCHEDULE, PROGRESS, CALL }
 
     /** Câu chữ của từng trường hợp (tiêu đề), để lớp Android tra ra chuỗi tiếng Việt. */
     public enum Kind {

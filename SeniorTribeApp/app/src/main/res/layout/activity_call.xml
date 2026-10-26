@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E06 · Màn hình gọi thoại / video. Một bố cục cho cả dọc và ngang (Activity tự xử lý xoay
+     màn hình để cuộc gọi không bị ngắt). Nút to, có nhãn đọc màn hình cho người dùng lớn tuổi. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF101614">
+
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/remoteView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/layoutPeer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="96dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tvAvatar"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:background="@drawable/bg_avatar_circle"
+            android:gravity="center"
+            android:textColor="@color/primary_dark"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            tools:text="M" />
+
+        <TextView
+            android:id="@+id/tvPeerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:textColor="#FFFFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            tools:text="Trần Thị Mai" />
+
+        <TextView
+            android:id="@+id/tvCallStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:accessibilityLiveRegion="polite"
+            android:gravity="center"
+            android:textColor="#CCFFFFFF"
+            android:textSize="16sp"
+            tools:text="Đang gọi video…" />
+    </LinearLayout>
+
+    <org.webrtc.SurfaceViewRenderer
+        android:id="@+id/localView"
+        android:layout_width="108dp"
+        android:layout_height="144dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvTimer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_pill"
+        android:backgroundTint="#66000000"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
+        android:textColor="#FFFFFFFF"
+        android:textSize="14sp"
+        android:visibility="gone"
+        tools:text="03:12"
+        tools:visibility="visible" />
+
+    <!-- Đang gọi / đang nói chuyện -->
+    <LinearLayout
+        android:id="@+id/layoutControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingVertical="28dp">
+
+        <ImageButton
+            android:id="@+id/btnMic"
+            style="@style/Call.Button"
+            android:contentDescription="@string/call_mute"
+            android:src="@drawable/ic_mic" />
+
+        <ImageButton
+            android:id="@+id/btnCamera"
+            style="@style/Call.Button"
+            android:contentDescription="@string/call_camera_off"
+            android:src="@drawable/ic_videocam" />
+
+        <ImageButton
+            android:id="@+id/btnSwitchCamera"
+            style="@style/Call.Button"
+            android:contentDescription="@string/call_switch_camera"
+            android:src="@drawable/ic_switch_camera" />
+
+        <ImageButton
+            android:id="@+id/btnSpeaker"
+            style="@style/Call.Button"
+            android:contentDescription="@string/call_speaker"
+            android:src="@drawable/ic_volume_up" />
+
+        <ImageButton
+            android:id="@+id/btnHangup"
+            style="@style/Call.Button"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/bg_call_hangup"
+            android:contentDescription="@string/call_hangup"
+            android:src="@drawable/ic_call_end" />
+    </LinearLayout>
+
+    <!-- Cuộc gọi đến -->
+    <LinearLayout
+        android:id="@+id/layoutIncoming"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingVertical="40dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="64dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btnDecline"
+                style="@style/Call.Button"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_call_hangup"
+                android:contentDescription="@string/call_decline"
+                android:src="@drawable/ic_call_end" />
+
+            <TextView
+                style="@style/Call.Label"
+                android:text="@string/call_decline" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/btnAccept"
+                style="@style/Call.Button"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_call_accept"
+                android:contentDescription="@string/call_accept"
+                android:src="@drawable/ic_call" />
+
+            <TextView
+                style="@style/Call.Label"
+                android:text="@string/call_accept" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -7,6 +7,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- E01 · Hiện thông báo tin nhắn, lịch hẹn và nhắc lịch (Android 13+ hỏi người dùng) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- E06 · Gọi thoại / video và chụp ảnh gửi trong chat (hỏi người dùng khi cần) -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <application
         android:name=".SeniorTribeApplication"
@@ -98,6 +104,32 @@
         <activity
             android:name=".activities.NotificationSettingsActivity"
             android:exported="false" />
+
+        <!-- E06 · Gọi thoại / video. Tự xử lý xoay màn hình để cuộc gọi không bị ngắt khi
+             Activity tạo lại; bố cục FrameLayout tự co giãn theo chiều ngang / dọc. -->
+        <activity
+            android:name=".activities.CallActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:exported="false"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.SeniorTribeApp.Call" />
+
+        <!-- E06 · Xem ảnh gửi trong chat -->
+        <activity
+            android:name=".activities.ImageViewerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SeniorTribeApp.Viewer" />
+
+        <!-- E06 · Chia sẻ tạm ảnh chụp / tệp mở bằng ứng dụng khác (chỉ thư mục cache/shared) -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <!-- E02 · Đổi lịch sau khi đã chốt -->
         <activity

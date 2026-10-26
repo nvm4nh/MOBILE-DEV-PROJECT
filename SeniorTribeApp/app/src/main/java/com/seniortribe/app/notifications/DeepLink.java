@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 
+import com.seniortribe.app.activities.CallActivity;
 import com.seniortribe.app.activities.ChatActivity;
 import com.seniortribe.app.activities.MainActivity;
 import com.seniortribe.app.activities.NeedDetailActivity;
@@ -32,7 +33,15 @@ public final class DeepLink {
     /** Intent mở MainActivity kèm đích đến, dùng làm PendingIntent của thông báo. */
     public static PendingIntent pendingIntent(Context context, int requestCode, NotificationRules.Target target,
                                               String needId, @Nullable String assignmentId, @Nullable String caseCode) {
+        return pendingIntent(context, requestCode, target, needId, assignmentId, caseCode, null);
+    }
+
+    /** @param callId cuộc gọi đến (E06), mở màn hình nghe máy */
+    public static PendingIntent pendingIntent(Context context, int requestCode, NotificationRules.Target target,
+                                              String needId, @Nullable String assignmentId, @Nullable String caseCode,
+                                              @Nullable String callId) {
         Intent intent = new Intent(context, MainActivity.class)
+                .putExtra(CallActivity.EXTRA_CALL_ID, callId)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP)
                 .putExtra(EXTRA_TARGET, target.name())
                 .putExtra(Constants.EXTRA_NEED_ID, needId)
@@ -57,6 +66,7 @@ public final class DeepLink {
         b.putString(Constants.EXTRA_NEED_ID, from.getStringExtra(Constants.EXTRA_NEED_ID));
         b.putString(Constants.EXTRA_ASSIGNMENT_ID, from.getStringExtra(Constants.EXTRA_ASSIGNMENT_ID));
         b.putString(Constants.EXTRA_CASE_CODE, from.getStringExtra(Constants.EXTRA_CASE_CODE));
+        b.putString(CallActivity.EXTRA_CALL_ID, from.getStringExtra(CallActivity.EXTRA_CALL_ID));
         to.putExtras(b);
     }
 
@@ -89,6 +99,15 @@ public final class DeepLink {
             case SCHEDULE: cls = ScheduleAgreementActivity.class; break;
             case RESCHEDULE: cls = RescheduleActivity.class; break;
             case PROGRESS: cls = NeedProgressActivity.class; break;
+            case CALL: {
+                String callId = from.getStringExtra(CallActivity.EXTRA_CALL_ID);
+                if (callId == null || assignmentId == null) return null;
+                return new Intent(context, CallActivity.class)
+                        .putExtra(Constants.EXTRA_NEED_ID, needId)
+                        .putExtra(Constants.EXTRA_ASSIGNMENT_ID, assignmentId)
+                        .putExtra(CallActivity.EXTRA_CALL_ID, callId)
+                        .putExtra(CallActivity.EXTRA_INCOMING, true);
+            }
             case NEED:
             default: cls = NeedDetailActivity.class; break;
         }

@@ -44,6 +44,33 @@
         <include layout="@layout/view_list_state" />
     </FrameLayout>
 
+    <!-- E06 · Tiến độ gửi ảnh / tệp -->
+    <LinearLayout
+        android:id="@+id/layoutUpload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvUpload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:accessibilityLiveRegion="polite"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressUpload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:max="100" />
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/layoutInput"
         android:layout_width="match_parent"
@@ -53,6 +80,19 @@
         android:orientation="horizontal"
         android:paddingHorizontal="12dp"
         android:paddingVertical="8dp">
+
+        <!-- E06 · Gửi ảnh / tệp -->
+        <ImageButton
+            android:id="@+id/btnAttach"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/chat_attach"
+            android:padding="12dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_attach"
+            app:tint="@color/text_secondary" />
 
         <EditText
             android:id="@+id/etMessage"

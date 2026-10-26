@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E06 · Chỉ chia sẻ thư mục tạm cache/shared (ảnh vừa chụp, tệp mở bằng ứng dụng khác).
+     Thư mục này bị xóa khi đóng chat và khi mở lại ứng dụng. -->
+<paths>
+    <cache-path
+        name="shared"
+        path="shared/" />
+</paths>

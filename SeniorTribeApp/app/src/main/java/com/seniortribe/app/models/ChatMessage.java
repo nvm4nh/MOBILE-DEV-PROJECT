@@ -1,5 +1,6 @@
 package com.seniortribe.app.models;
 
+import com.google.firebase.firestore.Blob;
 import com.google.firebase.firestore.DocumentId;
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.IgnoreExtraProperties;
@@ -26,7 +27,46 @@ public class ChatMessage {
     @Exclude
     private boolean pending;        // còn chờ máy chủ xác nhận, không lưu lên Firestore
 
+    // E06 · Tin ảnh / tệp (text khi đó là chú thích, có thể rỗng)
+    public static final String TYPE_TEXT = "TEXT";
+    public static final String TYPE_IMAGE = "IMAGE";
+    public static final String TYPE_FILE = "FILE";
+
+    private String type;            // null với tin cũ = TEXT
+    private String attachmentId;
+    private String fileName;
+    private String mimeType;
+    private long size;
+    private Blob thumb;             // ảnh xem trước nhỏ (≤ 64 KB), chỉ có ở tin ảnh
+
     public ChatMessage() {}
+
+    @Exclude
+    public boolean isImage() { return TYPE_IMAGE.equals(type) && attachmentId != null; }
+
+    @Exclude
+    public boolean isFile() { return TYPE_FILE.equals(type) && attachmentId != null; }
+
+    @Exclude
+    public boolean hasAttachment() { return isImage() || isFile(); }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+
+    public String getAttachmentId() { return attachmentId; }
+    public void setAttachmentId(String attachmentId) { this.attachmentId = attachmentId; }
+
+    public String getFileName() { return fileName; }
+    public void setFileName(String fileName) { this.fileName = fileName; }
+
+    public String getMimeType() { return mimeType; }
+    public void setMimeType(String mimeType) { this.mimeType = mimeType; }
+
+    public long getSize() { return size; }
+    public void setSize(long size) { this.size = size; }
+
+    public Blob getThumb() { return thumb; }
+    public void setThumb(Blob thumb) { this.thumb = thumb; }
 
     /** Thời điểm gửi; tin vừa gửi chưa có timestamp của máy chủ thì coi như bây giờ. */
     @Exclude

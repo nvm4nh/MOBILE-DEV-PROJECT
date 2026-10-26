@@ -179,6 +179,30 @@ public final class NotificationEngine {
         return text.length() > 120 ? text.substring(0, 117) + "…" : text;
     }
 
+    /**
+     * E06 · Cuộc gọi đến đang đổ chuông cho mình: hiện thông báo mức cao, bấm để mở màn hình nghe
+     * máy (đi qua MainActivity để kiểm tra quyền). Mỗi cuộc gọi chỉ báo một lần.
+     */
+    public void onIncomingCalls(NeedSummary n, String assignmentId, List<DocumentSnapshot> docs) {
+        long now = System.currentTimeMillis();
+        for (DocumentSnapshot d : docs) {
+            if (!uid.equals(d.getString("calleeUid")) || !"RINGING".equals(d.getString("status"))) continue;
+            long at = millis(d.getTimestamp("createdAt"));
+            if (at <= 0 || now - at > com.seniortribe.app.models.CallRecord.RING_TIMEOUT_MS) continue;
+            if (!prefs.advance(uid, "call_" + assignmentId, at)) continue;
+            String code = nonEmpty(n.getCaseCode(), context.getString(R.string.notif_need_fallback));
+            boolean video = Boolean.TRUE.equals(d.getBoolean("video"));
+            String caller = nonEmpty(d.getString("callerName"), context.getString(R.string.chat_sender_unknown));
+            String key = "call_" + d.getId();
+            notifier.post(NotifyCategory.CALLS, key,
+                    context.getString(video ? R.string.notif_call_title_video : R.string.notif_call_title_voice, code),
+                    context.getString(R.string.notif_call_text, caller),
+                    DeepLink.pendingIntent(context, AppNotifier.requestCode(key), NotificationRules.Target.CALL,
+                            n.getNeedId(), assignmentId, n.getCaseCode(), d.getId()),
+                    null);
+        }
+    }
+
     public static String chatKey(String assignmentId) {
         return "chat_" + assignmentId;
     }

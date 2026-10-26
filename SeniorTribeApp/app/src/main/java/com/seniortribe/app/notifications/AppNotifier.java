@@ -51,6 +51,8 @@ public final class AppNotifier {
                 R.string.notif_channel_status_desc, NotificationManager.IMPORTANCE_DEFAULT));
         nm.createNotificationChannel(channel(context, NotifyCategory.FOLLOW_UP, R.string.notif_channel_follow_up,
                 R.string.notif_channel_follow_up_desc, NotificationManager.IMPORTANCE_DEFAULT));
+        nm.createNotificationChannel(channel(context, NotifyCategory.CALLS, R.string.notif_channel_calls,
+                R.string.notif_channel_calls_desc, NotificationManager.IMPORTANCE_HIGH));
     }
 
     private static NotificationChannel channel(Context c, NotifyCategory cat, @StringRes int name,
@@ -92,14 +94,17 @@ public final class AppNotifier {
                         .setContentText(context.getString(R.string.notif_public_text))
                         .build())
                 .setPriority(category == NotifyCategory.MESSAGES || category == NotifyCategory.SCHEDULE
+                        || category == NotifyCategory.CALLS
                         ? NotificationCompat.PRIORITY_HIGH : NotificationCompat.PRIORITY_DEFAULT)
-                .setCategory(category == NotifyCategory.MESSAGES ? NotificationCompat.CATEGORY_MESSAGE
+                .setCategory(category == NotifyCategory.CALLS ? NotificationCompat.CATEGORY_CALL
+                        : category == NotifyCategory.MESSAGES ? NotificationCompat.CATEGORY_MESSAGE
                         : category == NotifyCategory.SCHEDULE ? NotificationCompat.CATEGORY_REMINDER
                         : NotificationCompat.CATEGORY_STATUS);
         if (!TextUtils.isEmpty(text)) {
             b.setContentText(text).setStyle(new NotificationCompat.BigTextStyle().bigText(text));
         }
         if (group != null) b.setGroup(group);
+        if (category == NotifyCategory.CALLS) b.setTimeoutAfter(com.seniortribe.app.models.CallRecord.RING_TIMEOUT_MS);
         try {
             NotificationManagerCompat.from(context).notify(key, 0, b.build());
         } catch (SecurityException ignored) {

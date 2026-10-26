@@ -13,7 +13,9 @@ public enum NotifyCategory {
     /** Tiếp nhận, trả lại, hủy, hoàn thành (F10, F13, F14). */
     STATUS("st_status", "pref_notify_status"),
     /** Việc cần mình xử lý: rà soát, bổ sung, đối soát kết quả (F07, F13). */
-    FOLLOW_UP("st_follow_up", "pref_notify_follow_up");
+    FOLLOW_UP("st_follow_up", "pref_notify_follow_up"),
+    /** Cuộc gọi đến (E06): kênh riêng mức cao, bật / tắt cùng công tắc "Tin nhắn". */
+    CALLS("st_calls", "pref_notify_messages");
 
     public final String channelId;
     public final String prefKey;

@@ -52,6 +52,8 @@ public class SeniorTribeApplication extends Application {
 
         // E01 · Kênh thông báo và listener realtime (chạy khi tài khoản đã được xác nhận quyền)
         AppNotifier.createChannels(this);
+        // E06 · Xóa tệp tạm của chat (ảnh chụp, tệp đã mở) còn sót nếu lần trước app bị tắt đột ngột
+        com.seniortribe.app.activities.ChatActivity.clearSharedCache(this);
         notificationCenter = new NotificationCenter(this);
 
         googleCredentialSession = new GoogleCredentialSession(this);
