@@ -16,6 +16,9 @@ import com.seniortribe.app.auth.AuthRepository;
 import com.seniortribe.app.auth.FirestoreMembershipWatch;
 import com.seniortribe.app.auth.GoogleCredentialSession;
 import com.seniortribe.app.auth.LiveAccessMonitor;
+import com.seniortribe.app.search.SearchHistory;
+import com.seniortribe.app.ui.DisplaySettings;
+import com.seniortribe.app.ui.TextScaleApplier;
 import com.seniortribe.app.data.MembershipRepository;
 
 public class SeniorTribeApplication extends Application {
@@ -33,9 +36,15 @@ public class SeniorTribeApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        // E08 · Giao diện sáng / tối và cỡ chữ người dùng đã chọn, áp dụng cho mọi màn hình
+        new DisplaySettings(this).applyStoredTheme();
+        TextScaleApplier.install(this);
+
         if (FirebaseApp.initializeApp(this) == null) {
             throw new IllegalStateException("Firebase configuration is missing");
         }
+        // E08 · Lịch sử tìm kiếm chỉ thuộc tài khoản đang dùng: đăng xuất thì xóa
+        SearchHistory.clearOnSignOut(this);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.setFirestoreSettings(

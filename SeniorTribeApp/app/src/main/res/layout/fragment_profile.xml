@@ -383,6 +383,32 @@
                 android:textAllCaps="false"
                 android:text="@string/st_profile_org_reload" />
 
+            <!-- E08 · Cỡ chữ & giao diện, E09 · Khẩn cấp -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/st_profile_display"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:minHeight="52dp"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_text_size"
+                android:text="@string/display_entry" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/st_profile_sos"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:minHeight="52dp"
+                android:textAllCaps="false"
+                android:textColor="@color/sos_red"
+                app:icon="@drawable/ic_sos"
+                app:iconTint="@color/sos_red"
+                app:strokeColor="@color/sos_red"
+                android:text="@string/sos_entry" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/st_profile_sign_out"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"

@@ -100,6 +100,11 @@ public class FeedFragment extends Fragment implements PostAdapter.OnPostClickLis
         swipeRefresh.setColorSchemeResources(R.color.primary);
         swipeRefresh.setOnRefreshListener(viewModel::refresh);
         fabCreatePost.setOnClickListener(v -> openCreate());
+        // E08 · Tìm kiếm chung, E09 · Khẩn cấp
+        view.findViewById(R.id.btnFeedSearch).setOnClickListener(v -> startActivity(
+                new android.content.Intent(requireContext(), com.seniortribe.app.activities.SearchActivity.class)));
+        view.findViewById(R.id.btnFeedSos).setOnClickListener(v -> startActivity(
+                new android.content.Intent(requireContext(), com.seniortribe.app.activities.SosActivity.class)));
         chipGroup.setOnCheckedStateChangeListener((group, ids) -> {
             if (ids.isEmpty()) return;
             viewModel.setFilter(ids.get(0) == R.id.chipFeedMyOrg
