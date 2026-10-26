@@ -10,6 +10,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -55,6 +56,7 @@ public final class AppNotifier {
                 R.string.notif_channel_calls_desc, NotificationManager.IMPORTANCE_HIGH));
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private static NotificationChannel channel(Context c, NotifyCategory cat, @StringRes int name,
                                                @StringRes int desc, int importance) {
         NotificationChannel ch = new NotificationChannel(cat.channelId, c.getString(name), importance);
