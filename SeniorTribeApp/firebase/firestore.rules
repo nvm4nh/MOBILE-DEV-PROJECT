@@ -407,9 +407,55 @@ service cloud.firestore {
 
       function coordinationStep() {
         return recorderConfirmsSchedule()
+          || rescheduleConfirmed()
           || assignedOrgReportsDelivered()
           || recorderNotesReconcile()
           || recorderCompletes();
+      }
+
+      // E02 · Đổi lịch đã chốt: nhu cầu vẫn SCHEDULED nhưng trỏ sang lịch mới.
+      // Lịch mới phải là yêu cầu đổi lịch đã được bên còn lại xác nhận (rule của schedules
+      // kiểm tra ai được xác nhận), có đồng ý của người cao tuổi, và lịch cũ chuyển RESCHEDULED
+      // trong cùng một lần ghi để lịch sử luôn khớp.
+      function rescheduleConfirmed() {
+        let d = request.resource.data;
+        let assignmentId = resource.data.currentAssignmentId;
+        let next = schedulePath(assignmentId, d.scheduleId);
+        let prev = schedulePath(assignmentId, resource.data.scheduleId);
+
+        return resource.data.status == 'SCHEDULED'
+          && d.status == 'SCHEDULED'
+          && (
+            isMember(resource.data.assignedOrgId)
+            || hasRole(resource.data.recorderOrgId, 'RECORDER')
+          )
+          && d.scheduledByUid == request.auth.uid
+          && d.scheduleId is string
+          && d.scheduleId != resource.data.scheduleId
+          && existsAfter(next)
+          && getAfter(next).data.status == 'CONFIRMED'
+          && getAfter(next).data.get('kind', '') == 'RESCHEDULE'
+          && getAfter(next).data.replacesScheduleId == resource.data.scheduleId
+          && getAfter(next).data.elderConsent == true
+          && getAfter(prev).data.status == 'RESCHEDULED'
+          && getAfter(prev).data.replacedById == d.scheduleId
+          && d.scheduledAt == getAfter(next).data.startAt
+          && d.scheduledEndAt == getAfter(next).data.endAt
+          && d.scheduledFormat == getAfter(next).data.format
+          && d.scheduledPlace == getAfter(next).data.place
+          && d.rescheduleCount == resource.data.get('rescheduleCount', 0) + 1
+          && d.rescheduledAt == request.time
+          && changed().hasOnly([
+            'scheduleId',
+            'scheduledAt',
+            'scheduledEndAt',
+            'scheduledFormat',
+            'scheduledPlace',
+            'scheduledByUid',
+            'rescheduleCount',
+            'rescheduledAt',
+            'updatedAt'
+          ]);
       }
 
       function recorderConfirmsSchedule() {
@@ -622,33 +668,314 @@ service cloud.firestore {
           );
       }
 
+      // Người trong luồng chat và lần tiếp nhận còn hiệu lực; đọc mỗi document một lần để
+      // không vượt giới hạn số lần get() của Security Rules khi ghi nhiều document một lúc
+      function activeChatMember() {
+        let a = get(assignmentPath(assignmentId)).data;
+        let n = get(needPath(a.needId)).data;
+        return signedIn()
+          && (request.auth.uid == a.assigneeUid || request.auth.uid == n.recorderUid)
+          && a.status == 'ACTIVE'
+          && n.status in ['ACCEPTED', 'SCHEDULED', 'DELIVERED']
+          && n.currentAssignmentId == assignmentId;
+      }
+
+      // Người kia trong luồng chat (để gọi điện, E06)
+      function otherChatMember(uid) {
+        let a = get(assignmentPath(assignmentId)).data;
+        let n = get(needPath(a.needId)).data;
+        return uid != request.auth.uid && (uid == a.assigneeUid || uid == n.recorderUid);
+      }
+
+      function attachmentPath(attachmentId) {
+        return /databases/$(database)/documents/needs_assignments/$(assignmentId)/attachments/$(attachmentId);
+      }
+
+      // E06 · Tin văn bản (F11) giữ nguyên dạng cũ; có thể ghi type 'TEXT'
+      function textMessage(d) {
+        return d.keys().hasOnly(['senderUid', 'senderName', 'text', 'at', 'type'])
+          && d.get('type', 'TEXT') == 'TEXT'
+          && isText(d.text, 1, 1000);
+      }
+
+      // E06 · Tin ảnh / tệp: phải trỏ tới tệp đính kèm của chính người gửi trong cùng lần
+      // tiếp nhận, khớp kích thước và kiểu tệp; chú thích (text) không bắt buộc
+      function attachmentMessage(d) {
+        let att = getAfter(attachmentPath(d.attachmentId)).data;
+        return d.type in ['IMAGE', 'FILE']
+          && d.keys().hasAll([
+            'senderUid', 'senderName', 'text', 'at', 'type',
+            'attachmentId', 'fileName', 'mimeType', 'size'
+          ])
+          && d.keys().hasOnly([
+            'senderUid', 'senderName', 'text', 'at', 'type',
+            'attachmentId', 'fileName', 'mimeType', 'size', 'thumb'
+          ])
+          && d.text is string
+          && d.text.size() <= 1000
+          && d.attachmentId is string
+          && isText(d.fileName, 1, 120)
+          && isText(d.mimeType, 3, 100)
+          && (d.type == 'FILE' || d.mimeType.matches('image/.*'))
+          && (!('thumb' in d) || (d.thumb is bytes && d.thumb.size() <= 65536))
+          && att.ownerUid == request.auth.uid
+          && att.size == d.size
+          && att.mimeType == d.mimeType
+          && att.kind == d.type
+          // Mảnh cuối đã lên máy chủ (ứng dụng tải mảnh theo thứ tự, tin nhắn gửi sau cùng)
+          && existsAfter(chunkPath(d.attachmentId, att.chunkCount - 1));
+      }
+
+      function chunkPath(attachmentId, index) {
+        return /databases/$(database)/documents/needs_assignments/$(assignmentId)/attachments/$(attachmentId)/chunks/$(string(index));
+      }
+
       match /messages/{messageId} {
         allow read: if chatMember();
 
-        allow create: if chatMember()
-          && assignmentActive()
-          && request.resource.data.keys().hasOnly([
-            'senderUid',
-            'senderName',
-            'text',
-            'at'
-          ])
+        allow create: if activeChatMember()
           && request.resource.data.senderUid == request.auth.uid
           && isText(request.resource.data.senderName, 1, 80)
-          && isText(request.resource.data.text, 1, 1000)
-          && request.resource.data.at == request.time;
+          && request.resource.data.at == request.time
+          && (
+            textMessage(request.resource.data)
+            || attachmentMessage(request.resource.data)
+          );
 
         allow update, delete: if false;
+      }
+
+      // ================================================================
+      // E06 · Ảnh / tệp gửi trong chat
+      // ================================================================
+      // Gói Firebase miễn phí của nhóm không dùng được Cloud Storage, nên tệp được chia thành
+      // các mảnh tối đa 700 000 byte lưu trong Firestore (mỗi document tối đa 1 MiB). Mỗi mảnh
+      // ghi trong một request riêng để không vượt giới hạn kích thước request. Chỉ hai người
+      // trong luồng chat đọc được (R08); không sửa, không xóa; tối đa 5 MB / tệp.
+      match /attachments/{attachmentId} {
+        allow read: if chatMember();
+
+        allow create: if activeChatMember()
+          && request.resource.data.keys().hasOnly([
+            'ownerUid', 'fileName', 'mimeType', 'size', 'chunkCount', 'kind', 'createdAt'
+          ])
+          && request.resource.data.ownerUid == request.auth.uid
+          && isText(request.resource.data.fileName, 1, 120)
+          && isText(request.resource.data.mimeType, 3, 100)
+          && request.resource.data.kind in ['IMAGE', 'FILE']
+          && request.resource.data.size is int
+          && request.resource.data.size > 0
+          && request.resource.data.size <= 5242880
+          && request.resource.data.chunkCount is int
+          && request.resource.data.chunkCount
+            == math.ceil(request.resource.data.size / 700000.0)
+          && request.resource.data.createdAt == request.time;
+
+        allow update, delete: if false;
+
+        match /chunks/{chunkId} {
+          function chunkFits(att, d) {
+            return att.ownerUid == request.auth.uid
+              && d.keys().hasOnly(['index', 'data'])
+              && d.index is int
+              && d.index >= 0
+              && d.index < att.chunkCount;
+          }
+
+          allow read: if chatMember();
+
+          allow create: if activeChatMember()
+            && chunkFits(getAfter(attachmentPath(attachmentId)).data, request.resource.data)
+            && chunkId == string(request.resource.data.index)
+            && request.resource.data.data is bytes
+            && request.resource.data.data.size() > 0
+            && request.resource.data.data.size() <= 700000;
+
+          allow update, delete: if false;
+        }
+      }
+
+      // ================================================================
+      // E06 · Gọi thoại / video (WebRTC, trao đổi tín hiệu qua Firestore)
+      // ================================================================
+      // Chỉ hai người trong luồng chat gọi cho nhau, khi lần tiếp nhận còn hiệu lực.
+      // Âm thanh / hình ảnh đi trực tiếp giữa hai máy, không lưu lại ở đâu.
+      function validSdp(s, type) {
+        return s is map
+          && s.keys().hasOnly(['type', 'sdp'])
+          && s.type == type
+          && s.sdp is string
+          && s.sdp.size() > 0
+          && s.sdp.size() <= 20000;
+      }
+
+      match /calls/{callId} {
+        allow read: if chatMember();
+
+        allow create: if activeChatMember()
+          && request.resource.data.keys().hasOnly([
+            'callerUid', 'callerName', 'calleeUid', 'video', 'status', 'offer', 'createdAt'
+          ])
+          && request.resource.data.callerUid == request.auth.uid
+          && isText(request.resource.data.callerName, 1, 80)
+          && otherChatMember(request.resource.data.calleeUid)
+          && request.resource.data.video is bool
+          && request.resource.data.status == 'RINGING'
+          && validSdp(request.resource.data.offer, 'offer')
+          && request.resource.data.createdAt == request.time;
+
+        function endFields() {
+          return changed().hasOnly(['status', 'endedAt', 'endedByUid', 'durationSec'])
+            && request.resource.data.endedByUid == request.auth.uid
+            && request.resource.data.endedAt == request.time
+            && (
+              !('durationSec' in request.resource.data)
+              || (
+                request.resource.data.durationSec is int
+                && request.resource.data.durationSec >= 0
+                && request.resource.data.durationSec <= 86400
+              )
+            );
+        }
+
+        allow update: if chatMember()
+          && (
+            // Người được gọi nghe máy (lần tiếp nhận phải còn hiệu lực)
+            (
+              request.auth.uid == resource.data.calleeUid
+              && resource.data.status == 'RINGING'
+              && request.resource.data.status == 'ACCEPTED'
+              && activeChatMember()
+              && changed().hasOnly(['status', 'answer', 'answeredAt'])
+              && validSdp(request.resource.data.answer, 'answer')
+              && request.resource.data.answeredAt == request.time
+            )
+            // Người được gọi từ chối
+            || (
+              request.auth.uid == resource.data.calleeUid
+              && resource.data.status == 'RINGING'
+              && request.resource.data.status == 'DECLINED'
+              && endFields()
+            )
+            // Người gọi hủy hoặc không ai nghe máy
+            || (
+              request.auth.uid == resource.data.callerUid
+              && resource.data.status == 'RINGING'
+              && request.resource.data.status in ['CANCELLED', 'MISSED']
+              && endFields()
+            )
+            // Một trong hai bên kết thúc cuộc gọi đang diễn ra
+            || (
+              (
+                request.auth.uid == resource.data.callerUid
+                || request.auth.uid == resource.data.calleeUid
+              )
+              && resource.data.status == 'ACCEPTED'
+              && request.resource.data.status == 'ENDED'
+              && endFields()
+            )
+          );
+
+        allow delete: if false;
+
+        function callDoc() {
+          return get(/databases/$(database)/documents/needs_assignments/$(assignmentId)/calls/$(callId)).data;
+        }
+
+        // Một trong hai bên của cuộc gọi đang đổ chuông hoặc đang diễn ra
+        function callLive(c) {
+          return callParty(c) && c.status in ['RINGING', 'ACCEPTED'];
+        }
+
+        function callParty(c) {
+          return request.auth.uid == c.callerUid || request.auth.uid == c.calleeUid;
+        }
+
+        match /candidates/{candidateId} {
+          allow read: if chatMember() && callParty(callDoc());
+
+          allow create: if chatMember()
+            && callLive(callDoc())
+            && request.resource.data.keys().hasOnly(['fromUid', 'candidate', 'sdpMid', 'sdpMLineIndex', 'at'])
+            && request.resource.data.fromUid == request.auth.uid
+            && isText(request.resource.data.candidate, 1, 2000)
+            && request.resource.data.sdpMid is string
+            && request.resource.data.sdpMid.size() <= 64
+            && request.resource.data.sdpMLineIndex is int
+            && request.resource.data.at == request.time;
+
+          allow update, delete: if false;
+        }
       }
 
       match /schedules/{scheduleId} {
         allow read: if isMember(assignment().orgId)
           || isMember(assignment().recorderOrgId);
 
-        allow create: if (
-            hasRole(assignment().orgId, 'REPRESENTATIVE')
-            || request.auth.uid == assignment().assigneeUid
-          )
+        function orgSide() {
+          return hasRole(assignment().orgId, 'REPRESENTATIVE')
+            || request.auth.uid == assignment().assigneeUid;
+        }
+
+        function recorderSide() {
+          return hasRole(assignment().recorderOrgId, 'RECORDER');
+        }
+
+        // Khung giờ hợp lệ, dùng chung cho đề xuất đầu tiên (F12) và đổi lịch (E02)
+        function validSlot(d) {
+          return d.status == 'PROPOSED'
+            && d.proposedByUid == request.auth.uid
+            && isText(d.proposedByName, 1, 80)
+            && d.startAt is timestamp
+            && d.startAt > request.time
+            && d.endAt is timestamp
+            && d.endAt > d.startAt
+            && d.endAt <= d.startAt + duration.value(12, 'h')
+            && isText(d.format, 2, 120)
+            && isText(d.place, 2, 200)
+            && d.createdAt == request.time;
+        }
+
+        // E02 · Yêu cầu đổi lịch khi nhu cầu đã SCHEDULED. Bên nào đề xuất thì bên kia xác nhận.
+        // Đầu mối đề xuất phải ghi sẵn đồng ý của người cao tuổi với giờ mới; tổ chức đề xuất
+        // thì đầu mối hỏi ý kiến cụ lúc xác nhận.
+        function reschedulePropose() {
+          let d = request.resource.data;
+
+          return assignmentActive()
+            && needOfAssignment().status == 'SCHEDULED'
+            && d.keys().hasAll([
+              'startAt', 'endAt', 'format', 'place', 'status', 'proposedByUid',
+              'proposedByName', 'createdAt', 'kind', 'replacesScheduleId',
+              'proposedBySide', 'reason'
+            ])
+            && d.keys().hasOnly([
+              'startAt', 'endAt', 'format', 'place', 'status', 'proposedByUid',
+              'proposedByName', 'createdAt', 'kind', 'replacesScheduleId',
+              'proposedBySide', 'reason', 'elderConsent', 'consentMethod'
+            ])
+            && d.kind == 'RESCHEDULE'
+            && d.replacesScheduleId == needOfAssignment().scheduleId
+            && isText(d.reason, 1, 300)
+            && validSlot(d)
+            && (
+              (
+                d.proposedBySide == 'ORG'
+                && orgSide()
+                && !('elderConsent' in d)
+                && !('consentMethod' in d)
+              )
+              || (
+                d.proposedBySide == 'RECORDER'
+                && recorderSide()
+                && d.elderConsent == true
+                && isText(d.consentMethod, 1, 200)
+              )
+            );
+        }
+
+        allow create: if reschedulePropose() || (
+          orgSide()
           && assignmentActive()
           && needOfAssignment().status == 'ACCEPTED'
           && request.resource.data.keys().hasAll([
@@ -681,12 +1008,25 @@ service cloud.firestore {
             <= request.resource.data.startAt + duration.value(12, 'h')
           && isText(request.resource.data.format, 2, 120)
           && isText(request.resource.data.place, 2, 200)
-          && request.resource.data.createdAt == request.time;
+          && request.resource.data.createdAt == request.time
+        );
 
-        allow update: if resource.data.status == 'PROPOSED'
+        // Đề xuất này do bên nào gửi; đề xuất F12 cũ không có trường này luôn là tổ chức
+        function proposedBy(side) {
+          return resource.data.get('proposedBySide', 'ORG') == side;
+        }
+
+        // Lịch được xác nhận phải đúng là lịch nhu cầu trỏ tới sau lần ghi này
+        function becomesCurrentSchedule() {
+          return getAfter(needPath(assignment().needId)).data.status == 'SCHEDULED'
+            && getAfter(needPath(assignment().needId)).data.scheduleId == scheduleId;
+        }
+
+        allow update: if (resource.data.status == 'PROPOSED'
           && (
             (
-              hasRole(assignment().recorderOrgId, 'RECORDER')
+              proposedBy('ORG')
+              && recorderSide()
               && request.resource.data.decidedByUid == request.auth.uid
               && changed().hasOnly([
                 'status',
@@ -706,9 +1046,7 @@ service cloud.firestore {
                     1,
                     200
                   )
-                  && getAfter(
-                    needPath(assignment().needId)
-                  ).data.status == 'SCHEDULED'
+                  && becomesCurrentSchedule()
                 )
                 || (
                   request.resource.data.status == 'DECLINED'
@@ -721,8 +1059,35 @@ service cloud.firestore {
                 )
               )
             )
+            // E02 · Tổ chức trả lời yêu cầu đổi lịch do đầu mối gửi (đồng ý của cụ đã có sẵn)
             || (
-              isMember(assignment().orgId)
+              proposedBy('RECORDER')
+              && orgSide()
+              && request.resource.data.decidedByUid == request.auth.uid
+              && changed().hasOnly([
+                'status',
+                'declineReason',
+                'decidedByUid',
+                'decidedByName',
+                'decidedAt'
+              ])
+              && (
+                (
+                  request.resource.data.status == 'CONFIRMED'
+                  && becomesCurrentSchedule()
+                )
+                || (
+                  request.resource.data.status == 'DECLINED'
+                  && isText(request.resource.data.declineReason, 1, 300)
+                )
+              )
+            )
+            // Rút lại đề xuất của chính bên mình (tổ chức: F12 và E02; đầu mối: E02)
+            || (
+              (
+                (proposedBy('ORG') && isMember(assignment().orgId))
+                || (proposedBy('RECORDER') && recorderSide())
+              )
               && request.resource.data.status == 'WITHDRAWN'
               && changed().hasOnly([
                 'status',
@@ -732,6 +1097,21 @@ service cloud.firestore {
               ])
               && request.resource.data.decidedByUid == request.auth.uid
             )
+          ))
+          // E02 · Lịch đã chốt bị thay bằng lịch mới: chỉ đổi sang RESCHEDULED, giữ lại để xem lịch sử
+          || (
+            resource.data.status == 'CONFIRMED'
+            && request.resource.data.status == 'RESCHEDULED'
+            && (isMember(assignment().orgId) || recorderSide())
+            && changed().hasOnly(['status', 'replacedById', 'rescheduledAt'])
+            && request.resource.data.replacedById is string
+            && request.resource.data.replacedById != scheduleId
+            && request.resource.data.rescheduledAt == request.time
+            && getAfter(needPath(assignment().needId)).data.scheduleId
+              == request.resource.data.replacedById
+            && getAfter(
+              schedulePath(assignmentId, request.resource.data.replacedById)
+            ).data.status == 'CONFIRMED'
           );
 
         allow delete: if false;

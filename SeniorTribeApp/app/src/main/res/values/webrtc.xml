@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E06 · Máy chủ TURN cho cuộc gọi (không bắt buộc).
+     Mặc định chỉ dùng STUN công khai của Google: gọi được khi hai máy cùng Wi-Fi hoặc mạng thông
+     thường. Một số mạng di động / công ty chặn kết nối trực tiếp thì cần TURN; khi đó điền địa chỉ
+     dạng "turn:host:3478" và tài khoản của máy chủ TURN nhóm thuê. Không commit mật khẩu thật. -->
+<resources>
+    <string name="webrtc_turn_url" translatable="false"></string>
+    <string name="webrtc_turn_username" translatable="false"></string>
+    <string name="webrtc_turn_password" translatable="false"></string>
+</resources>

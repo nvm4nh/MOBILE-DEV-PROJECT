@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E06 · Chat nâng cao: ảnh, tệp, gọi thoại / video. -->
+<resources>
+    <!-- Đính kèm -->
+    <string name="chat_attach">Đính kèm ảnh hoặc tệp</string>
+    <string name="chat_attach_title">Gửi kèm</string>
+    <string name="chat_attach_gallery">Ảnh trong máy</string>
+    <string name="chat_attach_camera">Chụp ảnh</string>
+    <string name="chat_attach_file">Tệp (PDF, Word, Excel…)</string>
+    <string name="chat_attach_confirm_title">Gửi %1$s?</string>
+    <string name="chat_attach_caption_hint">Chú thích (không bắt buộc)</string>
+    <string name="chat_attach_send">Gửi</string>
+    <string name="chat_attach_privacy">Chỉ đầu mối và người được giao phụ trách xem được. Ảnh được nén lại và xóa thông tin vị trí. Không gửi ảnh giấy tờ tùy thân hoặc ảnh chụp cụ khi chưa được cụ đồng ý.</string>
+    <string name="chat_attach_privacy_before_schedule">Chưa chốt lịch: không gửi địa chỉ, số điện thoại hay giấy tờ của cụ. Thông tin này chỉ chia sẻ sau khi cụ đồng ý lịch hẹn.</string>
+    <string name="chat_attach_preparing">Đang chuẩn bị tệp…</string>
+    <string name="chat_attach_uploading">Đang gửi %1$d%%…</string>
+    <string name="chat_attach_failed">Chưa gửi được tệp: %1$s</string>
+    <string name="chat_attach_image_label">ảnh</string>
+    <string name="chat_attach_file_label">tệp %1$s</string>
+    <string name="chat_image_content_description">Ảnh do %1$s gửi</string>
+    <string name="chat_file_open">Mở bằng ứng dụng khác</string>
+    <string name="chat_file_save">Lưu về máy</string>
+    <string name="chat_file_loading">Đang tải tệp…</string>
+    <string name="chat_file_saved">Đã lưu %1$s.</string>
+    <string name="chat_file_no_app">Không có ứng dụng nào mở được loại tệp này.</string>
+    <string name="chat_file_save_warning">Tệp lưu về máy sẽ nằm ngoài ứng dụng. Chỉ lưu khi thật cần và xóa sau khi dùng xong.</string>
+    <string name="chat_last_image">[Ảnh]</string>
+    <string name="chat_last_file">[Tệp] %1$s</string>
+
+    <!-- Xem ảnh -->
+    <string name="viewer_title">Ảnh</string>
+    <string name="viewer_loading">Đang tải ảnh…</string>
+    <string name="viewer_error">Không tải được ảnh.</string>
+    <string name="viewer_save">Lưu ảnh về máy</string>
+
+    <!-- Gọi -->
+    <string name="chat_call_voice">Gọi thoại</string>
+    <string name="chat_call_video">Gọi video</string>
+    <string name="chat_call_unavailable">Chỉ gọi được khi lần tiếp nhận còn hiệu lực.</string>
+    <string name="call_status_calling_voice">Đang gọi…</string>
+    <string name="call_status_calling_video">Đang gọi video…</string>
+    <string name="call_status_incoming_voice">Cuộc gọi thoại đến</string>
+    <string name="call_status_incoming_video">Cuộc gọi video đến</string>
+    <string name="call_status_connecting">Đang kết nối…</string>
+    <string name="call_status_connected">Đang nói chuyện</string>
+    <string name="call_status_reconnecting">Mạng chập chờn, đang kết nối lại…</string>
+    <string name="call_status_declined">Bên kia đã từ chối cuộc gọi.</string>
+    <string name="call_status_no_answer">Không có ai nghe máy.</string>
+    <string name="call_status_missed">Cuộc gọi đã kết thúc.</string>
+    <string name="call_status_ended">Cuộc gọi đã kết thúc.</string>
+    <string name="call_failed_start">Không bắt đầu được cuộc gọi. Kiểm tra mạng rồi thử lại.</string>
+    <string name="call_failed_network">Mất kết nối cuộc gọi.</string>
+    <string name="call_already_ended">Cuộc gọi này đã kết thúc.</string>
+    <string name="call_no_access">Tài khoản chưa được cấp quyền tổ chức.</string>
+    <string name="call_permission_denied">Cần quyền micro (và camera khi gọi video) để gọi.</string>
+    <string name="call_use_hangup">Bấm nút đỏ để kết thúc cuộc gọi.</string>
+    <string name="call_mute">Tắt micro</string>
+    <string name="call_unmute">Bật micro</string>
+    <string name="call_camera_off">Tắt camera</string>
+    <string name="call_camera_on">Bật camera</string>
+    <string name="call_switch_camera">Đổi camera trước / sau</string>
+    <string name="call_speaker">Bật / tắt loa ngoài</string>
+    <string name="call_hangup">Kết thúc cuộc gọi</string>
+    <string name="call_accept">Nghe máy</string>
+    <string name="call_decline">Từ chối</string>
+
+    <!-- Nhật ký cuộc gọi trong chat -->
+    <string name="chat_call_log_voice">Cuộc gọi thoại · %1$s</string>
+    <string name="chat_call_log_video">Cuộc gọi video · %1$s</string>
+    <string name="chat_call_log_missed">Cuộc gọi nhỡ từ %1$s</string>
+    <string name="chat_call_log_declined">%1$s đã từ chối cuộc gọi</string>
+    <string name="chat_call_log_cancelled">%1$s đã hủy cuộc gọi</string>
+    <string name="chat_call_log_ringing">%1$s đang gọi…</string>
+    <string name="chat_you">Bạn</string>
+    <string name="chat_other_side">Bên kia</string>
+    <string name="call_duration_min">%1$d phút %2$d giây</string>
+    <string name="call_duration_sec">%1$d giây</string>
+
+    <!-- Thông báo cuộc gọi đến -->
+    <string name="notif_channel_calls">Cuộc gọi</string>
+    <string name="notif_channel_calls_desc">Cuộc gọi thoại / video đến từ người cùng phối hợp.</string>
+    <string name="notif_call_title_voice">Cuộc gọi thoại · %1$s</string>
+    <string name="notif_call_title_video">Cuộc gọi video · %1$s</string>
+    <string name="notif_call_text">%1$s đang gọi cho bạn</string>
+</resources>

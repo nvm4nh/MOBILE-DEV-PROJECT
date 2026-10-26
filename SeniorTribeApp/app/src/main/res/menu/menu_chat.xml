@@ -2,10 +2,30 @@
 <!-- Tùy chọn trên màn hình chat phối hợp (F11): mở F12, F13, chi tiết và lịch sử. -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- E06 · Gọi cho người còn lại trong luồng chat (ẩn khi lần tiếp nhận đã kết thúc) -->
+    <item
+        android:id="@+id/action_call_voice"
+        android:icon="@drawable/ic_call"
+        android:title="@string/chat_call_voice"
+        android:visible="false"
+        app:iconTint="@color/primary"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_call_video"
+        android:icon="@drawable/ic_videocam"
+        android:title="@string/chat_call_video"
+        android:visible="false"
+        app:iconTint="@color/primary"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_schedule"
         android:icon="@drawable/ic_schedule"
         android:title="@string/agree_title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_reschedule"
+        android:icon="@drawable/ic_schedule"
+        android:title="@string/resched_title"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_progress"

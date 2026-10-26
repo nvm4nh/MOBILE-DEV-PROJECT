@@ -109,6 +109,11 @@ public class ProfileFragment extends Fragment {
         view.findViewById(R.id.st_profile_sign_out)
                 .setOnClickListener(v -> model.signOut());
 
+        // E01 · Thông báo & nhắc lịch
+        view.findViewById(R.id.st_profile_notifications)
+                .setOnClickListener(v -> startActivity(new Intent(requireContext(),
+                        com.seniortribe.app.activities.NotificationSettingsActivity.class)));
+
         view.findViewById(R.id.st_profile_copy_uid)
                 .setOnClickListener(v -> copyUid());
 

@@ -20,6 +20,14 @@ public class ScheduleSession {
     public static final String CONFIRMED = "CONFIRMED";
     public static final String DECLINED = "DECLINED";
     public static final String WITHDRAWN = "WITHDRAWN";
+    /** E02 · Lịch đã chốt bị thay bằng một lịch mới (giữ lại để xem lịch sử). */
+    public static final String RESCHEDULED = "RESCHEDULED";
+
+    /** E02 · Loại đề xuất: yêu cầu đổi lịch sau khi đã chốt. Đề xuất F12 không có trường này. */
+    public static final String KIND_RESCHEDULE = "RESCHEDULE";
+    /** Bên gửi đề xuất đổi lịch. */
+    public static final String SIDE_ORG = "ORG";
+    public static final String SIDE_RECORDER = "RECORDER";
 
     @DocumentId
     private String scheduleId;
@@ -38,10 +46,31 @@ public class ScheduleSession {
     private String decidedByName;
     private Date decidedAt;
 
+    // E02 · Đổi lịch
+    private String kind;                // RESCHEDULE, hoặc null với đề xuất F12
+    private String replacesScheduleId;  // lịch đã chốt mà yêu cầu này muốn thay
+    private String proposedBySide;      // ORG / RECORDER
+    private String reason;              // lý do đổi lịch
+    private String replacedById;        // khi RESCHEDULED: lịch mới thay cho lịch này
+    private Date rescheduledAt;
+
     public ScheduleSession() {}
 
+    /** Đề xuất F12 đang chờ đầu mối trả lời (không tính yêu cầu đổi lịch). */
     @Exclude
-    public boolean isPending() { return PROPOSED.equals(status); }
+    public boolean isPending() { return PROPOSED.equals(status) && !isReschedule(); }
+
+    /** Yêu cầu đổi lịch (E02), ở bất kỳ trạng thái nào. */
+    @Exclude
+    public boolean isReschedule() { return KIND_RESCHEDULE.equals(kind); }
+
+    /** Yêu cầu đổi lịch đang chờ bên kia trả lời. */
+    @Exclude
+    public boolean isPendingReschedule() { return isReschedule() && PROPOSED.equals(status); }
+
+    /** Bên gửi; đề xuất F12 cũ không ghi thì luôn là tổ chức. */
+    @Exclude
+    public String side() { return SIDE_RECORDER.equals(proposedBySide) ? SIDE_RECORDER : SIDE_ORG; }
 
     @Exclude
     public long getStartAtMillis() { return startAt != null ? startAt.getTime() : 0L; }
@@ -101,4 +130,22 @@ public class ScheduleSession {
 
     public Date getDecidedAt() { return decidedAt; }
     public void setDecidedAt(Date decidedAt) { this.decidedAt = decidedAt; }
+
+    public String getKind() { return kind; }
+    public void setKind(String kind) { this.kind = kind; }
+
+    public String getReplacesScheduleId() { return replacesScheduleId; }
+    public void setReplacesScheduleId(String replacesScheduleId) { this.replacesScheduleId = replacesScheduleId; }
+
+    public String getProposedBySide() { return proposedBySide; }
+    public void setProposedBySide(String proposedBySide) { this.proposedBySide = proposedBySide; }
+
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
+
+    public String getReplacedById() { return replacedById; }
+    public void setReplacedById(String replacedById) { this.replacedById = replacedById; }
+
+    public Date getRescheduledAt() { return rescheduledAt; }
+    public void setRescheduledAt(Date rescheduledAt) { this.rescheduledAt = rescheduledAt; }
 }

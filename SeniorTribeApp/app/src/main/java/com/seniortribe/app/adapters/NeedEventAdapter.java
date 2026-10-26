@@ -58,7 +58,8 @@ public class NeedEventAdapter extends RecyclerView.Adapter<NeedEventAdapter.Even
         h.viewLine.setVisibility(position == events.size() - 1 ? View.INVISIBLE : View.VISIBLE);
     }
 
-    private int label(String type) {
+    /** Nhãn tiếng Việt của một loại sự kiện; dùng chung cho thông báo (E01). */
+    public static int label(String type) {
         if (type == null) return R.string.event_unknown;
         switch (type) {
             case NeedRepository.EVENT_SUBMITTED: return R.string.event_submitted;
@@ -74,6 +75,10 @@ public class NeedEventAdapter extends RecyclerView.Adapter<NeedEventAdapter.Even
             case CoordinationRepository.EVENT_DELIVERED: return R.string.event_delivered;
             case CoordinationRepository.EVENT_RECONCILE_PENDING: return R.string.event_reconcile_pending;
             case CoordinationRepository.EVENT_COMPLETED: return R.string.event_completed;
+            case CoordinationRepository.EVENT_RESCHEDULE_PROPOSED: return R.string.event_reschedule_proposed;
+            case CoordinationRepository.EVENT_RESCHEDULE_DECLINED: return R.string.event_reschedule_declined;
+            case CoordinationRepository.EVENT_RESCHEDULE_WITHDRAWN: return R.string.event_reschedule_withdrawn;
+            case CoordinationRepository.EVENT_RESCHEDULED: return R.string.event_rescheduled;
             default: return R.string.event_unknown;
         }
     }

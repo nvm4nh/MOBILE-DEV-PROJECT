@@ -1,11 +1,18 @@
 package com.seniortribe.app.viewmodels;
 
+import android.content.Context;
+import android.net.Uri;
+
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.seniortribe.app.data.CallRepository;
+import com.seniortribe.app.data.ChatMediaRepository;
+import com.seniortribe.app.models.CallRecord;
 import com.seniortribe.app.data.CoordinationRepository;
 import com.seniortribe.app.data.MembershipRepository;
 import com.seniortribe.app.data.NeedErrors;
@@ -17,7 +24,9 @@ import com.seniortribe.app.models.ScheduleSession;
 import com.seniortribe.app.utils.Event;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Màn hình chat phối hợp của một lần tiếp nhận (F11). Ngoài tin nhắn, theo dõi các đề xuất
@@ -36,10 +45,18 @@ public class ChatViewModel extends ViewModel {
         public NeedSummary need;
         public List<ChatMessage> messages = new ArrayList<>();
         public List<ScheduleSession> schedules = new ArrayList<>();
+        public List<CallRecord> calls = new ArrayList<>();          // E06 · nhật ký cuộc gọi
+        @Nullable public ChatMediaRepository.Prepared pendingAttachment; // E06 · chờ người dùng xác nhận gửi
+        public boolean preparing;                                   // đang đọc / nén tệp
+        public int uploadPercent = -1;                               // -1 = không gửi tệp nào
     }
 
     private final NeedRepository needs = new NeedRepository();
     private final CoordinationRepository coordination = new CoordinationRepository();
+    private final ChatMediaRepository media = new ChatMediaRepository();
+    private final CallRepository callsRepo = new CallRepository();
+    private final MutableLiveData<Event<CallRecord>> incomingCall = new MutableLiveData<>();
+    private final Set<String> announcedCalls = new HashSet<>();
     private final MutableLiveData<Ui> ui = new MutableLiveData<>(new Ui());
     private final MutableLiveData<Event<String>> messages = new MutableLiveData<>();
     private final MutableLiveData<Event<Boolean>> messageSent = new MutableLiveData<>();
@@ -60,6 +77,9 @@ public class ChatViewModel extends ViewModel {
     public LiveData<Event<String>> getSendFailed() { return sendFailed; }
 
     public String getAssignmentId() { return assignmentId; }
+
+    /** E06 · Có cuộc gọi đến (vừa đổ chuông) cho tài khoản này trong luồng chat. */
+    public LiveData<Event<CallRecord>> getIncomingCall() { return incomingCall; }
 
     public void start(String needId, String assignmentId) {
         if (this.needId != null) return; // đã chạy, ví dụ sau khi xoay màn hình
@@ -132,6 +152,77 @@ public class ChatViewModel extends ViewModel {
                 // Không đọc được lịch thì vẫn chat bình thường, chỉ thiếu tin hệ thống về lịch
             }
         }));
+        registrations.add(callsRepo.listenCalls(assignmentId, new NeedRepository.Callback<List<CallRecord>>() {
+            @Override public void onData(List<CallRecord> data, boolean fromCache) {
+                Ui s = copy();
+                s.calls = data;
+                ui.setValue(s);
+                Membership me = s.membership;
+                if (me == null) return;
+                long now = System.currentTimeMillis();
+                for (CallRecord c : data) {
+                    if (me.getUid().equals(c.getCalleeUid()) && c.isFreshRinging(now)
+                            && announcedCalls.add(c.getCallId())) {
+                        incomingCall.setValue(new Event<>(c));
+                    }
+                }
+            }
+
+            @Override public void onError(Exception error) {
+                // Không đọc được nhật ký cuộc gọi thì vẫn chat bình thường
+            }
+        }));
+    }
+
+    // =====================================================================
+    // E06 · Ảnh / tệp
+    // =====================================================================
+
+    /** Đọc và (với ảnh) nén tệp vừa chọn; xong thì Activity hỏi xác nhận trước khi gửi. */
+    public void prepareAttachment(Context context, Uri uri, boolean image) {
+        Ui start = copy();
+        if (start.preparing || start.uploadPercent >= 0) return;
+        start.preparing = true;
+        ui.setValue(start);
+        Task<ChatMediaRepository.Prepared> task = image ? media.prepareImage(context, uri) : media.prepareFile(context, uri);
+        task.addOnCompleteListener(t -> {
+            Ui s = copy();
+            s.preparing = false;
+            if (t.isSuccessful()) s.pendingAttachment = t.getResult();
+            else messages.setValue(new Event<>(NeedErrors.message(t.getException())));
+            ui.setValue(s);
+        });
+    }
+
+    /** Người dùng bỏ không gửi tệp đang chờ. */
+    public void discardAttachment() {
+        Ui s = copy();
+        s.pendingAttachment = null;
+        ui.setValue(s);
+    }
+
+    /** Gửi tệp đang chờ kèm chú thích; hiện tiến độ theo từng mảnh. */
+    public void sendAttachment(@Nullable String caption) {
+        Membership me = membership();
+        Ui s0 = copy();
+        ChatMediaRepository.Prepared p = s0.pendingAttachment;
+        if (me == null || p == null || s0.uploadPercent >= 0) return;
+        s0.pendingAttachment = null;
+        s0.uploadPercent = 0;
+        ui.setValue(s0);
+        media.send(assignmentId, me, p, caption, (sent, total) -> {
+            Ui s = copy();
+            if (s.uploadPercent < 0) return;
+            s.uploadPercent = (int) Math.min(99, sent * 100 / Math.max(1, total));
+            ui.setValue(s);
+        }).addOnCompleteListener(t -> {
+            Ui s = copy();
+            s.uploadPercent = -1;
+            ui.setValue(s);
+            if (!t.isSuccessful()) {
+                messages.setValue(new Event<>("Chưa gửi được tệp: " + NeedErrors.message(t.getException())));
+            }
+        });
     }
 
     /**
@@ -178,6 +269,10 @@ public class ChatViewModel extends ViewModel {
             s.need = old.need;
             s.messages = old.messages;
             s.schedules = old.schedules;
+            s.calls = old.calls;
+            s.pendingAttachment = old.pendingAttachment;
+            s.preparing = old.preparing;
+            s.uploadPercent = old.uploadPercent;
         }
         return s;
     }

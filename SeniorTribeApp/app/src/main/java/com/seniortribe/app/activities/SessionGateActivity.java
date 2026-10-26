@@ -78,6 +78,10 @@ public class SessionGateActivity extends AppCompatActivity {
         if (routed) return;
         routed = true;
         Intent intent = new Intent(this, destination);
+        // E01 · Mở từ thông báo: chuyển tiếp đích đến cho MainActivity sau khi đã kiểm tra quyền
+        if (destination == MainActivity.class) {
+            com.seniortribe.app.notifications.DeepLink.copy(getIntent(), intent);
+        }
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

@@ -20,6 +20,7 @@ public class NeedEvent {
     private String toStatus;
     private String byUid;
     private String byName;
+    private String byOrgId;         // tổ chức của người thao tác (để biết bên nào gửi yêu cầu, E01)
     private String note;
     private Date at;
 
@@ -45,6 +46,9 @@ public class NeedEvent {
 
     public String getByName() { return byName; }
     public void setByName(String byName) { this.byName = byName; }
+
+    public String getByOrgId() { return byOrgId; }
+    public void setByOrgId(String byOrgId) { this.byOrgId = byOrgId; }
 
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }

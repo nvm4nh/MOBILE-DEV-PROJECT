@@ -72,7 +72,9 @@ public class NeedSummary implements Serializable {
     private Date scheduledEndAt;    // hết khung giờ đã chốt
     private String scheduledFormat; // hình thức đã chốt, ví dụ "Đến nhà · 2 đoàn viên"
     private String scheduledPlace;
-    private String deliveryReport;  // tổ chức mô tả việc đã hỗ trợ
+    private long rescheduleCount;   // E02 · số lần đã đổi lịch sau khi chốt
+    private Date rescheduledAt;
+    private String deliveryReport; // tổ chức mô tả việc đã hỗ trợ
     private String deliveredByName;
     private Date deliveredAt;
     private String reconcileNote;   // nội dung đầu mối còn cần đối soát
@@ -243,6 +245,12 @@ public class NeedSummary implements Serializable {
 
     public String getScheduledPlace() { return scheduledPlace; }
     public void setScheduledPlace(String scheduledPlace) { this.scheduledPlace = scheduledPlace; }
+
+    public long getRescheduleCount() { return rescheduleCount; }
+    public void setRescheduleCount(long rescheduleCount) { this.rescheduleCount = rescheduleCount; }
+
+    public Date getRescheduledAt() { return rescheduledAt; }
+    public void setRescheduledAt(Date rescheduledAt) { this.rescheduledAt = rescheduledAt; }
 
     public String getDeliveryReport() { return deliveryReport; }
     public void setDeliveryReport(String deliveryReport) { this.deliveryReport = deliveryReport; }

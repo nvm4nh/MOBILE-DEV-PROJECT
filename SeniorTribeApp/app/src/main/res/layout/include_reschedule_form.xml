@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E02 · Đề xuất giờ mới: Ngày, Khung giờ, Hình thức, Lý do.
+     Đầu mối gửi yêu cầu thì phải hỏi ý kiến cụ trước và ghi lại cách hỏi. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutForm"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvFormTitle"
+        style="@style/Needs.Text.SectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:accessibilityHeading="true"
+        android:drawableStart="@drawable/ic_schedule"
+        android:text="@string/resched_section_form" />
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Needs.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                style="@style/Needs.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/tvNewDate"
+                android:text="@string/agree_label_date" />
+
+            <TextView
+                android:id="@+id/tvNewDate"
+                style="@style/Needs.Field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:hint="@string/agree_pick_date"
+                tools:text="Chủ nhật, 20/10/2026" />
+
+            <TextView
+                style="@style/Needs.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/tvNewTime"
+                android:text="@string/agree_label_time" />
+
+            <TextView
+                android:id="@+id/tvNewTime"
+                style="@style/Needs.Field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:hint="@string/agree_pick_time"
+                tools:text="08:00 – 10:00" />
+
+            <TextView
+                android:id="@+id/tvNewTimeError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/error"
+                android:textSize="12sp"
+                android:visibility="gone"
+                tools:text="Giờ kết thúc phải sau giờ bắt đầu." />
+
+            <TextView
+                style="@style/Needs.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/etNewFormat"
+                android:text="@string/agree_label_format" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNewFormat"
+                style="@style/Needs.Input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:placeholderText="@string/agree_format_hint">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNewFormat"
+                    style="@style/Needs.InputText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences"
+                    android:maxLength="120" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                style="@style/Needs.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/etReason"
+                android:text="@string/resched_label_reason" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilReason"
+                style="@style/Needs.Input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:counterEnabled="true"
+                app:counterMaxLength="300"
+                app:placeholderText="@string/resched_reason_hint">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etReason"
+                    style="@style/Needs.InputText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:maxLength="300"
+                    android:minLines="2" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Chỉ hiện với đầu mối -->
+            <LinearLayout
+                android:id="@+id/layoutFormConsent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/cbFormAgreed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:text="@string/resched_consent_checkbox"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
+                    app:buttonTint="@color/primary" />
+
+                <TextView
+                    style="@style/Needs.Text.Label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@id/etFormConsent"
+                    android:text="@string/agree_label_consent_method" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilFormConsent"
+                    style="@style/Needs.Input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:placeholderText="@string/agree_consent_method_hint">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etFormConsent"
+                        style="@style/Needs.InputText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapSentences"
+                        android:maxLength="200" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/tvFormNote"
+        style="@style/Needs.Note.Info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        tools:text="Lịch cũ vẫn giữ nguyên cho tới khi đầu mối hỏi ý kiến cụ và xác nhận." />
+</LinearLayout>

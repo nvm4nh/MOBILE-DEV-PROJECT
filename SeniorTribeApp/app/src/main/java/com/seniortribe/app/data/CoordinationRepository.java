@@ -45,6 +45,11 @@ public class CoordinationRepository {
     public static final String EVENT_DELIVERED = "DELIVERED";
     public static final String EVENT_RECONCILE_PENDING = "RECONCILE_PENDING";
     public static final String EVENT_COMPLETED = "COMPLETED";
+    // E02 · Đổi lịch
+    public static final String EVENT_RESCHEDULE_PROPOSED = "RESCHEDULE_PROPOSED";
+    public static final String EVENT_RESCHEDULE_DECLINED = "RESCHEDULE_DECLINED";
+    public static final String EVENT_RESCHEDULE_WITHDRAWN = "RESCHEDULE_WITHDRAWN";
+    public static final String EVENT_RESCHEDULED = "RESCHEDULED";
 
     /** Khung giờ hẹn dài tối đa 12 tiếng, khớp với rule tạo schedules. */
     public static final long MAX_SLOT_MILLIS = 12L * 60 * 60 * 1000;
@@ -270,6 +275,223 @@ public class CoordinationRepository {
     }
 
     // =====================================================================
+    // E02 · Đổi lịch sau khi đã chốt
+    // =====================================================================
+
+    /**
+     * Một bên đề xuất đổi lịch đã chốt (nhu cầu đang SCHEDULED); bên còn lại xác nhận.
+     *  - Tổ chức đề xuất: đầu mối hỏi ý kiến người cao tuổi rồi mới xác nhận.
+     *  - Đầu mối đề xuất: phải hỏi ý kiến người cao tuổi trước và ghi lại cách hỏi.
+     * Lịch đang hẹn vẫn giữ nguyên cho tới khi bên kia xác nhận. Yêu cầu đổi lịch đang chờ của
+     * chính bên mình (nếu có) được rút lại trong cùng transaction để chỉ còn một yêu cầu.
+     */
+    public Task<Void> proposeReschedule(String needId, String assignmentId, Membership me, String side,
+                                        Date startAt, Date endAt, String format, String reason,
+                                        @Nullable String consentMethod, List<String> myPendingIds) {
+        if (startAt == null || startAt.getTime() <= System.currentTimeMillis()) {
+            return Tasks.forException(new NeedActionException("Hãy chọn ngày và giờ bắt đầu trong tương lai."));
+        }
+        if (endAt == null || endAt.getTime() <= startAt.getTime()) {
+            return Tasks.forException(new NeedActionException("Giờ kết thúc phải sau giờ bắt đầu."));
+        }
+        if (endAt.getTime() - startAt.getTime() > MAX_SLOT_MILLIS) {
+            return Tasks.forException(new NeedActionException("Khung giờ hẹn dài tối đa 12 tiếng."));
+        }
+        final String cleanFormat = format != null ? format.trim() : "";
+        if (cleanFormat.length() < 2 || cleanFormat.length() > 120) {
+            return Tasks.forException(new NeedActionException("Hãy ghi hình thức hỗ trợ (ví dụ: Đến nhà · 2 đoàn viên)."));
+        }
+        final String cleanReason = reason != null ? reason.trim() : "";
+        if (cleanReason.isEmpty() || cleanReason.length() > 300) {
+            return Tasks.forException(new NeedActionException("Hãy ghi lý do đổi lịch (tối đa 300 ký tự)."));
+        }
+        final boolean recorderSide = ScheduleSession.SIDE_RECORDER.equals(side);
+        final String consent = consentMethod != null ? consentMethod.trim() : "";
+        if (recorderSide && (consent.isEmpty() || consent.length() > 200)) {
+            return Tasks.forException(new NeedActionException(
+                    "Hãy hỏi ý kiến người cao tuổi về giờ mới và ghi lại cách hỏi trước khi gửi."));
+        }
+
+        final DocumentReference ref = needRef(needId);
+        final DocumentReference newRef = assignmentRef(assignmentId).collection(Constants.COL_SCHEDULES).document();
+        return db.runTransaction(tx -> {
+            DocumentSnapshot need = tx.get(ref);
+            requireExists(need);
+            requireSide(me, need, side);
+            requireScheduledThread(need, assignmentId);
+
+            // Đọc trước mọi đề xuất cần rút (transaction phải đọc xong mới được ghi)
+            List<DocumentReference> toWithdraw = new ArrayList<>();
+            for (String id : myPendingIds) {
+                DocumentReference r = scheduleRef(assignmentId, id);
+                DocumentSnapshot s = tx.get(r);
+                if (s.exists() && ScheduleSession.PROPOSED.equals(s.getString("status"))
+                        && ScheduleSession.KIND_RESCHEDULE.equals(s.getString("kind"))
+                        && side.equals(s.getString("proposedBySide"))) {
+                    toWithdraw.add(r);
+                }
+            }
+            String place = need.getString("scheduledPlace");
+            if (place == null || place.trim().length() < 2) place = need.getString("area");
+            if (place == null || place.trim().length() < 2) place = "Theo khu vực của nhu cầu";
+
+            for (DocumentReference r : toWithdraw) tx.update(r, decision(ScheduleSession.WITHDRAWN, me));
+
+            Map<String, Object> s = new HashMap<>();
+            s.put("startAt", new Timestamp(startAt));
+            s.put("endAt", new Timestamp(endAt));
+            s.put("format", cleanFormat);
+            s.put("place", place.trim());
+            s.put("status", ScheduleSession.PROPOSED);
+            s.put("proposedByUid", me.getUid());
+            s.put("proposedByName", me.getDisplayName());
+            s.put("createdAt", FieldValue.serverTimestamp());
+            s.put("kind", ScheduleSession.KIND_RESCHEDULE);
+            s.put("replacesScheduleId", need.getString("scheduleId"));
+            s.put("proposedBySide", side);
+            s.put("reason", cleanReason);
+            if (recorderSide) {
+                s.put("elderConsent", true);
+                s.put("consentMethod", consent);
+            }
+            tx.set(newRef, s);
+            tx.set(NeedRepository.newEventRef(ref), NeedRepository.event(EVENT_RESCHEDULE_PROPOSED,
+                    Constants.STATUS_SCHEDULED, Constants.STATUS_SCHEDULED, me,
+                    describe(startAt, endAt, cleanFormat) + " · Lý do: " + cleanReason));
+            return null;
+        });
+    }
+
+    /**
+     * Bên còn lại xác nhận yêu cầu đổi lịch: yêu cầu thành CONFIRMED, lịch cũ thành RESCHEDULED
+     * và nhu cầu trỏ sang lịch mới, tất cả trong một transaction (Security Rules kiểm tra khớp).
+     *
+     * @param consentMethod bắt buộc khi đầu mối xác nhận đề xuất của tổ chức (cách hỏi ý kiến cụ)
+     */
+    public Task<Void> confirmReschedule(String needId, String scheduleId, Membership me,
+                                        boolean elderAgreed, @Nullable String consentMethod) {
+        final String consent = consentMethod != null ? consentMethod.trim() : "";
+        final DocumentReference ref = needRef(needId);
+        return db.runTransaction(tx -> {
+            DocumentSnapshot need = tx.get(ref);
+            requireExists(need);
+            String assignmentId = need.getString("currentAssignmentId");
+            requireScheduledThread(need, assignmentId);
+            String currentId = need.getString("scheduleId");
+
+            DocumentReference nextRef = scheduleRef(assignmentId, scheduleId);
+            DocumentSnapshot next = tx.get(nextRef);
+            requirePendingReschedule(next, currentId);
+            String proposerSide = sideOf(next);
+            // Người xác nhận phải ở bên còn lại
+            requireSide(me, need, opposite(proposerSide));
+            if (me.getUid().equals(next.getString("proposedByUid"))) {
+                throw new NeedActionException("Bạn không thể tự xác nhận yêu cầu đổi lịch của chính mình.");
+            }
+            boolean recorderConfirms = ScheduleSession.SIDE_ORG.equals(proposerSide);
+            if (recorderConfirms) {
+                if (!elderAgreed) throw new NeedActionException("Chỉ đổi lịch khi người cao tuổi đã đồng ý giờ mới.");
+                if (consent.isEmpty() || consent.length() > 200) {
+                    throw new NeedActionException("Hãy ghi cách người cao tuổi đã đồng ý giờ mới.");
+                }
+            }
+            DocumentReference prevRef = currentId != null ? scheduleRef(assignmentId, currentId) : null;
+            if (prevRef != null) {
+                DocumentSnapshot prev = tx.get(prevRef);
+                if (!prev.exists() || !ScheduleSession.CONFIRMED.equals(prev.getString("status"))) {
+                    throw new NeedActionException("Lịch đang hẹn vừa thay đổi. Vui lòng xem lại.");
+                }
+            }
+            Timestamp startAt = next.getTimestamp("startAt");
+            Timestamp endAt = next.getTimestamp("endAt");
+            String format = next.getString("format");
+            String place = next.getString("place");
+            if (startAt == null || endAt == null || format == null || place == null) {
+                throw new NeedActionException("Yêu cầu đổi lịch thiếu thông tin. Hãy nhờ bên kia gửi lại.");
+            }
+
+            Map<String, Object> decided = decision(ScheduleSession.CONFIRMED, me);
+            if (recorderConfirms) {
+                decided.put("elderConsent", true);
+                decided.put("consentMethod", consent);
+            }
+            Map<String, Object> superseded = new HashMap<>();
+            superseded.put("status", ScheduleSession.RESCHEDULED);
+            superseded.put("replacedById", scheduleId);
+            superseded.put("rescheduledAt", FieldValue.serverTimestamp());
+
+            Map<String, Object> update = new HashMap<>();
+            update.put("scheduleId", scheduleId);
+            update.put("scheduledAt", startAt);
+            update.put("scheduledEndAt", endAt);
+            update.put("scheduledFormat", format);
+            update.put("scheduledPlace", place);
+            update.put("scheduledByUid", me.getUid());
+            update.put("rescheduleCount", FieldValue.increment(1));
+            update.put("rescheduledAt", FieldValue.serverTimestamp());
+            update.put("updatedAt", FieldValue.serverTimestamp());
+
+            tx.update(nextRef, decided);
+            if (prevRef != null) tx.update(prevRef, superseded);
+            tx.update(ref, update);
+            tx.set(NeedRepository.newEventRef(ref), NeedRepository.event(EVENT_RESCHEDULED,
+                    Constants.STATUS_SCHEDULED, Constants.STATUS_SCHEDULED, me,
+                    describe(startAt.toDate(), endAt.toDate(), format)
+                            + (recorderConfirms ? " · Đồng ý: " + consent : "")));
+            return null;
+        });
+    }
+
+    /** Bên còn lại không nhận giờ mới: từ chối kèm lý do, lịch đang hẹn giữ nguyên. */
+    public Task<Void> declineReschedule(String needId, String scheduleId, Membership me, String reason) {
+        final String clean = reason != null ? reason.trim() : "";
+        if (clean.isEmpty() || clean.length() > 300) {
+            return Tasks.forException(new NeedActionException("Hãy ghi lý do không nhận giờ mới."));
+        }
+        final DocumentReference ref = needRef(needId);
+        return db.runTransaction(tx -> {
+            DocumentSnapshot need = tx.get(ref);
+            requireExists(need);
+            String assignmentId = need.getString("currentAssignmentId");
+            requireScheduledThread(need, assignmentId);
+            DocumentReference r = scheduleRef(assignmentId, scheduleId);
+            DocumentSnapshot s = tx.get(r);
+            requirePendingReschedule(s, need.getString("scheduleId"));
+            requireSide(me, need, opposite(sideOf(s)));
+
+            Map<String, Object> decided = decision(ScheduleSession.DECLINED, me);
+            decided.put("declineReason", clean);
+            tx.update(r, decided);
+            tx.set(NeedRepository.newEventRef(ref), NeedRepository.event(EVENT_RESCHEDULE_DECLINED,
+                    Constants.STATUS_SCHEDULED, Constants.STATUS_SCHEDULED, me, clean));
+            return null;
+        });
+    }
+
+    /** Bên gửi rút lại yêu cầu đổi lịch còn đang chờ. */
+    public Task<Void> withdrawReschedule(String needId, String scheduleId, Membership me) {
+        final DocumentReference ref = needRef(needId);
+        return db.runTransaction(tx -> {
+            DocumentSnapshot need = tx.get(ref);
+            requireExists(need);
+            String assignmentId = need.getString("currentAssignmentId");
+            if (assignmentId == null) throw new NeedActionException("Nhu cầu chưa có tổ chức phụ trách.");
+            DocumentReference r = scheduleRef(assignmentId, scheduleId);
+            DocumentSnapshot s = tx.get(r);
+            if (!s.exists() || !ScheduleSession.PROPOSED.equals(s.getString("status"))
+                    || !ScheduleSession.KIND_RESCHEDULE.equals(s.getString("kind"))) {
+                throw new NeedActionException("Yêu cầu đổi lịch này đã được trả lời hoặc rút lại.");
+            }
+            requireSide(me, need, sideOf(s));
+
+            tx.update(r, decision(ScheduleSession.WITHDRAWN, me));
+            tx.set(NeedRepository.newEventRef(ref), NeedRepository.event(EVENT_RESCHEDULE_WITHDRAWN,
+                    need.getString("status"), need.getString("status"), me, null));
+            return null;
+        });
+    }
+
+    // =====================================================================
     // F13 · Báo đã hỗ trợ và đối soát kết quả
     // =====================================================================
 
@@ -411,6 +633,74 @@ public class CoordinationRepository {
         if (!me.isRecorder() || !me.getOrgId().equals(need.getString("recorderOrgId"))) {
             throw new NeedActionException("Chỉ đầu mối của đơn vị ghi nhận mới thực hiện được thao tác này.");
         }
+    }
+
+    /**
+     * Bên của tài khoản trong lần phối hợp (E02): đầu mối của đơn vị ghi nhận, hoặc đại diện /
+     * người được giao của tổ chức phụ trách. Trả null nếu không thuộc bên nào.
+     */
+    @Nullable
+    public static String sideOf(Membership me, @Nullable com.seniortribe.app.models.NeedSummary need) {
+        if (me == null || need == null) return null;
+        if (me.isRecorder() && me.getOrgId().equals(need.getRecorderOrgId())) return ScheduleSession.SIDE_RECORDER;
+        if (me.getOrgId().equals(need.getAssignedOrgId())
+                && (me.isRepresentative() || me.getUid().equals(need.getAssigneeUid()))) {
+            return ScheduleSession.SIDE_ORG;
+        }
+        return null;
+    }
+
+    private static void requireSide(Membership me, DocumentSnapshot need, String side) {
+        boolean ok;
+        if (ScheduleSession.SIDE_RECORDER.equals(side)) {
+            ok = me.isRecorder() && me.getOrgId().equals(need.getString("recorderOrgId"));
+        } else {
+            ok = me.getOrgId().equals(need.getString("assignedOrgId"))
+                    && (me.isRepresentative() || me.getUid().equals(need.getString("assigneeUid")));
+        }
+        if (!ok) {
+            throw new NeedActionException(ScheduleSession.SIDE_RECORDER.equals(side)
+                    ? "Chỉ đầu mối của đơn vị ghi nhận mới thực hiện được bước này."
+                    : "Chỉ tổ chức đang phụ trách mới thực hiện được bước này.");
+        }
+    }
+
+    private static void requireScheduledThread(DocumentSnapshot need, @Nullable String assignmentId) {
+        if (!Constants.STATUS_SCHEDULED.equals(need.getString("status"))) {
+            throw new NeedActionException("Chỉ đổi lịch khi nhu cầu đang ở bước đã hẹn lịch.");
+        }
+        if (assignmentId == null || !assignmentId.equals(need.getString("currentAssignmentId"))) {
+            throw new NeedActionException("Lần tiếp nhận này đã kết thúc nên không đổi lịch được.");
+        }
+    }
+
+    private static void requirePendingReschedule(DocumentSnapshot s, @Nullable String currentScheduleId) {
+        if (!s.exists() || !ScheduleSession.PROPOSED.equals(s.getString("status"))
+                || !ScheduleSession.KIND_RESCHEDULE.equals(s.getString("kind"))) {
+            throw new NeedActionException("Yêu cầu đổi lịch này đã được trả lời hoặc rút lại.");
+        }
+        if (currentScheduleId == null || !currentScheduleId.equals(s.getString("replacesScheduleId"))) {
+            throw new NeedActionException("Lịch đang hẹn đã đổi sau khi gửi yêu cầu này. Hãy gửi yêu cầu mới.");
+        }
+    }
+
+    private static String sideOf(DocumentSnapshot schedule) {
+        return ScheduleSession.SIDE_RECORDER.equals(schedule.getString("proposedBySide"))
+                ? ScheduleSession.SIDE_RECORDER : ScheduleSession.SIDE_ORG;
+    }
+
+    private static String opposite(String side) {
+        return ScheduleSession.SIDE_RECORDER.equals(side) ? ScheduleSession.SIDE_ORG : ScheduleSession.SIDE_RECORDER;
+    }
+
+    /** Các trường ghi khi một đề xuất được trả lời hoặc rút lại. */
+    private static Map<String, Object> decision(String status, Membership me) {
+        Map<String, Object> m = new HashMap<>();
+        m.put("status", status);
+        m.put("decidedByUid", me.getUid());
+        m.put("decidedByName", me.getDisplayName());
+        m.put("decidedAt", FieldValue.serverTimestamp());
+        return m;
     }
 
     /** "Thứ 7, 19/10 · 14:00 – 16:00 · Đến nhà · 2 đoàn viên" cho lịch sử thay đổi. */

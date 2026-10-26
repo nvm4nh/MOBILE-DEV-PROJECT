@@ -59,6 +59,36 @@ public class CoordinationViewModel extends ViewModel {
             for (ScheduleSession s : schedules) if (need.getScheduleId().equals(s.getScheduleId())) return s;
             return null;
         }
+
+        /** E02 · Yêu cầu đổi lịch đang chờ cho lịch hiện tại (mới nhất trước). */
+        @Nullable
+        public ScheduleSession pendingReschedule() {
+            if (need == null || need.getScheduleId() == null) return null;
+            for (ScheduleSession s : schedules) {
+                if (s.isPendingReschedule() && need.getScheduleId().equals(s.getReplacesScheduleId())) return s;
+            }
+            return null;
+        }
+
+        /** E02 · Lịch sử các lần chốt / đổi lịch, mới nhất trước (bỏ đề xuất F12 bị rút lại). */
+        public List<ScheduleSession> scheduleHistory() {
+            List<ScheduleSession> out = new ArrayList<>();
+            for (ScheduleSession s : schedules) {
+                if (s.isReschedule() || ScheduleSession.CONFIRMED.equals(s.getStatus())
+                        || ScheduleSession.RESCHEDULED.equals(s.getStatus())) {
+                    out.add(s);
+                }
+            }
+            return out;
+        }
+    }
+
+    /** E02 · Lịch mới đang soạn trên màn hình Đổi lịch, giữ qua xoay màn hình. */
+    public static class RescheduleDraft {
+        public boolean prefilled;
+        public long startAt;
+        public long endAt;
+        public boolean dateSet;
     }
 
     /** Lịch tổ chức đang soạn trên màn hình F12, giữ qua xoay màn hình. */
@@ -75,8 +105,10 @@ public class CoordinationViewModel extends ViewModel {
     private final MutableLiveData<Ui> ui = new MutableLiveData<>(new Ui());
     private final MutableLiveData<Event<String>> messages = new MutableLiveData<>();
     private final MutableLiveData<Event<String>> done = new MutableLiveData<>();
+    private final MutableLiveData<Event<Boolean>> rescheduleSent = new MutableLiveData<>();
     private final List<ListenerRegistration> registrations = new ArrayList<>();
     private final Draft draft = new Draft();
+    private final RescheduleDraft rescheduleDraft = new RescheduleDraft();
 
     private String needId;
     private String assignmentId;
@@ -89,7 +121,12 @@ public class CoordinationViewModel extends ViewModel {
     /** Một thao tác đổi trạng thái vừa thành công; giá trị là câu thông báo. */
     public LiveData<Event<String>> getDone() { return done; }
 
+    /** E02 · Yêu cầu đổi lịch vừa gửi thành công: màn hình xóa ô lý do / cách hỏi ý kiến. */
+    public LiveData<Event<Boolean>> getRescheduleSent() { return rescheduleSent; }
+
     public Draft getDraft() { return draft; }
+
+    public RescheduleDraft getRescheduleDraft() { return rescheduleDraft; }
 
     public String getAssignmentId() { return assignmentId; }
 
@@ -185,6 +222,49 @@ public class CoordinationViewModel extends ViewModel {
                 "Đã báo tổ chức đề xuất giờ khác.", false);
     }
 
+    // ----- E02 · Đổi lịch -----
+
+    /** Gửi yêu cầu đổi lịch theo bên của tài khoản; kết quả báo qua getDone / getMessages. */
+    public void proposeReschedule(Date startAt, Date endAt, String format, String reason, @Nullable String consentMethod) {
+        Membership me = membership();
+        Ui s = ui.getValue();
+        if (me == null || s == null || s.need == null || assignmentId == null) return;
+        String side = CoordinationRepository.sideOf(me, s.need);
+        if (side == null) {
+            messages.setValue(new Event<>("Tài khoản của bạn không thuộc hai bên đang phối hợp nhu cầu này."));
+            return;
+        }
+        List<String> mine = new ArrayList<>();
+        for (ScheduleSession x : s.schedules) {
+            if (x.isPendingReschedule() && side.equals(x.side())) mine.add(x.getScheduleId());
+        }
+        String done = ScheduleSession.SIDE_RECORDER.equals(side)
+                ? "Đã gửi yêu cầu đổi lịch. Lịch cũ giữ nguyên cho tới khi tổ chức xác nhận."
+                : "Đã gửi yêu cầu đổi lịch. Lịch cũ giữ nguyên cho tới khi đầu mối hỏi ý kiến cụ và xác nhận.";
+        run(coordination.proposeReschedule(needId, assignmentId, me, side, startAt, endAt, format, reason,
+                consentMethod, mine), done, false, true);
+    }
+
+    public void confirmReschedule(String scheduleId, boolean elderAgreed, @Nullable String consentMethod) {
+        Membership me = membership();
+        if (me == null) return;
+        run(coordination.confirmReschedule(needId, scheduleId, me, elderAgreed, consentMethod),
+                "Đã đổi sang lịch mới. Lịch cũ vẫn được giữ trong lịch sử.", false, false);
+    }
+
+    public void declineReschedule(String scheduleId, String reason) {
+        Membership me = membership();
+        if (me == null) return;
+        run(coordination.declineReschedule(needId, scheduleId, me, reason),
+                "Đã từ chối giờ mới. Lịch đang hẹn giữ nguyên.", false, false);
+    }
+
+    public void withdrawReschedule(String scheduleId) {
+        Membership me = membership();
+        if (me == null) return;
+        run(coordination.withdrawReschedule(needId, scheduleId, me), "Đã rút lại yêu cầu đổi lịch.", false, false);
+    }
+
     // ----- F13 · Báo hỗ trợ và đối soát -----
 
     public void reportDelivered(String report) {
@@ -207,11 +287,20 @@ public class CoordinationViewModel extends ViewModel {
     }
 
     private void run(Task<?> task, String successMessage, boolean endEditing) {
+        run(task, successMessage, endEditing, false);
+    }
+
+    private void run(Task<?> task, String successMessage, boolean endEditing, boolean resetReschedule) {
         setBusy(true);
         task.addOnCompleteListener(t -> {
             setBusy(false);
             if (t.isSuccessful()) {
                 if (endEditing) draft.editing = false;
+                if (resetReschedule) {
+                    rescheduleDraft.dateSet = false;
+                    rescheduleDraft.startAt = rescheduleDraft.endAt = 0;
+                    rescheduleSent.setValue(new Event<>(true));
+                }
                 done.setValue(new Event<>(successMessage));
             } else {
                 messages.setValue(new Event<>(NeedErrors.message(t.getException())));

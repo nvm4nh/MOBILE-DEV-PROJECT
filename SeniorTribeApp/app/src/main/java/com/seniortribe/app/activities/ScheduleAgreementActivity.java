@@ -315,6 +315,11 @@ public class ScheduleAgreementActivity extends AppCompatActivity {
             case CONFIRMED:
                 primary = getString(R.string.agree_action_progress);
                 onPrimary = v -> openProgress();
+                // E02 · Lịch đã chốt vẫn đổi được khi một bên không sắp xếp được
+                if (RescheduleActivity.canReschedule(s.membership, s.need)) {
+                    secondary = getString(R.string.resched_open);
+                    onSecondary = v -> openReschedule();
+                }
                 break;
             default:
                 break;
@@ -497,6 +502,14 @@ public class ScheduleAgreementActivity extends AppCompatActivity {
 
     private void openProgress() {
         startActivity(new Intent(this, NeedProgressActivity.class)
+                .putExtra(Constants.EXTRA_NEED_ID, needId)
+                .putExtra(Constants.EXTRA_ASSIGNMENT_ID, viewModel.getAssignmentId())
+                .putExtra(Constants.EXTRA_CASE_CODE, current != null && current.need != null
+                        ? current.need.getCaseCode() : null));
+    }
+
+    private void openReschedule() {
+        startActivity(new Intent(this, RescheduleActivity.class)
                 .putExtra(Constants.EXTRA_NEED_ID, needId)
                 .putExtra(Constants.EXTRA_ASSIGNMENT_ID, viewModel.getAssignmentId())
                 .putExtra(Constants.EXTRA_CASE_CODE, current != null && current.need != null
