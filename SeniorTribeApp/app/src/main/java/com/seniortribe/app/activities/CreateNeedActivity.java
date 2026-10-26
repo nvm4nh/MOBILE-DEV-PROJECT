@@ -28,6 +28,7 @@ import com.seniortribe.app.models.NeedPrivateDetails;
 import com.seniortribe.app.models.NeedSummary;
 import com.seniortribe.app.utils.Constants;
 import com.seniortribe.app.utils.NeedDraftStore;
+import com.seniortribe.app.utils.NeedFormAssist;
 import com.seniortribe.app.utils.NetworkUtils;
 import com.seniortribe.app.utils.PrivacyGuard;
 import com.seniortribe.app.utils.StateView;
@@ -64,6 +65,8 @@ public class CreateNeedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_need);
         bindViews();
+        // E04, E05 · "Nói để nhập nội dung" và "Nhờ trợ lý viết lại" dưới ô Nội dung
+        new NeedFormAssist(this, scrollForm, etContent, etElderlyName, etAddress, etContact, etDesiredTime);
 
         draftChecked = savedInstanceState != null && savedInstanceState.getBoolean(STATE_DRAFT_CHECKED);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();

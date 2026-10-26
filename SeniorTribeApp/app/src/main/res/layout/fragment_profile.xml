@@ -407,6 +407,18 @@
                 app:icon="@drawable/ic_text_size"
                 android:text="@string/display_entry" />
 
+            <!-- E05 · Trợ lý SeniorTribe -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOpenAssistant"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:minHeight="52dp"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_sparkles"
+                android:text="@string/assistant_open" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/st_profile_sos"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"

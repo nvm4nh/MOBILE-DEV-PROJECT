@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E05 · Tin của trợ lý: biểu tượng + bong bóng bên trái. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="6dp"
+    android:paddingEnd="40dp"
+    android:paddingBottom="6dp">
+
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/bg_assist_icon"
+        android:importantForAccessibility="no"
+        android:padding="6dp"
+        android:src="@drawable/ic_sparkles"
+        app:tint="@color/primary" />
+
+    <TextView
+        android:id="@+id/tvBubble"
+        style="@style/Assist.BubbleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_bubble_assistant"
+        android:paddingStart="14dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="12dp"
+        android:textIsSelectable="true"
+        tools:text="Chào bạn! Mình hướng dẫn thao tác và gợi ý nhu cầu phù hợp." />
+</LinearLayout>

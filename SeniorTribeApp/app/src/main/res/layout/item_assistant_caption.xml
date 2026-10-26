@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E05 · Dòng chú thích nhỏ dưới các thẻ nhu cầu gợi ý. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tvCaption"
+    style="@style/Needs.Text.Meta"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="40dp"
+    android:paddingTop="2dp"
+    android:paddingBottom="8dp"
+    tools:text="Xếp theo khu vực và thời gian mong muốn. Bạn vẫn tự quyết định tiếp nhận." />
