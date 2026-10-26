@@ -159,6 +159,35 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- E03 · Đánh giá và xử lý phản ánh -->
+        <activity
+            android:name=".activities.RateOrgActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.ReportFormActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.ReportListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ReportDetailActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- E07 · Nhóm và sự kiện -->
+        <activity
+            android:name=".activities.EventListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.EventDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.CreateEventActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

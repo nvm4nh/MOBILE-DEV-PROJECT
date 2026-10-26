@@ -30,6 +30,18 @@
                 android:accessibilityHeading="true"
                 android:text="@string/nav_feed" />
 
+            <!-- E07 · Sự kiện cộng đồng -->
+            <ImageButton
+                android:id="@+id/btnOpenEvents"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/events_open"
+                android:padding="12dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_event"
+                app:tint="@color/text_primary" />
+
             <!-- E08 · Tìm kiếm chung (nhu cầu, bài đăng, lịch hẹn) -->
             <ImageButton
                 android:id="@+id/btnFeedSearch"

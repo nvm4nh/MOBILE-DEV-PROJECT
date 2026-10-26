@@ -24,6 +24,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.snackbar.Snackbar;
 import com.seniortribe.app.R;
 import com.seniortribe.app.activities.CreatePostActivity;
+import com.seniortribe.app.activities.EventListActivity;
 import com.seniortribe.app.activities.PostDetailActivity;
 import com.seniortribe.app.adapters.PostAdapter;
 import com.seniortribe.app.dialogs.PostOptionsSheet;
@@ -90,6 +91,9 @@ public class FeedFragment extends Fragment implements PostAdapter.OnPostClickLis
         chipGroup = view.findViewById(R.id.chipGroupFeed);
         fabCreatePost = view.findViewById(R.id.fabCreatePost);
         rvPosts = view.findViewById(R.id.rvPosts);
+        // E07 · Sự kiện cộng đồng
+        view.findViewById(R.id.btnOpenEvents).setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), EventListActivity.class)));
 
         adapter = new PostAdapter(requireContext(), this);
         rvPosts.setLayoutManager(new LinearLayoutManager(requireContext()));

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E07 · Một dòng trong danh sách tổ chức đã đăng ký: tên tổ chức và số người (không có tên các cụ). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="40dp"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/tvRegAvatar"
+        style="@style/Post.Avatar"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:textSize="11sp"
+        tools:text="ĐT" />
+
+    <TextView
+        android:id="@+id/tvRegOrg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        tools:text="Đoàn TN Phường 7" />
+
+    <TextView
+        android:id="@+id/tvRegPeople"
+        style="@style/Needs.Text.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="2 người" />
+</LinearLayout>
