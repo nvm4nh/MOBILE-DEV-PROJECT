@@ -17,13 +17,6 @@
         android:icon="@drawable/ic_close"
         android:title="@string/action_cancel_need"
         app:showAsAction="never" />
-    <!-- E09 · Báo khẩn / gọi số khẩn cấp khi đang phối hợp nhu cầu này -->
-    <item
-        android:id="@+id/action_need_sos"
-        android:icon="@drawable/ic_sos"
-        android:title="@string/sos_menu"
-        android:visible="false"
-        app:showAsAction="never" />
     <item
         android:id="@+id/action_need_history"
         android:icon="@drawable/ic_time"

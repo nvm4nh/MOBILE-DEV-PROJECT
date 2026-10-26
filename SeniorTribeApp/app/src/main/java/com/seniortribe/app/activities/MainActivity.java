@@ -86,8 +86,6 @@ public class MainActivity extends AppCompatActivity {
         createAccessOverlay();
         setupNavigation();
         app.liveAccess().observe(this, this::renderAccess);
-        // E09 · Nhận báo khẩn của bên cùng phối hợp khi ứng dụng đang chạy
-        com.seniortribe.app.sos.SosWatcher.get(this).start();
     }
 
     @Override

@@ -53,11 +53,6 @@
     <color name="urgency_high">#E53935</color>
     <color name="urgency_urgent">#B71C1C</color>
 
-    <!-- E09 · SOS: đỏ khẩn cấp (nút gọi 115/113/114, thẻ báo khẩn) -->
-    <color name="sos_red">#C62828</color>
-    <color name="sos_red_bg">#FDECEA</color>
-    <color name="sos_on_red">#FFFFFF</color>
-
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>

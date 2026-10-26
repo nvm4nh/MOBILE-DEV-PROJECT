@@ -29,36 +29,6 @@
                 android:layout_weight="1"
                 android:accessibilityHeading="true"
                 android:text="@string/nav_feed" />
-
-            <!-- E08 · Tìm kiếm chung (nhu cầu, bài đăng, lịch hẹn) -->
-            <ImageButton
-                android:id="@+id/btnFeedSearch"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/search_open"
-                android:padding="12dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_search"
-                app:tint="@color/text_primary" />
-
-            <!-- E09 · Khẩn cấp -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnFeedSos"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:contentDescription="@string/sos_entry"
-                android:minWidth="0dp"
-                android:minHeight="44dp"
-                android:paddingHorizontal="14dp"
-                android:text="@string/sos_open"
-                android:textColor="@color/sos_on_red"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:backgroundTint="@color/sos_red"
-                app:cornerRadius="22dp" />
         </LinearLayout>
 
         <!-- F04 · Lọc "Tất cả" / "Đơn vị của tôi" như Figma -->
