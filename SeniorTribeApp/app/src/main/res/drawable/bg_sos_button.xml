@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E09 · Nút gọi khẩn cấp: nền đỏ, bo góc, có hiệu ứng chạm. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#33FFFFFF">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/sos_red" />
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+</ripple>

@@ -645,6 +645,94 @@ service cloud.firestore {
 
       allow delete: if false;
 
+      // ================================================================
+      // E09 · SOS: báo khẩn cho bên cùng phối hợp
+      // ================================================================
+      // Ứng dụng không phải dịch vụ cứu hộ: người dùng tự gọi 115 / 113 / 114 bằng trình quay số
+      // của máy. Báo khẩn chỉ để người còn lại trong luồng chat (đầu mối ghi nhận / người được
+      // giao) biết ngay và hỗ trợ liên hệ người nhà. Chỉ hai người đó đọc / ghi (R08); vị trí
+      // (nếu gửi) chỉ hai người đó thấy; không sửa nội dung, không xóa (giữ để đối soát).
+      match /sos/{alertId} {
+        function sosParty() {
+          let a = get(assignmentPath(assignmentId)).data;
+          let n = get(needPath(a.needId)).data;
+          return signedIn()
+            && (request.auth.uid == a.assigneeUid || request.auth.uid == n.recorderUid);
+        }
+
+        function sosActive() {
+          let a = get(assignmentPath(assignmentId)).data;
+          let n = get(needPath(a.needId)).data;
+          return a.status == 'ACTIVE'
+            && n.status in ['ACCEPTED', 'SCHEDULED', 'DELIVERED']
+            && n.currentAssignmentId == assignmentId;
+        }
+
+        allow read: if sosParty();
+
+        allow create: if sosParty()
+          && sosActive()
+          && request.resource.data.keys().hasAll([
+            'byUid', 'byName', 'kind', 'note', 'status', 'createdAt'
+          ])
+          && request.resource.data.keys().hasOnly([
+            'byUid', 'byName', 'kind', 'note', 'status', 'createdAt',
+            'calledNumber', 'location', 'accuracyM'
+          ])
+          && request.resource.data.byUid == request.auth.uid
+          && isText(request.resource.data.byName, 1, 80)
+          && request.resource.data.kind in ['MEDICAL', 'SAFETY', 'FIRE', 'OTHER']
+          && request.resource.data.note is string
+          && request.resource.data.note.size() <= 300
+          && request.resource.data.status == 'OPEN'
+          && request.resource.data.createdAt == request.time
+          && (
+            !('calledNumber' in request.resource.data)
+            || request.resource.data.calledNumber in ['115', '113', '114']
+          )
+          && (
+            !('location' in request.resource.data)
+            || request.resource.data.location is latlng
+          )
+          && (
+            !('accuracyM' in request.resource.data)
+            || (
+              request.resource.data.accuracyM is number
+              && request.resource.data.accuracyM >= 0
+              && request.resource.data.accuracyM <= 100000
+            )
+          );
+
+        allow update: if sosParty()
+          && (
+            // Người còn lại xác nhận đã nhận báo khẩn
+            (
+              resource.data.status == 'OPEN'
+              && request.resource.data.status == 'ACK'
+              && request.auth.uid != resource.data.byUid
+              && request.resource.data.ackByUid == request.auth.uid
+              && isText(request.resource.data.ackByName, 1, 80)
+              && request.resource.data.ackAt == request.time
+              && request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['status', 'ackByUid', 'ackByName', 'ackAt'])
+            )
+            // Một trong hai người ghi đã xử lý xong (kèm ghi chú ngắn)
+            || (
+              resource.data.status in ['OPEN', 'ACK']
+              && request.resource.data.status == 'RESOLVED'
+              && request.resource.data.resolvedByUid == request.auth.uid
+              && isText(request.resource.data.resolvedByName, 1, 80)
+              && request.resource.data.resolvedAt == request.time
+              && request.resource.data.resolveNote is string
+              && request.resource.data.resolveNote.size() <= 300
+              && request.resource.data.diff(resource.data).affectedKeys()
+                .hasOnly(['status', 'resolvedByUid', 'resolvedByName', 'resolvedAt', 'resolveNote'])
+            )
+          );
+
+        allow delete: if false;
+      }
+
       function assignment() {
         return get(assignmentPath(assignmentId)).data;
       }
