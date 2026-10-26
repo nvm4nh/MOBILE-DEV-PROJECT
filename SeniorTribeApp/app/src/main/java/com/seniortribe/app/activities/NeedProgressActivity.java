@@ -314,6 +314,15 @@ public class NeedProgressActivity extends AppCompatActivity {
             tilInput.setPlaceholderText(getString(R.string.progress_report_input_hint));
             primary = getString(R.string.progress_action_delivered);
             onPrimary = v -> submitReport();
+            // E02 · Chưa thực hiện được theo giờ đã chốt thì đề xuất đổi lịch thay vì trả lại
+            if (RescheduleActivity.canReschedule(me, n)) {
+                secondary = getString(R.string.resched_open);
+                onSecondary = v -> openReschedule();
+            }
+        } else if (currentThread && RescheduleActivity.canReschedule(me, n)) {
+            // E02 · Đầu mối (hoặc thành viên tổ chức không báo kết quả) xin đổi lịch
+            primary = getString(R.string.resched_open);
+            onPrimary = v -> openReschedule();
         } else if (action == Action.RECONCILE) {
             tvInputLabel.setText(R.string.progress_reconcile_input_label);
             tilInput.setPlaceholderText(getString(R.string.progress_reconcile_input_hint));
@@ -385,6 +394,14 @@ public class NeedProgressActivity extends AppCompatActivity {
         startActivity(new Intent(this, ScheduleAgreementActivity.class)
                 .putExtra(Constants.EXTRA_NEED_ID, needId)
                 .putExtra(Constants.EXTRA_ASSIGNMENT_ID, viewModel.getAssignmentId()));
+    }
+
+    private void openReschedule() {
+        startActivity(new Intent(this, RescheduleActivity.class)
+                .putExtra(Constants.EXTRA_NEED_ID, needId)
+                .putExtra(Constants.EXTRA_ASSIGNMENT_ID, viewModel.getAssignmentId())
+                .putExtra(Constants.EXTRA_CASE_CODE, current != null && current.need != null
+                        ? current.need.getCaseCode() : null));
     }
 
     private String inputText() {

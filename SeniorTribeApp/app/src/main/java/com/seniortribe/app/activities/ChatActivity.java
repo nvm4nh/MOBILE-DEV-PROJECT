@@ -81,6 +81,10 @@ public class ChatActivity extends AppCompatActivity implements ChatAdapter.OnSch
                 openProgress();
                 return true;
             }
+            if (id == R.id.action_reschedule) {
+                openReschedule();
+                return true;
+            }
             if (id == R.id.action_open_need) {
                 startActivity(new Intent(this, NeedDetailActivity.class).putExtra(Constants.EXTRA_NEED_ID, needId));
                 return true;
@@ -249,6 +253,19 @@ public class ChatActivity extends AppCompatActivity implements ChatAdapter.OnSch
     @Override
     public void onScheduleClick() {
         openSchedule();
+    }
+
+    @Override
+    public void onRescheduleClick() {
+        openReschedule();
+    }
+
+    /** E02 · Đổi lịch đã chốt. */
+    private void openReschedule() {
+        startActivity(new Intent(this, RescheduleActivity.class)
+                .putExtra(Constants.EXTRA_NEED_ID, needId)
+                .putExtra(Constants.EXTRA_ASSIGNMENT_ID, viewModel.getAssignmentId())
+                .putExtra(Constants.EXTRA_CASE_CODE, caseCode));
     }
 
     private void openSchedule() {

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E02 · Đổi lịch sau khi đã chốt. -->
+<resources>
+    <string name="resched_title">Đổi lịch</string>
+    <string name="resched_title_with_code">Đổi lịch · %1$s</string>
+    <string name="resched_open">Đổi lịch</string>
+
+    <string name="resched_section_current">Lịch đang hẹn</string>
+    <string name="resched_section_pending">Yêu cầu đổi lịch đang chờ</string>
+    <string name="resched_section_form">Đề xuất giờ mới</string>
+    <string name="resched_section_form_replace">Gửi giờ khác thay yêu cầu đang chờ</string>
+    <string name="resched_section_history">Lịch sử thay đổi lịch</string>
+    <string name="resched_history_empty">Chưa có thay đổi nào.</string>
+    <string name="resched_no_current">Chưa có lịch đã chốt</string>
+    <string name="resched_count">Đã đổi lịch %1$d lần</string>
+
+    <string name="resched_label_reason">Lý do đổi lịch</string>
+    <string name="resched_reason_hint">Ví dụ: Thứ 7 đoàn có lịch trực, xin dời sang sáng Chủ nhật</string>
+    <string name="resched_reason_value">Lý do: %1$s</string>
+    <string name="resched_declined_value">Không nhận vì: %1$s</string>
+    <string name="resched_consent_value">Cách hỏi ý kiến cụ: %1$s</string>
+    <string name="resched_consent_checkbox">Cụ đồng ý với giờ mới này</string>
+    <string name="resched_by_org">%1$s (tổ chức phụ trách) gửi · %2$s</string>
+    <string name="resched_by_recorder">%1$s (đầu mối) gửi · %2$s</string>
+
+    <string name="resched_note_mine">Đang chờ bên kia xác nhận. Lịch cũ vẫn giữ nguyên cho tới lúc đó.</string>
+    <string name="resched_note_ask_elder">Hãy hỏi ý kiến cụ về giờ mới. Chỉ đồng ý đổi lịch khi cụ đã đồng ý.</string>
+    <string name="resched_note_org_respond">Đầu mối đã hỏi ý kiến cụ về giờ mới. Kiểm tra lại người đi hỗ trợ có sắp xếp được không.</string>
+    <string name="resched_form_note_org">Lịch cũ vẫn giữ nguyên cho tới khi đầu mối hỏi ý kiến cụ và xác nhận.</string>
+    <string name="resched_form_note_recorder">Hãy hỏi ý kiến cụ trước khi gửi. Lịch cũ vẫn giữ nguyên cho tới khi tổ chức xác nhận.</string>
+
+    <string name="resched_closed_status">Chỉ đổi lịch được khi nhu cầu đang ở bước đã hẹn lịch. Lịch sử bên dưới chỉ để xem lại.</string>
+    <string name="resched_closed_thread">Lần tiếp nhận này đã kết thúc nên không đổi lịch được.</string>
+    <string name="resched_closed_not_party">Chỉ đầu mối ghi nhận và tổ chức phụ trách mới đổi lịch được.</string>
+
+    <string name="resched_hist_current">Lịch đang hẹn</string>
+    <string name="resched_hist_confirmed">Đã chốt</string>
+    <string name="resched_hist_replaced">Đã được thay</string>
+    <string name="resched_hist_pending">Đang chờ xác nhận</string>
+    <string name="resched_hist_declined">Không nhận</string>
+    <string name="resched_hist_withdrawn">Đã rút lại</string>
+    <string name="resched_hist_by_one">%1$s · %2$s</string>
+    <string name="resched_hist_by_two">Gửi: %1$s · Trả lời: %2$s · %3$s</string>
+
+    <string name="resched_action_send">Gửi yêu cầu đổi lịch</string>
+    <string name="resched_action_send_replace">Gửi giờ khác</string>
+    <string name="resched_action_withdraw">Rút lại yêu cầu</string>
+    <string name="resched_action_decline">Không nhận</string>
+    <string name="resched_action_confirm">Đồng ý đổi lịch</string>
+
+    <string name="resched_decline_title">Không nhận giờ mới</string>
+    <string name="resched_decline_message">Ghi lý do để bên kia biết và đề xuất giờ khác nếu cần. Lịch đang hẹn giữ nguyên.</string>
+    <string name="resched_decline_hint">Ví dụ: Cụ có hẹn tái khám sáng Chủ nhật</string>
+    <string name="resched_decline_send">Gửi</string>
+    <string name="resched_withdraw_title">Rút lại yêu cầu đổi lịch?</string>
+    <string name="resched_withdraw_message">Lịch đang hẹn giữ nguyên. Yêu cầu vẫn được ghi trong lịch sử là đã rút lại.</string>
+
+    <string name="resched_error_reason">Hãy ghi lý do đổi lịch.</string>
+    <string name="resched_error_same_slot">Giờ mới đang trùng lịch đang hẹn.</string>
+    <string name="resched_error_consent_unchecked">Chỉ đổi lịch khi cụ đã đồng ý giờ mới.</string>
+
+    <!-- Tin hệ thống trong chat và nhãn lịch sử nhu cầu -->
+    <string name="chat_system_resched_proposed">Yêu cầu đổi lịch: %1$s</string>
+    <string name="chat_system_resched_confirmed">Đã đổi lịch sang: %1$s</string>
+    <string name="chat_system_resched_declined">Không nhận giờ mới: %1$s</string>
+    <string name="event_reschedule_proposed">Yêu cầu đổi lịch</string>
+    <string name="event_reschedule_declined">Không nhận giờ mới</string>
+    <string name="event_reschedule_withdrawn">Rút lại yêu cầu đổi lịch</string>
+    <string name="event_rescheduled">Đã đổi lịch</string>
+</resources>

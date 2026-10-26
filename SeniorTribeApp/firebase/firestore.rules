@@ -407,9 +407,55 @@ service cloud.firestore {
 
       function coordinationStep() {
         return recorderConfirmsSchedule()
+          || rescheduleConfirmed()
           || assignedOrgReportsDelivered()
           || recorderNotesReconcile()
           || recorderCompletes();
+      }
+
+      // E02 · Đổi lịch đã chốt: nhu cầu vẫn SCHEDULED nhưng trỏ sang lịch mới.
+      // Lịch mới phải là yêu cầu đổi lịch đã được bên còn lại xác nhận (rule của schedules
+      // kiểm tra ai được xác nhận), có đồng ý của người cao tuổi, và lịch cũ chuyển RESCHEDULED
+      // trong cùng một lần ghi để lịch sử luôn khớp.
+      function rescheduleConfirmed() {
+        let d = request.resource.data;
+        let assignmentId = resource.data.currentAssignmentId;
+        let next = schedulePath(assignmentId, d.scheduleId);
+        let prev = schedulePath(assignmentId, resource.data.scheduleId);
+
+        return resource.data.status == 'SCHEDULED'
+          && d.status == 'SCHEDULED'
+          && (
+            isMember(resource.data.assignedOrgId)
+            || hasRole(resource.data.recorderOrgId, 'RECORDER')
+          )
+          && d.scheduledByUid == request.auth.uid
+          && d.scheduleId is string
+          && d.scheduleId != resource.data.scheduleId
+          && existsAfter(next)
+          && getAfter(next).data.status == 'CONFIRMED'
+          && getAfter(next).data.get('kind', '') == 'RESCHEDULE'
+          && getAfter(next).data.replacesScheduleId == resource.data.scheduleId
+          && getAfter(next).data.elderConsent == true
+          && getAfter(prev).data.status == 'RESCHEDULED'
+          && getAfter(prev).data.replacedById == d.scheduleId
+          && d.scheduledAt == getAfter(next).data.startAt
+          && d.scheduledEndAt == getAfter(next).data.endAt
+          && d.scheduledFormat == getAfter(next).data.format
+          && d.scheduledPlace == getAfter(next).data.place
+          && d.rescheduleCount == resource.data.get('rescheduleCount', 0) + 1
+          && d.rescheduledAt == request.time
+          && changed().hasOnly([
+            'scheduleId',
+            'scheduledAt',
+            'scheduledEndAt',
+            'scheduledFormat',
+            'scheduledPlace',
+            'scheduledByUid',
+            'rescheduleCount',
+            'rescheduledAt',
+            'updatedAt'
+          ]);
       }
 
       function recorderConfirmsSchedule() {
@@ -645,10 +691,70 @@ service cloud.firestore {
         allow read: if isMember(assignment().orgId)
           || isMember(assignment().recorderOrgId);
 
-        allow create: if (
-            hasRole(assignment().orgId, 'REPRESENTATIVE')
-            || request.auth.uid == assignment().assigneeUid
-          )
+        function orgSide() {
+          return hasRole(assignment().orgId, 'REPRESENTATIVE')
+            || request.auth.uid == assignment().assigneeUid;
+        }
+
+        function recorderSide() {
+          return hasRole(assignment().recorderOrgId, 'RECORDER');
+        }
+
+        // Khung giờ hợp lệ, dùng chung cho đề xuất đầu tiên (F12) và đổi lịch (E02)
+        function validSlot(d) {
+          return d.status == 'PROPOSED'
+            && d.proposedByUid == request.auth.uid
+            && isText(d.proposedByName, 1, 80)
+            && d.startAt is timestamp
+            && d.startAt > request.time
+            && d.endAt is timestamp
+            && d.endAt > d.startAt
+            && d.endAt <= d.startAt + duration.value(12, 'h')
+            && isText(d.format, 2, 120)
+            && isText(d.place, 2, 200)
+            && d.createdAt == request.time;
+        }
+
+        // E02 · Yêu cầu đổi lịch khi nhu cầu đã SCHEDULED. Bên nào đề xuất thì bên kia xác nhận.
+        // Đầu mối đề xuất phải ghi sẵn đồng ý của người cao tuổi với giờ mới; tổ chức đề xuất
+        // thì đầu mối hỏi ý kiến cụ lúc xác nhận.
+        function reschedulePropose() {
+          let d = request.resource.data;
+
+          return assignmentActive()
+            && needOfAssignment().status == 'SCHEDULED'
+            && d.keys().hasAll([
+              'startAt', 'endAt', 'format', 'place', 'status', 'proposedByUid',
+              'proposedByName', 'createdAt', 'kind', 'replacesScheduleId',
+              'proposedBySide', 'reason'
+            ])
+            && d.keys().hasOnly([
+              'startAt', 'endAt', 'format', 'place', 'status', 'proposedByUid',
+              'proposedByName', 'createdAt', 'kind', 'replacesScheduleId',
+              'proposedBySide', 'reason', 'elderConsent', 'consentMethod'
+            ])
+            && d.kind == 'RESCHEDULE'
+            && d.replacesScheduleId == needOfAssignment().scheduleId
+            && isText(d.reason, 1, 300)
+            && validSlot(d)
+            && (
+              (
+                d.proposedBySide == 'ORG'
+                && orgSide()
+                && !('elderConsent' in d)
+                && !('consentMethod' in d)
+              )
+              || (
+                d.proposedBySide == 'RECORDER'
+                && recorderSide()
+                && d.elderConsent == true
+                && isText(d.consentMethod, 1, 200)
+              )
+            );
+        }
+
+        allow create: if reschedulePropose() || (
+          orgSide()
           && assignmentActive()
           && needOfAssignment().status == 'ACCEPTED'
           && request.resource.data.keys().hasAll([
@@ -681,12 +787,25 @@ service cloud.firestore {
             <= request.resource.data.startAt + duration.value(12, 'h')
           && isText(request.resource.data.format, 2, 120)
           && isText(request.resource.data.place, 2, 200)
-          && request.resource.data.createdAt == request.time;
+          && request.resource.data.createdAt == request.time
+        );
 
-        allow update: if resource.data.status == 'PROPOSED'
+        // Đề xuất này do bên nào gửi; đề xuất F12 cũ không có trường này luôn là tổ chức
+        function proposedBy(side) {
+          return resource.data.get('proposedBySide', 'ORG') == side;
+        }
+
+        // Lịch được xác nhận phải đúng là lịch nhu cầu trỏ tới sau lần ghi này
+        function becomesCurrentSchedule() {
+          return getAfter(needPath(assignment().needId)).data.status == 'SCHEDULED'
+            && getAfter(needPath(assignment().needId)).data.scheduleId == scheduleId;
+        }
+
+        allow update: if (resource.data.status == 'PROPOSED'
           && (
             (
-              hasRole(assignment().recorderOrgId, 'RECORDER')
+              proposedBy('ORG')
+              && recorderSide()
               && request.resource.data.decidedByUid == request.auth.uid
               && changed().hasOnly([
                 'status',
@@ -706,9 +825,7 @@ service cloud.firestore {
                     1,
                     200
                   )
-                  && getAfter(
-                    needPath(assignment().needId)
-                  ).data.status == 'SCHEDULED'
+                  && becomesCurrentSchedule()
                 )
                 || (
                   request.resource.data.status == 'DECLINED'
@@ -721,8 +838,35 @@ service cloud.firestore {
                 )
               )
             )
+            // E02 · Tổ chức trả lời yêu cầu đổi lịch do đầu mối gửi (đồng ý của cụ đã có sẵn)
             || (
-              isMember(assignment().orgId)
+              proposedBy('RECORDER')
+              && orgSide()
+              && request.resource.data.decidedByUid == request.auth.uid
+              && changed().hasOnly([
+                'status',
+                'declineReason',
+                'decidedByUid',
+                'decidedByName',
+                'decidedAt'
+              ])
+              && (
+                (
+                  request.resource.data.status == 'CONFIRMED'
+                  && becomesCurrentSchedule()
+                )
+                || (
+                  request.resource.data.status == 'DECLINED'
+                  && isText(request.resource.data.declineReason, 1, 300)
+                )
+              )
+            )
+            // Rút lại đề xuất của chính bên mình (tổ chức: F12 và E02; đầu mối: E02)
+            || (
+              (
+                (proposedBy('ORG') && isMember(assignment().orgId))
+                || (proposedBy('RECORDER') && recorderSide())
+              )
               && request.resource.data.status == 'WITHDRAWN'
               && changed().hasOnly([
                 'status',
@@ -732,6 +876,21 @@ service cloud.firestore {
               ])
               && request.resource.data.decidedByUid == request.auth.uid
             )
+          ))
+          // E02 · Lịch đã chốt bị thay bằng lịch mới: chỉ đổi sang RESCHEDULED, giữ lại để xem lịch sử
+          || (
+            resource.data.status == 'CONFIRMED'
+            && request.resource.data.status == 'RESCHEDULED'
+            && (isMember(assignment().orgId) || recorderSide())
+            && changed().hasOnly(['status', 'replacedById', 'rescheduledAt'])
+            && request.resource.data.replacedById is string
+            && request.resource.data.replacedById != scheduleId
+            && request.resource.data.rescheduledAt == request.time
+            && getAfter(needPath(assignment().needId)).data.scheduleId
+              == request.resource.data.replacedById
+            && getAfter(
+              schedulePath(assignmentId, request.resource.data.replacedById)
+            ).data.status == 'CONFIRMED'
           );
 
         allow delete: if false;

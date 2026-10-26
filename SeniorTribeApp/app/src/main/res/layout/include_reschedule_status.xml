@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E02 · Lịch đang hẹn và yêu cầu đổi lịch đang chờ (nếu có).
+     Bên nhận yêu cầu do tổ chức gửi là đầu mối: phải tick đồng ý của cụ và ghi cách hỏi ý kiến. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/Needs.Text.SectionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:accessibilityHeading="true"
+        android:drawableStart="@drawable/ic_schedule"
+        android:text="@string/resched_section_current" />
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Needs.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvCurrentSlot"
+                style="@style/Needs.Text.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                tools:text="Thứ 7, 19/10 · 14:00 – 16:00" />
+
+            <TextView
+                android:id="@+id/tvCurrentFormat"
+                style="@style/Needs.Text.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                tools:text="Đến nhà · 2 đoàn viên" />
+
+            <TextView
+                android:id="@+id/tvCurrentMeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="@color/text_hint"
+                android:textSize="12sp"
+                android:visibility="gone"
+                tools:text="Đã đổi lịch 1 lần"
+                tools:visibility="visible" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Yêu cầu đổi lịch đang chờ -->
+    <LinearLayout
+        android:id="@+id/layoutPending"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            style="@style/Needs.Text.SectionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:accessibilityHeading="true"
+            android:drawableStart="@drawable/ic_time"
+            android:text="@string/resched_section_pending" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Needs.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvPendingSlot"
+                    style="@style/Needs.Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/status_scheduled"
+                    android:textStyle="bold"
+                    tools:text="Chủ nhật, 20/10 · 08:00 – 10:00" />
+
+                <TextView
+                    android:id="@+id/tvPendingFormat"
+                    style="@style/Needs.Text.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    tools:text="Đến nhà · 2 đoàn viên" />
+
+                <TextView
+                    android:id="@+id/tvPendingReason"
+                    style="@style/Needs.Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    tools:text="Lý do: thứ 7 đoàn có lịch trực." />
+
+                <TextView
+                    android:id="@+id/tvPendingConsent"
+                    style="@style/Needs.Text.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:visibility="gone"
+                    tools:text="Cụ đã đồng ý giờ mới: Gọi qua con gái"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/tvPendingBy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/text_hint"
+                    android:textSize="12sp"
+                    tools:text="Nguyễn Minh Khoa (tổ chức) gửi · 10:24 18/10/2026" />
+
+                <!-- Đầu mối xác nhận yêu cầu của tổ chức: ghi nhận đồng ý của cụ -->
+                <LinearLayout
+                    android:id="@+id/layoutPendingConsent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/cbPendingAgreed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:text="@string/resched_consent_checkbox"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp"
+                        app:buttonTint="@color/primary" />
+
+                    <TextView
+                        style="@style/Needs.Text.Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@id/etPendingConsent"
+                        android:text="@string/agree_label_consent_method" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilPendingConsent"
+                        style="@style/Needs.Input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:placeholderText="@string/agree_consent_method_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPendingConsent"
+                            style="@style/Needs.InputText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapSentences"
+                            android:maxLength="200" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/tvPendingNote"
+            style="@style/Needs.Note.Info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            tools:text="Lịch cũ vẫn giữ nguyên cho tới khi bên kia xác nhận." />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvClosedNote"
+        style="@style/Needs.Note.Neutral"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        tools:text="Chỉ đổi lịch khi nhu cầu đang ở bước đã hẹn lịch."
+        tools:visibility="visible" />
+</LinearLayout>

@@ -39,6 +39,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public interface OnScheduleClickListener {
         void onScheduleClick();
+
+        /** E02 · Bấm tin hệ thống về yêu cầu đổi lịch. */
+        default void onRescheduleClick() { onScheduleClick(); }
     }
 
     private static final int TYPE_ME = 1;
@@ -54,6 +57,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         String text;             // TYPE_DAY, TYPE_SYSTEM
         @DrawableRes int icon;   // TYPE_SYSTEM
         @ColorRes int fg, bg;    // TYPE_SYSTEM
+        boolean reschedule;      // TYPE_SYSTEM: dòng về đổi lịch (E02)
 
         Row(int type, long at) {
             this.type = type;
@@ -110,27 +114,34 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private void addScheduleRows(List<Row> out, ScheduleSession s) {
         if (s.getStartAtMillis() == 0) return;
         String slot = DateTimeUtils.formatSlot(s.getStartAtMillis(), s.getEndAtMillis());
+        boolean reschedule = s.isReschedule();
 
         Row proposed = new Row(TYPE_SYSTEM, s.getCreatedAtMillis());
-        proposed.text = context.getString(R.string.chat_system_proposed, slot);
+        proposed.text = context.getString(reschedule ? R.string.chat_system_resched_proposed
+                : R.string.chat_system_proposed, slot);
         proposed.icon = R.drawable.ic_schedule;
         proposed.fg = R.color.status_scheduled;
         proposed.bg = R.color.status_scheduled_bg;
+        proposed.reschedule = reschedule;
         out.add(proposed);
 
         long decidedAt = s.getDecidedAtMillis();
         if (decidedAt == 0) return;
-        if (ScheduleSession.CONFIRMED.equals(s.getStatus())) {
+        // Lịch đã chốt rồi được đổi (RESCHEDULED) vẫn hiện dòng "Đã chốt lịch" lúc chốt
+        if (ScheduleSession.CONFIRMED.equals(s.getStatus()) || ScheduleSession.RESCHEDULED.equals(s.getStatus())) {
             Row r = new Row(TYPE_SYSTEM, decidedAt);
-            r.text = context.getString(R.string.chat_system_confirmed, slot);
+            r.reschedule = reschedule;
+            r.text = context.getString(reschedule ? R.string.chat_system_resched_confirmed
+                    : R.string.chat_system_confirmed, slot);
             r.icon = R.drawable.ic_check;
             r.fg = R.color.status_completed;
             r.bg = R.color.status_completed_bg;
             out.add(r);
         } else if (ScheduleSession.DECLINED.equals(s.getStatus())) {
             Row r = new Row(TYPE_SYSTEM, decidedAt);
-            r.text = context.getString(R.string.chat_system_declined,
-                    s.getDeclineReason() != null ? s.getDeclineReason() : "");
+            r.reschedule = reschedule;
+            r.text = context.getString(reschedule ? R.string.chat_system_resched_declined
+                    : R.string.chat_system_declined, s.getDeclineReason() != null ? s.getDeclineReason() : "");
             r.icon = R.drawable.ic_warning;
             r.fg = R.color.warning_text;
             r.bg = R.color.warning_bg;
@@ -186,7 +197,11 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 }
                 vh.tvLabel.setCompoundDrawablesRelative(icon, null, null, null);
                 TextViewCompat.setCompoundDrawableTintList(vh.tvLabel, ColorStateList.valueOf(fg));
-                vh.itemView.setOnClickListener(scheduleListener != null ? v -> scheduleListener.onScheduleClick() : null);
+                final boolean reschedule = row.reschedule;
+                vh.itemView.setOnClickListener(scheduleListener == null ? null : v -> {
+                    if (reschedule) scheduleListener.onRescheduleClick();
+                    else scheduleListener.onScheduleClick();
+                });
             }
         }
     }

@@ -92,6 +92,12 @@
             android:name=".activities.NeedHistoryActivity"
             android:exported="false" />
 
+        <!-- E02 · Đổi lịch sau khi đã chốt -->
+        <activity
+            android:name=".activities.RescheduleActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

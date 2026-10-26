@@ -8,6 +8,11 @@
         android:title="@string/agree_title"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_reschedule"
+        android:icon="@drawable/ic_schedule"
+        android:title="@string/resched_title"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_progress"
         android:icon="@drawable/ic_check"
         android:title="@string/progress_menu"
