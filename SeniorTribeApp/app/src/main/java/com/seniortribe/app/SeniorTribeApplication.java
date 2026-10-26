@@ -17,6 +17,8 @@ import com.seniortribe.app.auth.FirestoreMembershipWatch;
 import com.seniortribe.app.auth.GoogleCredentialSession;
 import com.seniortribe.app.auth.LiveAccessMonitor;
 import com.seniortribe.app.data.MembershipRepository;
+import com.seniortribe.app.notifications.AppNotifier;
+import com.seniortribe.app.notifications.NotificationCenter;
 
 public class SeniorTribeApplication extends Application {
     private AuthRepository authRepository;
@@ -28,6 +30,7 @@ public class SeniorTribeApplication extends Application {
 
     private String authorizedUid;
     private String previousSessionUid;
+    private NotificationCenter notificationCenter;
 
     @Override
     public void onCreate() {
@@ -46,6 +49,10 @@ public class SeniorTribeApplication extends Application {
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         Handler handler = new Handler(Looper.getMainLooper());
+
+        // E01 · Kênh thông báo và listener realtime (chạy khi tài khoản đã được xác nhận quyền)
+        AppNotifier.createChannels(this);
+        notificationCenter = new NotificationCenter(this);
 
         googleCredentialSession = new GoogleCredentialSession(this);
         authRepository = new AuthRepository(auth, db, googleCredentialSession);
@@ -79,6 +86,8 @@ public class SeniorTribeApplication extends Application {
 
             if (user == null && previousSessionUid != null) {
                 googleCredentialSession.clearState();
+                // E01 · Đăng xuất: gỡ thông báo, hủy nhắc lịch và xóa mốc đã xem trên máy
+                notificationCenter.signOut();
             }
 
             previousSessionUid = user == null ? null : user.getUid();
@@ -87,6 +96,11 @@ public class SeniorTribeApplication extends Application {
 
     public AuthRepository getAuthRepository() {
         return authRepository;
+    }
+
+    /** E01 · Thông báo realtime của tài khoản đang đăng nhập. */
+    public NotificationCenter getNotificationCenter() {
+        return notificationCenter;
     }
 
     public GoogleCredentialSession getGoogleCredentialSession() {
@@ -104,6 +118,7 @@ public class SeniorTribeApplication extends Application {
 
         authorizedUid = uid;
         accessMonitor.start(uid);
+        notificationCenter.start(uid);
     }
 
     public void recheckActiveAccess(String uid) {
@@ -122,6 +137,7 @@ public class SeniorTribeApplication extends Application {
     private void dropAccess() {
         authorizedUid = null;
         MembershipRepository.get().clear();
+        if (notificationCenter != null) notificationCenter.stop();
     }
 
     public boolean hasActiveAccess() {

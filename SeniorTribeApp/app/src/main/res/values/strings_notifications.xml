@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E01 · Nhắc lịch và thông báo. -->
+<resources>
+    <!-- Kênh thông báo (hiện trong Cài đặt hệ thống) -->
+    <string name="notif_channel_messages">Tin nhắn phối hợp</string>
+    <string name="notif_channel_messages_desc">Tin nhắn mới trong chat giữa đầu mối và người phụ trách.</string>
+    <string name="notif_channel_schedule">Lịch hẹn và nhắc lịch</string>
+    <string name="notif_channel_schedule_desc">Đề xuất, chốt, đổi lịch và nhắc trước giờ hẹn.</string>
+    <string name="notif_channel_status">Tiếp nhận và trạng thái</string>
+    <string name="notif_channel_status_desc">Nhu cầu được tiếp nhận, trả lại, hủy hoặc hoàn thành.</string>
+    <string name="notif_channel_follow_up">Việc cần theo dõi</string>
+    <string name="notif_channel_follow_up_desc">Nhu cầu chờ rà soát, cần bổ sung hoặc cần đối soát kết quả.</string>
+    <string name="notif_public_text">Có thông báo mới</string>
+
+    <!-- Nội dung -->
+    <string name="notif_need_fallback">Nhu cầu</string>
+    <string name="notif_title_with_code">%1$s · %2$s</string>
+    <string name="notif_by_line">%1$s · %2$s</string>
+    <string name="notif_message_title">Tin nhắn mới · %1$s</string>
+    <string name="notif_message_hidden">%1$s đã gửi tin nhắn mới</string>
+    <string name="notif_message_many">%1$s đã gửi %2$d tin nhắn mới</string>
+    <string name="notif_message_preview">%1$s: %2$s</string>
+    <string name="notif_message_image">[Ảnh]</string>
+    <string name="notif_message_file">[Tệp đính kèm]</string>
+    <string name="notif_remind_day">Ngày mai có lịch hỗ trợ · %1$s</string>
+    <string name="notif_remind_soon">Sắp tới giờ hỗ trợ · %1$s</string>
+
+    <string name="notif_review_needed">Có nhu cầu chờ rà soát</string>
+    <string name="notif_revision_needed">Nhu cầu cần bổ sung</string>
+    <string name="notif_approved">Nhu cầu đã được duyệt</string>
+    <string name="notif_assigned_to_me">Bạn được giao phụ trách</string>
+    <string name="notif_accepted_by_org">Nhu cầu đã có tổ chức tiếp nhận</string>
+    <string name="notif_returned">Tổ chức trả lại nhu cầu</string>
+    <string name="notif_cancelled">Đầu mối đã hủy nhu cầu</string>
+    <string name="notif_schedule_to_answer">Có đề xuất lịch cần hỏi ý kiến cụ</string>
+    <string name="notif_schedule_declined">Đầu mối đề nghị đổi giờ khác</string>
+    <string name="notif_schedule_confirmed">Lịch hẹn đã được chốt</string>
+    <string name="notif_reschedule_to_answer">Có yêu cầu đổi lịch cần trả lời</string>
+    <string name="notif_reschedule_declined">Yêu cầu đổi lịch chưa được nhận</string>
+    <string name="notif_reschedule_withdrawn">Yêu cầu đổi lịch đã được rút lại</string>
+    <string name="notif_rescheduled">Lịch hẹn đã được đổi</string>
+    <string name="notif_reconcile_needed">Tổ chức báo đã hỗ trợ, cần đối soát</string>
+    <string name="notif_reconcile_note">Đầu mối ghi nội dung cần đối soát</string>
+    <string name="notif_completed">Nhu cầu đã hoàn thành</string>
+
+    <!-- Màn hình tùy chọn -->
+    <string name="notif_settings_title">Thông báo &amp; nhắc lịch</string>
+    <string name="notif_settings_entry">Thông báo &amp; nhắc lịch</string>
+    <string name="notif_settings_permission_off">Ứng dụng đang bị tắt thông báo trên máy này nên bạn sẽ không nhận được tin nhắn và nhắc lịch.</string>
+    <string name="notif_settings_open_system">Mở cài đặt thông báo của máy</string>
+    <string name="notif_settings_section_types">Loại thông báo</string>
+    <string name="notif_settings_section_reminders">Nhắc lịch hẹn</string>
+    <string name="notif_settings_section_privacy">Riêng tư</string>
+    <string name="notif_type_messages">Tin nhắn</string>
+    <string name="notif_type_messages_desc">Tin nhắn mới trong chat phối hợp của bạn.</string>
+    <string name="notif_type_schedule">Lịch hẹn</string>
+    <string name="notif_type_schedule_desc">Đề xuất, chốt, đổi lịch và nhắc trước giờ hẹn.</string>
+    <string name="notif_type_status">Tiếp nhận và trạng thái</string>
+    <string name="notif_type_status_desc">Được giao phụ trách, nhu cầu được tiếp nhận, trả lại, hủy, hoàn thành.</string>
+    <string name="notif_type_follow_up">Việc cần theo dõi</string>
+    <string name="notif_type_follow_up_desc">Nhu cầu chờ rà soát, cần bổ sung, cần đối soát kết quả.</string>
+    <string name="notif_remind_day_before">Nhắc trước 1 ngày</string>
+    <string name="notif_remind_hours_label">Nhắc lại trước giờ hẹn</string>
+    <string name="notif_remind_hours_off">Không nhắc</string>
+    <string name="notif_remind_hours_1">1 giờ</string>
+    <string name="notif_remind_hours_2">2 giờ</string>
+    <string name="notif_remind_hours_3">3 giờ</string>
+    <string name="notif_preview">Hiện nội dung tin nhắn</string>
+    <string name="notif_preview_desc">Tắt thì thông báo chỉ ghi "Tên đã gửi tin nhắn mới". Màn hình khóa luôn ẩn nội dung.</string>
+    <string name="notif_settings_how">Khi ứng dụng đang mở, thông báo đến ngay. Khi đã tắt ứng dụng, máy kiểm tra khoảng 15 phút một lần (khi có mạng), nên có thể đến chậm hơn. Nhắc lịch vẫn hoạt động khi không có mạng. Thông báo không chứa tên, địa chỉ hay số điện thoại của người cao tuổi.</string>
+</resources>

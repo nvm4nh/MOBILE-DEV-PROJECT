@@ -20,6 +20,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.seniortribe.app.R;
 import com.seniortribe.app.adapters.ChatAdapter;
 import com.seniortribe.app.models.NeedSummary;
+import com.seniortribe.app.notifications.AppNotifier;
+import com.seniortribe.app.notifications.NotificationCenter;
+import com.seniortribe.app.notifications.NotificationEngine;
 import com.seniortribe.app.utils.Constants;
 import com.seniortribe.app.utils.NeedStatus;
 import com.seniortribe.app.utils.StateView;
@@ -127,6 +130,22 @@ public class ChatActivity extends AppCompatActivity implements ChatAdapter.OnSch
             if (failed != null) restoreDraft(failed);
         });
         viewModel.start(needId, assignmentId);
+    }
+
+    // E01 · Đang xem luồng chat này thì không hiện thông báo tin nhắn của nó, và gỡ thông báo cũ
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String assignmentId = viewModel != null ? viewModel.getAssignmentId() : null;
+        if (assignmentId == null) return;
+        NotificationCenter.setVisibleChat(assignmentId);
+        new AppNotifier(this).cancel(NotificationEngine.chatKey(assignmentId));
+    }
+
+    @Override
+    protected void onPause() {
+        NotificationCenter.setVisibleChat(null);
+        super.onPause();
     }
 
     private void bindViews() {

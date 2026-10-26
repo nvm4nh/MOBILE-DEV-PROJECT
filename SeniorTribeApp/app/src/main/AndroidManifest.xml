@@ -5,6 +5,8 @@
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- E01 · Hiện thông báo tin nhắn, lịch hẹn và nhắc lịch (Android 13+ hỏi người dùng) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".SeniorTribeApplication"
@@ -90,6 +92,11 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.NeedHistoryActivity"
+            android:exported="false" />
+
+        <!-- E01 · Tùy chọn thông báo và nhắc lịch -->
+        <activity
+            android:name=".activities.NotificationSettingsActivity"
             android:exported="false" />
 
         <!-- E02 · Đổi lịch sau khi đã chốt -->

@@ -12,8 +12,18 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+
+import com.seniortribe.app.notifications.DeepLink;
+import com.seniortribe.app.notifications.NotificationPrefs;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigationrail.NavigationRailView;
@@ -30,13 +40,19 @@ import com.seniortribe.app.fragments.ScheduleFragment;
 public class MainActivity extends AppCompatActivity {
     private static final String KEY_SESSION_UID = "KEY_SESSION_UID";
 
-    private boolean redirecting, revalidateOnStart, contentInitialized;
+    private static final String KEY_DEEPLINK_HANDLED = "KEY_DEEPLINK_HANDLED";
+
+    private boolean redirecting, revalidateOnStart, contentInitialized, deepLinkHandled;
     private String sessionUid = "";
     private int currentNavId = R.id.nav_feed;
 
     private SeniorTribeApplication app;
     private View mainContent;
     private LinearLayout accessOverlay;
+
+    // E01 · Xin quyền hiện thông báo (Android 13+), chỉ hỏi một lần; đổi lại trong Cài đặt thông báo
+    private final ActivityResultLauncher<String> notificationPermission =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> { });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (restore) {
             currentNavId = savedInstanceState.getInt("KEY_NAV_ID", R.id.nav_feed);
+            deepLinkHandled = savedInstanceState.getBoolean(KEY_DEEPLINK_HANDLED, false);
         }
 
         contentInitialized = getSupportFragmentManager()
@@ -126,6 +143,8 @@ public class MainActivity extends AppCompatActivity {
             if (!contentInitialized) {
                 contentInitialized = loadFragment(getFragmentForId(currentNavId));
             }
+            openDeepLink();
+            askNotificationPermissionOnce();
         } else {
             openSessionGate();
         }
@@ -200,6 +219,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // =====================================================================
+    // E01 · Mở màn hình từ thông báo
+    // =====================================================================
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (DeepLink.has(intent)) {
+            setIntent(intent);
+            deepLinkHandled = false;
+            if (businessReady()) openDeepLink();
+        }
+    }
+
+    /** Chỉ mở màn hình đích sau khi phiên và quyền tổ chức đã được xác nhận (R01). */
+    private void openDeepLink() {
+        if (!businessReady() || deepLinkHandled) return;
+        Intent target = DeepLink.targetIntent(this, getIntent());
+        DeepLink.clear(getIntent());
+        deepLinkHandled = true; // xoay màn hình tạo lại Activity với intent cũ: không mở lần nữa
+        if (target != null) startActivity(target);
+    }
+
+    private void askNotificationPermissionOnce() {
+        if (Build.VERSION.SDK_INT < 33) return;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED) return;
+        NotificationPrefs prefs = new NotificationPrefs(this);
+        if (prefs.permissionAsked()) return;
+        prefs.markPermissionAsked();
+        notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+    }
+
     private void openSessionGate() {
         if (redirecting) return;
 
@@ -207,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
         showChecking(true);
 
         Intent intent = new Intent(this, SessionGateActivity.class);
+        DeepLink.copy(getIntent(), intent); // giữ đích đến của thông báo qua bước kiểm tra phiên
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
@@ -217,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putInt("KEY_NAV_ID", currentNavId);
         outState.putString(KEY_SESSION_UID, sessionUid);
+        outState.putBoolean(KEY_DEEPLINK_HANDLED, deepLinkHandled);
     }
 
     private void setupNavigation() {

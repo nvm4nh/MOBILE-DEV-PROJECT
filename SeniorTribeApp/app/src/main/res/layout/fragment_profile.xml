@@ -334,6 +334,18 @@
                 android:textAllCaps="false"
                 android:text="@string/st_profile_reload" />
 
+            <!-- E01 · Thông báo & nhắc lịch -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/st_profile_notifications"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:minHeight="52dp"
+                android:textAllCaps="false"
+                app:icon="@drawable/ic_notification"
+                android:text="@string/notif_settings_entry" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

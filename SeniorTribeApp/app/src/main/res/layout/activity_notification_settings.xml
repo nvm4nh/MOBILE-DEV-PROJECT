@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E01 · Thông báo & nhắc lịch: bật/tắt từng loại, mốc nhắc trước giờ hẹn, ẩn nội dung tin nhắn.
+     Một cột cuộn được, dùng chung cho dọc và ngang (công tắc giữ trạng thái qua xoay màn hình). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/surface"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="@string/notif_settings_title" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxWidth="640dp"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Quyền hệ thống -->
+            <LinearLayout
+                android:id="@+id/layoutPermission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/Needs.Note.Warning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/notif_settings_permission_off" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOpenSystem"
+                    style="@style/Needs.Button.Outlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/notif_settings_open_system" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/Needs.Text.SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:accessibilityHeading="true"
+                android:drawableStart="@drawable/ic_notification"
+                android:text="@string/notif_settings_section_types" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Needs.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingVertical="4dp">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swMessages"
+                        style="@style/Notif.Switch"
+                        android:text="@string/notif_type_messages" />
+
+                    <TextView
+                        style="@style/Notif.SwitchHint"
+                        android:text="@string/notif_type_messages_desc" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swSchedule"
+                        style="@style/Notif.Switch"
+                        android:text="@string/notif_type_schedule" />
+
+                    <TextView
+                        style="@style/Notif.SwitchHint"
+                        android:text="@string/notif_type_schedule_desc" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swStatus"
+                        style="@style/Notif.Switch"
+                        android:text="@string/notif_type_status" />
+
+                    <TextView
+                        style="@style/Notif.SwitchHint"
+                        android:text="@string/notif_type_status_desc" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swFollowUp"
+                        style="@style/Notif.Switch"
+                        android:text="@string/notif_type_follow_up" />
+
+                    <TextView
+                        style="@style/Notif.SwitchHint"
+                        android:text="@string/notif_type_follow_up_desc" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                style="@style/Needs.Text.SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:drawableStart="@drawable/ic_schedule"
+                android:text="@string/notif_settings_section_reminders" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Needs.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="12dp">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swRemindDay"
+                        style="@style/Notif.Switch"
+                        android:text="@string/notif_remind_day_before" />
+
+                    <TextView
+                        style="@style/Needs.Text.Label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="@string/notif_remind_hours_label" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipsHours"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        app:selectionRequired="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipHours0"
+                            style="@style/Needs.FilterChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/notif_remind_hours_off" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipHours1"
+                            style="@style/Needs.FilterChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/notif_remind_hours_1" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipHours2"
+                            style="@style/Needs.FilterChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/notif_remind_hours_2" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipHours3"
+                            style="@style/Needs.FilterChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/notif_remind_hours_3" />
+                    </com.google.android.material.chip.ChipGroup>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                style="@style/Needs.Text.SectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:drawableStart="@drawable/ic_lock"
+                android:text="@string/notif_settings_section_privacy" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Needs.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="8dp">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swPreview"
+                        style="@style/Notif.Switch"
+                        android:text="@string/notif_preview" />
+
+                    <TextView
+                        style="@style/Notif.SwitchHint"
+                        android:text="@string/notif_preview_desc" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                style="@style/Needs.Note.Info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/notif_settings_how" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
