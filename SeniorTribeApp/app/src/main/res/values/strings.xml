@@ -36,6 +36,9 @@
     <!-- Feed -->
     <string name="feed_title">Bảng tin cộng đồng</string>
     <string name="feed_offline_notice">Đang xem dữ liệu ngoại tuyến đã lưu (SQLite cache)</string>
+    <string name="feed_empty_title">Chưa có bài đăng</string>
+    <string name="feed_empty_message">Bài đăng của các tổ chức trong mạng lưới sẽ hiện ở đây.</string>
+    <string name="feed_offline_empty_message">Bạn đang ngoại tuyến và chưa có bài đăng nào được lưu trên máy. Kết nối mạng rồi thử lại.</string>
     <string name="btn_create_post">Đăng bài viết mới</string>
     <string name="post_title_hint">Tiêu đề bài viết hoạt động</string>
     <string name="post_content_hint">Chia sẻ hoạt động thăm hỏi, hỗ trợ người cao tuổi...</string>

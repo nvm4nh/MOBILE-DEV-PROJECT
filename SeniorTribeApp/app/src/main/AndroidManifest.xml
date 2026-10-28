@@ -47,11 +47,10 @@
             android:name=".activities.SessionGateActivity"
             android:exported="false" />
 
-        <!-- Main Screen -->
+        <!-- Main Screen: tạo lại khi xoay để dùng layout-land (navRail); tab được khôi phục qua onSaveInstanceState. -->
         <activity
             android:name=".activities.MainActivity"
-            android:exported="false"
-            android:configChanges="orientation|screenSize" />
+            android:exported="false" />
 
         <!-- Needs Management Activities -->
         <activity

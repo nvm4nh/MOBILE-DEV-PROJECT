@@ -27,6 +27,7 @@ import com.seniortribe.app.database.AppDatabaseHelper;
 import com.seniortribe.app.models.Post;
 import com.seniortribe.app.utils.Constants;
 import com.seniortribe.app.utils.NetworkUtils;
+import com.seniortribe.app.utils.StateView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnPostClickLis
     private RecyclerView rvPosts;
     private TextView tvOfflineNotice;
     private FloatingActionButton fabCreatePost;
+    private StateView stateView;
 
     private PostAdapter adapter;
     private AppDatabaseHelper dbHelper;
@@ -51,6 +53,7 @@ public class FeedFragment extends Fragment implements PostAdapter.OnPostClickLis
         rvPosts = view.findViewById(R.id.rvPosts);
         tvOfflineNotice = view.findViewById(R.id.tvOfflineNotice);
         fabCreatePost = view.findViewById(R.id.fabCreatePost);
+        stateView = new StateView(view.findViewById(R.id.frameFeed));
 
         dbHelper = AppDatabaseHelper.getInstance(requireContext());
         try { firestore = FirebaseFirestore.getInstance(); } catch (Exception ignored) {}
@@ -78,14 +81,12 @@ public class FeedFragment extends Fragment implements PostAdapter.OnPostClickLis
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!isAdded()) return;
                     List<Post> posts = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Post p = doc.toObject(Post.class);
                         p.setId(doc.getId());
                         posts.add(p);
-                    }
-                    if (posts.isEmpty()) {
-                        posts = getSamplePosts();
                     }
                     // Tự động lưu cache bài viết vào SQLite
                     dbHelper.savePosts(posts);
@@ -93,35 +94,31 @@ public class FeedFragment extends Fragment implements PostAdapter.OnPostClickLis
                     adapter.setPosts(posts);
                     tvOfflineNotice.setVisibility(View.GONE);
                     swipeRefresh.setRefreshing(false);
+                    if (posts.isEmpty()) {
+                        stateView.showMessage(R.drawable.ic_feed, getString(R.string.feed_empty_title),
+                                getString(R.string.feed_empty_message), null, null);
+                    } else {
+                        stateView.hide();
+                    }
                 })
-                .addOnFailureListener(e -> loadFromOfflineCache());
+                .addOnFailureListener(e -> {
+                    if (isAdded()) loadFromOfflineCache();
+                });
     }
 
     private void loadFromOfflineCache() {
         List<Post> cached = dbHelper.getAllCachedPosts();
-        if (cached.isEmpty()) {
-            cached = getSamplePosts();
-            dbHelper.savePosts(cached);
-        }
         adapter.setPosts(cached);
-        tvOfflineNotice.setVisibility(View.VISIBLE);
         swipeRefresh.setRefreshing(false);
-    }
-
-    private List<Post> getSamplePosts() {
-        List<Post> list = new ArrayList<>();
-        Post p1 = new Post("1", "Chuyến thăm và tặng quà các cụ già neo đơn tại Quận 8",
-                "Đoàn thiện nguyện đã đến thăm, tặng 30 suất quà dinh dưỡng và trò chuyện thân mật cùng các cụ có hoàn cảnh khó khăn tại địa bàn Phường 3.",
-                "DNXH Vầng Trăng Khuyết", "admin_01");
-        p1.setLikesCount(28);
-        list.add(p1);
-
-        Post p2 = new Post("2", "Kêu gọi tình nguyện viên hỗ trợ chăm sóc sức khỏe người cao tuổi",
-                "Dự án kết hợp cùng HelpAge Việt Nam nhằm mở rộng mạng lưới chăm sóc sức khỏe, hỗ trợ việc nhà và kiểm tra y tế định kỳ cho người già neo đơn.",
-                "Hội Chữ thập đỏ TP.HCM", "admin_02");
-        p2.setLikesCount(45);
-        list.add(p2);
-        return list;
+        if (cached.isEmpty()) {
+            tvOfflineNotice.setVisibility(View.GONE);
+            stateView.showError(getString(R.string.state_error_title),
+                    getString(R.string.feed_offline_empty_message),
+                    getString(R.string.action_retry), v -> loadPosts());
+        } else {
+            tvOfflineNotice.setVisibility(View.VISIBLE);
+            stateView.hide();
+        }
     }
 
     @Override
