@@ -3,6 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Permissions -->
+    <!-- E09 · Gửi kèm vị trí hiện tại trong báo khẩn (chỉ khi người dùng chọn) -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <!-- E09 · Hiện báo khẩn của bên cùng phối hợp (Android 13+ hỏi người dùng) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- E01 · Hiện thông báo tin nhắn, lịch hẹn và nhắc lịch (Android 13+ hỏi người dùng) -->
@@ -72,6 +79,21 @@
             android:exported="false" />
         <activity
             android:name=".activities.ReviewNeedActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- E08 · Tìm kiếm chung, cỡ chữ & giao diện -->
+        <activity
+            android:name=".activities.SearchActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".activities.DisplaySettingsActivity"
+            android:exported="false" />
+
+        <!-- E09 · Khẩn cấp (SOS) -->
+        <activity
+            android:name=".activities.SosActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 

@@ -117,6 +117,14 @@ public class ProfileFragment extends Fragment {
         view.findViewById(R.id.st_profile_copy_uid)
                 .setOnClickListener(v -> copyUid());
 
+        // E08 · Cỡ chữ & giao diện, E09 · Khẩn cấp
+        view.findViewById(R.id.st_profile_display)
+                .setOnClickListener(v -> startActivity(new Intent(requireContext(),
+                        com.seniortribe.app.activities.DisplaySettingsActivity.class)));
+        view.findViewById(R.id.st_profile_sos)
+                .setOnClickListener(v -> startActivity(new Intent(requireContext(),
+                        com.seniortribe.app.activities.SosActivity.class)));
+
         view.findViewById(R.id.st_profile_change_password)
                 .setOnClickListener(v -> {
                     if (!canOpenSecurityDialog()) return;
