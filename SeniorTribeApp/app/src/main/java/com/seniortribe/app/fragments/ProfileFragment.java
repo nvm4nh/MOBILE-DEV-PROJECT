@@ -114,6 +114,11 @@ public class ProfileFragment extends Fragment {
                 .setOnClickListener(v -> startActivity(new Intent(requireContext(),
                         com.seniortribe.app.activities.NotificationSettingsActivity.class)));
 
+        // E05 · Trợ lý SeniorTribe
+        view.findViewById(R.id.btnOpenAssistant)
+                .setOnClickListener(v -> startActivity(new Intent(requireContext(),
+                        com.seniortribe.app.activities.AssistantActivity.class)));
+
         view.findViewById(R.id.st_profile_copy_uid)
                 .setOnClickListener(v -> copyUid());
 

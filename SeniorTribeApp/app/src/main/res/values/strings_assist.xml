@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E04 · Nhập bằng giọng nói · E05 · Trợ lý gợi ý (chạy ngay trên máy, không gửi nội dung ra ngoài) -->
+<resources>
+    <!-- E04 · Nút dưới ô Nội dung -->
+    <string name="voice_action_speak">Nói để nhập nội dung</string>
+    <string name="voice_action_speak_again">Nói lại</string>
+    <string name="voice_action_undo">Hoàn tác</string>
+    <string name="voice_inserted_note">Đã chèn nội dung từ giọng nói. Hãy đọc lại và sửa trước khi gửi rà soát.</string>
+    <string name="voice_audio_note">Âm thanh chỉ dùng để chuyển thành chữ và không được lưu lại sau khi chèn.</string>
+    <string name="voice_undone">Đã hoàn tác nội dung vừa chèn.</string>
+    <string name="voice_truncated">Nội dung dài quá 1000 ký tự nên đã cắt bớt phần cuối.</string>
+
+    <!-- E04 · Bảng đang nghe -->
+    <string name="voice_listening">Đang nghe…</string>
+    <string name="voice_preparing">Đang mở micro…</string>
+    <string name="voice_processing">Đang chuyển thành chữ…</string>
+    <string name="voice_stopped">Đã dừng nghe</string>
+    <string name="voice_error_title">Chưa nghe rõ</string>
+    <string name="voice_meta">Tiếng Việt · %1$s</string>
+    <string name="voice_transcript_label">Chữ đang nhận</string>
+    <string name="voice_transcript_empty">Hãy nói nội dung nhu cầu: cụ cần hỗ trợ việc gì, khi nào…</string>
+    <string name="voice_privacy_warning">Đừng đọc tên, địa chỉ hay số điện thoại của cụ. Thông tin riêng nhập ở mục riêng.</string>
+    <string name="voice_stop">Dừng</string>
+    <string name="voice_continue">Nói tiếp</string>
+    <string name="voice_use">Dùng nội dung</string>
+    <string name="voice_mic_desc">Micro. Chạm để dừng hoặc nói tiếp</string>
+    <string name="voice_error_no_match">Không nhận được lời nói. Hãy nói gần micro hơn rồi bấm “Nói tiếp”.</string>
+    <string name="voice_error_network">Không kết nối được dịch vụ nhận giọng nói. Kiểm tra mạng hoặc gõ nội dung.</string>
+    <string name="voice_error_busy">Micro đang bận. Hãy thử lại sau giây lát.</string>
+    <string name="voice_error_permission">Ứng dụng chưa được dùng micro.</string>
+    <string name="voice_error_generic">Có lỗi khi nhận giọng nói. Hãy thử lại hoặc gõ nội dung.</string>
+    <string name="voice_not_available">Máy chưa hỗ trợ nhận giọng nói tiếng Việt. Bạn vẫn có thể gõ nội dung.</string>
+    <string name="voice_permission_title">Cho phép dùng micro</string>
+    <string name="voice_permission_message">SeniorTribe dùng micro để chuyển lời nói thành chữ trong ô nội dung. Âm thanh không được lưu lại.</string>
+    <string name="voice_permission_allow">Cho phép</string>
+    <string name="voice_permission_denied">Cần quyền micro để nhập bằng giọng nói. Bạn vẫn có thể gõ nội dung.</string>
+    <string name="voice_open_settings">Cài đặt</string>
+    <string name="voice_prompt">Nói nội dung nhu cầu</string>
+
+    <!-- E05 · Gợi ý viết lại nội dung -->
+    <string name="ai_action_rewrite">Nhờ trợ lý viết lại</string>
+    <string name="ai_suggestion_title">Gợi ý của trợ lý</string>
+    <string name="ai_skip">Bỏ qua</string>
+    <string name="ai_use">Dùng gợi ý</string>
+    <string name="ai_used">Đã dùng gợi ý. Hãy đọc lại trước khi gửi.</string>
+    <string name="ai_empty_content">Hãy nhập hoặc nói nội dung trước, trợ lý sẽ gợi ý cách viết rõ hơn.</string>
+    <string name="ai_disclaimer">Trợ lý chỉ gợi ý câu chữ. Không tự duyệt hoàn cảnh, sự đồng ý hay quyền tổ chức; người nhập chịu trách nhiệm nội dung gửi đi.</string>
+    <string name="ai_change_abbrev">Viết đầy đủ chữ viết tắt (%1$s).</string>
+    <string name="ai_change_style">Viết hoa đầu câu và thêm dấu câu cho dễ đọc.</string>
+    <string name="ai_change_phone">Đã bỏ số điện thoại khỏi nội dung chung. Hãy nhập ở mục Thông tin riêng.</string>
+    <string name="ai_change_address">Đã bỏ địa chỉ khỏi nội dung chung. Hãy nhập ở mục Thông tin riêng.</string>
+    <string name="ai_change_address_phone">Đã bỏ địa chỉ và số điện thoại khỏi nội dung chung. Hãy nhập ở mục Thông tin riêng.</string>
+    <string name="ai_change_name">Đã thay tên cụ bằng “cụ”. Tên chỉ ghi ở mục Thông tin riêng.</string>
+    <string name="ai_hint_time">Nên ghi thời gian mong muốn, ví dụ “sáng thứ 3 hoặc thứ 5”.</string>
+    <string name="ai_hint_detail">Nên mô tả rõ cụ cần hỗ trợ việc gì, bao lâu một lần.</string>
+    <string name="ai_no_change">Nội dung đã rõ ràng, không cần sửa.</string>
+
+    <!-- E05 · Trợ lý SeniorTribe -->
+    <string name="assistant_title">Trợ lý SeniorTribe</string>
+    <string name="assistant_open">Trợ lý SeniorTribe</string>
+    <string name="assistant_open_hint">Hỏi cách thao tác, gợi ý nhu cầu phù hợp</string>
+    <string name="assistant_input_hint">Hỏi trợ lý…</string>
+    <string name="assistant_send">Gửi câu hỏi</string>
+    <string name="assistant_voice">Nói câu hỏi</string>
+    <string name="assistant_typing">Trợ lý đang tìm…</string>
+</resources>

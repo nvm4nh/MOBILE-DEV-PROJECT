@@ -114,6 +114,9 @@
             android:minLines="4" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- E04, E05 · Nói để nhập nội dung / Nhờ trợ lý viết lại -->
+    <include layout="@layout/include_need_form_assist" />
+
     <TextView
         style="@style/Needs.Text.Label"
         android:layout_width="wrap_content"
