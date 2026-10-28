@@ -111,6 +111,8 @@ public class NeedRepository {
 
             Map<String, Object> counterData = new HashMap<>();
             counterData.put("next", number + 1);
+            // Security Rules dùng lastNeedId để chỉ cho tăng bộ đếm khi tạo nhu cầu thật
+            counterData.put("lastNeedId", needRef.getId());
 
             tx.set(counterRef, counterData);
             tx.set(needRef, summary);

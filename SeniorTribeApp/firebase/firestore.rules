@@ -26,6 +26,14 @@ service cloud.firestore {
         && get(membershipPath(request.auth.uid, orgId)).data.active == true;
     }
 
+    // Cờ mạng lưới memberships/{uid} { active } do quản trị ghi: true khi tài khoản đang có
+    // ít nhất một quyền tổ chức còn hiệu lực. Dùng khi không biết trước orgId (R02).
+    function inNetwork() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/memberships/$(request.auth.uid))
+        && get(/databases/$(database)/documents/memberships/$(request.auth.uid)).data.active == true;
+    }
+
     function hasRole(orgId, role) {
       return isMember(orgId)
         && role in get(
@@ -148,6 +156,11 @@ service cloud.firestore {
     // TỔ CHỨC VÀ PHÂN QUYỀN
     // ================================================================
 
+    match /memberships/{uid} {
+      allow get: if owns(uid);
+      allow list, write: if false;
+    }
+
     match /memberships/{uid}/organizations/{organizationId} {
       allow get, list: if owns(uid);
       allow create, update, delete: if false;
@@ -221,7 +234,7 @@ service cloud.firestore {
     function canReadNeed(d) {
       return signedIn()
         && (
-          d.status == 'OPEN'
+          (d.status == 'OPEN' && inNetwork())
           || isMember(d.recorderOrgId)
           || isMember(d.get('assignedOrgId', '-'))
         );
@@ -274,6 +287,9 @@ service cloud.firestore {
         && request.resource.data.returnCount == 0
         && request.resource.data.createdAt == request.time
         && request.resource.data.caseCode is string
+        && getAfter(
+          /databases/$(database)/documents/counters/needs
+        ).data.get('lastNeedId', null) == needId
         && validSummary(request.resource.data);
 
       allow update: if signedIn()
@@ -333,7 +349,9 @@ service cloud.firestore {
           && d.status == 'ACCEPTED'
           && hasRole(d.assignedOrgId, 'REPRESENTATIVE')
           && d.acceptedByUid == request.auth.uid
+          && d.assigneeUid is string
           && exists(membershipPath(d.assigneeUid, d.assignedOrgId))
+          && get(membershipPath(d.assigneeUid, d.assignedOrgId)).data.active == true
           && d.currentAssignmentId is string
           && existsAfter(assignmentPath(d.currentAssignmentId))
           && changed().hasOnly([
@@ -356,6 +374,7 @@ service cloud.firestore {
         return resource.data.status in ['ACCEPTED', 'SCHEDULED']
           && hasRole(resource.data.assignedOrgId, 'REPRESENTATIVE')
           && d.status == 'OPEN'
+          && isText(d.get('lastReturnReason', null), 1, 200)
           && d.assignedOrgId == null
           && d.assigneeUid == null
           && d.currentAssignmentId == null
@@ -541,10 +560,34 @@ service cloud.firestore {
       match /events/{eventId} {
         allow read: if canReadNeed(get(needPath(needId)).data);
 
+        // Sự kiện ghi cùng lúc với thay đổi nhu cầu: chỉ đơn vị ghi nhận hoặc tổ chức phụ trách
+        // (kể cả tổ chức vừa trả lại) được ghi, và toStatus phải khớp trạng thái sau khi ghi.
         allow create: if signedIn()
+          && request.resource.data.keys().hasOnly([
+            'type',
+            'fromStatus',
+            'toStatus',
+            'byUid',
+            'byName',
+            'byOrgId',
+            'note',
+            'at'
+          ])
+          && isText(request.resource.data.type, 1, 40)
           && request.resource.data.byUid == request.auth.uid
           && isMember(request.resource.data.byOrgId)
-          && request.resource.data.at == request.time;
+          && request.resource.data.at == request.time
+          && request.resource.data.toStatus == getAfter(needPath(needId)).data.status
+          && (
+            request.resource.data.byOrgId == getAfter(needPath(needId)).data.recorderOrgId
+            || request.resource.data.byOrgId
+              == getAfter(needPath(needId)).data.get('assignedOrgId', '-')
+            || (
+              exists(needPath(needId))
+              && request.resource.data.byOrgId
+                == get(needPath(needId)).data.get('assignedOrgId', '-')
+            )
+          );
 
         allow update, delete: if false;
       }
@@ -632,14 +675,25 @@ service cloud.firestore {
           'endedAt'
         ])
         && request.resource.data.endedByUid == request.auth.uid
+        && isText(request.resource.data.endReason, 1, 300)
+        && (
+          request.resource.data.get('endNote', null) == null
+          || isText(request.resource.data.endNote, 1, 1000)
+        )
+        // Kết thúc lần tiếp nhận phải đi cùng thay đổi của nhu cầu trong cùng transaction,
+        // không để lần tiếp nhận đóng mà nhu cầu vẫn trỏ tới nó.
         && (
           (
             request.resource.data.status == 'RETURNED'
             && hasRole(resource.data.orgId, 'REPRESENTATIVE')
+            && getAfter(needPath(resource.data.needId)).data.status == 'OPEN'
+            && getAfter(needPath(resource.data.needId)).data.currentAssignmentId == null
           )
           || (
             request.resource.data.status == 'CLOSED'
             && hasRole(resource.data.recorderOrgId, 'RECORDER')
+            && getAfter(needPath(resource.data.needId)).data.status
+              in ['CANCELLED', 'COMPLETED']
           )
         );
 
@@ -1210,15 +1264,24 @@ service cloud.firestore {
     // BỘ ĐẾM MÃ NHU CẦU
     // ================================================================
 
+    // Bộ đếm chỉ tăng khi đầu mối tạo nhu cầu mới trong cùng transaction (lastNeedId).
+    function counterBumpedByRecorder() {
+      let d = request.resource.data;
+
+      return d.keys().hasOnly(['next', 'lastNeedId'])
+        && d.lastNeedId is string
+        && !exists(needPath(d.lastNeedId))
+        && existsAfter(needPath(d.lastNeedId))
+        && hasRole(getAfter(needPath(d.lastNeedId)).data.recorderOrgId, 'RECORDER');
+    }
+
     match /counters/needs {
       allow read: if signedIn();
 
-      allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['next'])
+      allow create: if counterBumpedByRecorder()
         && request.resource.data.next == 2;
 
-      allow update: if signedIn()
-        && request.resource.data.keys().hasOnly(['next'])
+      allow update: if counterBumpedByRecorder()
         && request.resource.data.next == resource.data.next + 1;
     }
 
