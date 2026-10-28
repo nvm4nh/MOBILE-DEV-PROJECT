@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E09 · Khung cảnh báo đỏ nhạt (không phải dịch vụ cứu hộ). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/sos_red_bg" />
+    <stroke android:width="1dp" android:color="@color/sos_red" />
+    <corners android:radius="12dp" />
+</shape>
