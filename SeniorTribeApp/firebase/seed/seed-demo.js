@@ -104,6 +104,15 @@ async function main() {
     console.log('✓ Quyền', m.email, '→', m.orgId, m.roles.join(', '));
   }
 
+  // Cờ mạng lưới: Security Rules chỉ cho xem nhu cầu OPEN khi memberships/{uid}.active == true.
+  // Khi tắt hết quyền tổ chức của một tài khoản thì đặt lại cờ này thành false.
+  for (const uid of new Set(members.map((m) => m.uid))) {
+    await db.doc(`memberships/${uid}`).set({
+      active: true,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+  }
+
   if (!config.createSampleNeeds) return;
   const recorder = members.find((m) => m.roles.includes('RECORDER'));
   if (!recorder) {

@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Kiểm thử Firestore Security Rules của SeniorTribe trên Firebase Emulator",
   "scripts": {
-    "test": "firebase emulators:exec --only firestore --config ../firebase.json --project demo-seniortribe \"node --test\""
+    "test": "firebase emulators:exec --only firestore --config ../firebase.json --project demo-seniortribe \"node --test --test-concurrency=1\""
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^3.0.4",
