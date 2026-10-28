@@ -43,6 +43,7 @@ Phần dùng chung:
 
 | Collection / document | Ai ghi | Nội dung chính |
 |---|---|---|
+| `memberships/{uid}` | Quản trị (seed) | `active`: true khi tài khoản còn ít nhất một quyền tổ chức; rules dùng cờ này để chỉ cho mạng lưới xem nhu cầu OPEN (R02) |
 | `memberships/{uid}/organizations/{orgId}` | Quản trị (seed) | `orgName`, `roles: [RECORDER, REVIEWER, REPRESENTATIVE]`, `active` |
 | `organizations/{orgId}` | Quản trị | `name`, `area`, `verified` |
 | `organizations/{orgId}/members/{uid}` | Quản trị | `displayName`, `roles`, `active` (để chọn người phụ trách) |
