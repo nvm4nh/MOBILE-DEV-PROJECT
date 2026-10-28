@@ -29,4 +29,10 @@
         android:icon="@drawable/ic_time"
         android:title="@string/history_title"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_report_need"
+        android:icon="@drawable/ic_flag"
+        android:title="@string/action_report_need"
+        android:visible="false"
+        app:showAsAction="never" />
 </menu>

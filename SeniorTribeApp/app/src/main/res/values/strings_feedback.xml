@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E03 · Đánh giá sau hỗ trợ và xử lý phản ánh -->
+<resources>
+    <!-- Lối vào -->
+    <string name="detail_action_rate">Đánh giá tổ chức</string>
+    <string name="action_report_need">Gửi phản ánh</string>
+    <string name="ui_open_reports">Phản ánh</string>
+
+    <!-- Đánh giá -->
+    <string name="rate_title">Đánh giá · %1$s</string>
+    <string name="rate_title_plain">Đánh giá</string>
+    <string name="rate_completed_on">Hoàn thành %1$s</string>
+    <string name="rate_assignee">Đại diện: %1$s</string>
+    <string name="rate_question">Cụ có hài lòng không?</string>
+    <string name="rate_star_desc">%1$d sao</string>
+    <string name="rate_hint_elder">Chọn theo ý kiến của cụ, không phải của bạn.</string>
+    <string name="rate_level_0">Chạm vào ngôi sao để chọn</string>
+    <string name="rate_level_1">Rất không hài lòng</string>
+    <string name="rate_level_2">Chưa hài lòng</string>
+    <string name="rate_level_3">Bình thường</string>
+    <string name="rate_level_4">Hài lòng</string>
+    <string name="rate_level_5">Rất hài lòng</string>
+    <string name="rate_good_label">Điều cụ thấy tốt</string>
+    <string-array name="rate_tags">
+        <item>Đúng giờ</item>
+        <item>Nhiệt tình</item>
+        <item>Trò chuyện vui</item>
+        <item>Giữ riêng tư</item>
+        <item>Báo trước khi đến</item>
+        <item>Làm đúng việc đã hẹn</item>
+    </string-array>
+    <string name="rate_comment_label">Nhận xét (không bắt buộc)</string>
+    <string name="rate_comment_hint">Ví dụ: hai bạn đến đúng giờ, cụ mong tháng sau gặp lại.</string>
+    <string name="rate_elder_asked">Đã hỏi ý kiến cụ trước khi đánh giá</string>
+    <string name="rate_privacy">Đánh giá chỉ đơn vị ghi nhận, tổ chức được đánh giá và điều phối viên xem; không hiện trên bảng tin.</string>
+    <string name="rate_submit">Gửi đánh giá</string>
+    <string name="rate_report_link">Có vấn đề? Gửi phản ánh</string>
+    <string name="rate_error_stars">Hãy chọn số sao theo ý kiến của cụ.</string>
+    <string name="rate_error_elder">Hãy hỏi ý kiến cụ và đánh dấu ô này trước khi gửi.</string>
+    <string name="rate_done">Đã gửi đánh giá. Cảm ơn bạn!</string>
+    <string name="rate_already">Đã đánh giá %1$s · %2$s</string>
+    <string name="rate_not_allowed">Chỉ đầu mối của đơn vị ghi nhận mới đánh giá được, sau khi nhu cầu hoàn thành.</string>
+
+    <!-- Gửi phản ánh -->
+    <string name="report_title">Gửi phản ánh</string>
+    <string name="report_related_label">Liên quan</string>
+    <string name="report_related_value">%1$s · %2$s</string>
+    <string name="report_type_label">Loại phản ánh</string>
+    <string name="report_type_late">Không đến đúng lịch hẹn</string>
+    <string name="report_type_attitude">Thái độ chưa phù hợp với cụ</string>
+    <string name="report_type_privacy">Chia sẻ thông tin riêng sai phạm vi</string>
+    <string name="report_type_other">Khác</string>
+    <string name="report_desc_label">Mô tả sự việc</string>
+    <string name="report_desc_hint">Chuyện gì đã xảy ra, vào lúc nào? Không cần ghi tên hay địa chỉ của cụ.</string>
+    <string name="report_privacy">Phản ánh gửi tới điều phối viên của đơn vị ghi nhận. Tổ chức bị phản ánh chỉ được báo khi điều phối viên bắt đầu xử lý.</string>
+    <string name="report_submit">Gửi phản ánh</string>
+    <string name="report_error_type">Hãy chọn loại phản ánh.</string>
+    <string name="report_error_desc">Hãy mô tả sự việc (ít nhất 10 ký tự).</string>
+    <string name="report_sent">Đã gửi phản ánh. Theo dõi kết quả trong mục Phản ánh ở tab Nhu cầu.</string>
+    <string name="feedback_phone_warning">Nội dung có vẻ chứa số điện thoại. Hãy bỏ thông tin riêng trước khi gửi.</string>
+    <string name="report_not_allowed">Chỉ đơn vị ghi nhận hoặc tổ chức đang phụ trách nhu cầu này mới gửi phản ánh được.</string>
+
+    <!-- Danh sách phản ánh -->
+    <string name="reports_title">Phản ánh</string>
+    <string name="reports_mode_handle">Cần xử lý</string>
+    <string name="reports_mode_handle_count">Cần xử lý · %1$d</string>
+    <string name="reports_mode_mine">Tôi đã gửi</string>
+    <string name="reports_empty_handle_title">Chưa có phản ánh cần xử lý</string>
+    <string name="reports_empty_handle_message">Phản ánh về các lần hỗ trợ của đơn vị sẽ hiện ở đây.</string>
+    <string name="reports_empty_mine_title">Bạn chưa gửi phản ánh nào</string>
+    <string name="reports_empty_mine_message">Gửi phản ánh từ màn hình chi tiết nhu cầu: menu ⋮ → Gửi phản ánh.</string>
+    <string name="reports_no_membership">Tài khoản chưa được cấp quyền tổ chức nên chưa xem được phản ánh.</string>
+    <string name="report_status_new">Mới</string>
+    <string name="report_status_in_progress">Đang xử lý</string>
+    <string name="report_status_closed">Đã đóng</string>
+    <string name="report_item_meta">%1$s · về %2$s</string>
+    <string name="report_item_time">Cập nhật %1$s</string>
+
+    <!-- Chi tiết phản ánh -->
+    <string name="report_detail_title">Phản ánh · %1$s</string>
+    <string name="report_sent_by">Gửi %1$s · %2$s</string>
+    <string name="report_about">Về tổ chức: %1$s</string>
+    <string name="report_related_need">Nhu cầu %1$s</string>
+    <string name="report_timeline">Quá trình xử lý</string>
+    <string name="report_timeline_empty">Đang chờ điều phối viên của đơn vị ghi nhận tiếp nhận.</string>
+    <string name="report_note_start">Tiếp nhận phản ánh</string>
+    <string name="report_note_ask">Hỏi thêm</string>
+    <string name="report_note_info">Bổ sung thông tin</string>
+    <string name="report_note_close">Đóng phản ánh</string>
+    <string name="report_note_by">%1$s · %2$s · %3$s</string>
+    <string name="report_role_reviewer">Điều phối viên</string>
+    <string name="report_role_reporter">Người phản ánh</string>
+    <string name="report_resolution_label">Kết quả xử lý</string>
+    <string name="report_resolution_hint">Ghi rõ đã làm gì và quyết định tiếp theo.</string>
+    <string name="report_resolution_error">Hãy ghi kết quả xử lý (ít nhất 5 ký tự).</string>
+    <string name="report_action_start">Tiếp nhận xử lý</string>
+    <string name="report_action_ask">Hỏi thêm</string>
+    <string name="report_action_close">Đóng phản ánh</string>
+    <string name="report_action_add_info">Bổ sung thông tin</string>
+    <string name="report_ask_title">Hỏi thêm người phản ánh</string>
+    <string name="report_ask_hint">Nội dung cần hỏi</string>
+    <string name="report_info_title">Bổ sung thông tin</string>
+    <string name="report_info_hint">Nội dung bổ sung</string>
+    <string name="report_send">Gửi</string>
+    <string name="report_close_confirm_title">Đóng phản ánh?</string>
+    <string name="report_close_confirm_message">Người phản ánh và tổ chức liên quan sẽ thấy kết quả xử lý. Phản ánh đã đóng không mở lại được.</string>
+    <string name="report_rules_note">Phản ánh không tự khóa tổ chức. Mọi quyết định do điều phối viên ghi rõ lý do và được lưu lại.</string>
+    <string name="report_closed_on">Đã đóng %1$s · %2$s</string>
+</resources>

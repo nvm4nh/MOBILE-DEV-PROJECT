@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E07 · Chi tiết sự kiện: thông tin, số chỗ, tổ chức đã đăng ký, đăng ký tham gia. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootEventDetail"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/surface"
+        app:navigationContentDescription="@string/action_back"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="@string/event_detail_title"
+        app:titleTextColor="@color/text_primary" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressBusy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:indicatorColor="@color/primary" />
+
+    <FrameLayout
+        android:id="@+id/frameEventDetail"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollEventDetail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="16dp">
+
+                <TextView
+                    android:id="@+id/tvEventTitle"
+                    style="@style/Needs.Text.ScreenTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Ngày hội sức khỏe người cao tuổi" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvOrgAvatar"
+                        style="@style/Post.Avatar"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:textSize="13sp"
+                        tools:text="CT" />
+
+                    <TextView
+                        android:id="@+id/tvEventOrg"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        tools:text="Hội CTĐ Quận 3" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvEventNote"
+                    style="@style/Needs.Note.Warning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:drawableStart="@drawable/ic_info"
+                    android:visibility="gone"
+                    tools:text="Sự kiện đã bị hủy."
+                    tools:visibility="visible" />
+
+                <!-- Khi nào, ở đâu, ai tham gia -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Needs.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:id="@+id/tvEventWhen"
+                            style="@style/Needs.Text.Body"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:drawableStart="@drawable/ic_schedule"
+                            android:drawablePadding="10dp"
+                            android:drawableTint="@color/text_secondary"
+                            android:gravity="center_vertical"
+                            tools:text="Thứ Bảy, 26/10/2026 · 08:00 – 11:00" />
+
+                        <TextView
+                            android:id="@+id/tvEventWhere"
+                            style="@style/Needs.Text.Body"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:drawableStart="@drawable/ic_place"
+                            android:drawablePadding="10dp"
+                            android:drawableTint="@color/text_secondary"
+                            android:gravity="center_vertical"
+                            tools:text="Nhà văn hóa Phường 7, Quận 3" />
+
+                        <TextView
+                            android:id="@+id/tvEventWho"
+                            style="@style/Needs.Text.Body"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:drawableStart="@drawable/ic_groups"
+                            android:drawablePadding="10dp"
+                            android:drawableTint="@color/text_secondary"
+                            android:gravity="center_vertical"
+                            tools:text="Thành viên các tổ chức trong mạng lưới" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Số chỗ và danh sách đăng ký -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Needs.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/Needs.Text.Label"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/event_registered_label" />
+
+                            <TextView
+                                android:id="@+id/tvEventCapacity"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_primary"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                tools:text="18/40 chỗ" />
+                        </LinearLayout>
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progressCapacity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:max="100"
+                            app:indicatorColor="@color/primary"
+                            app:trackColor="@color/surface_variant"
+                            app:trackCornerRadius="4dp"
+                            app:trackThickness="8dp" />
+
+                        <TextView
+                            android:id="@+id/tvEventRemaining"
+                            style="@style/Needs.Text.Secondary"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            tools:text="Còn 22 chỗ · tự đóng đăng ký khi đủ người" />
+
+                        <LinearLayout
+                            android:id="@+id/layoutRegistrations"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="vertical" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    style="@style/Needs.Text.SectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/event_content_label" />
+
+                <TextView
+                    android:id="@+id/tvEventContent"
+                    style="@style/Needs.Text.Body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textIsSelectable="true"
+                    tools:text="Đo huyết áp, tư vấn dinh dưỡng và giao lưu văn nghệ. Mỗi tổ chức cử thành viên hỗ trợ đưa đón các cụ." />
+
+                <TextView
+                    style="@style/Needs.Note.Neutral"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/event_privacy" />
+
+                <!-- Đăng ký của tổ chức mình -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardRegister"
+                    style="@style/Needs.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:id="@+id/tvRegisterFor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            tools:text="Đoàn TN Phường 7 đăng ký" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/Needs.Text.Secondary"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/event_people_label" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnPeopleMinus"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:contentDescription="@string/event_people_minus"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:padding="0dp"
+                                app:icon="@drawable/ic_remove"
+                                app:iconGravity="textStart"
+                                app:iconPadding="0dp"
+                                app:iconTint="@color/primary" />
+
+                            <TextView
+                                android:id="@+id/tvPeople"
+                                android:layout_width="48dp"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textColor="@color/text_primary"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                tools:text="2" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnPeoplePlus"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:contentDescription="@string/event_people_plus"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:padding="0dp"
+                                app:icon="@drawable/ic_add"
+                                app:iconGravity="textStart"
+                                app:iconPadding="0dp"
+                                app:iconTint="@color/primary" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvRegisterRule"
+                            style="@style/Needs.Text.Meta"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            tools:text="Có thể hủy hoặc giảm số người trước giờ bắt đầu ít nhất 24 giờ." />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <include layout="@layout/view_list_state" />
+    </FrameLayout>
+
+    <include layout="@layout/include_bottom_actions" />
+</LinearLayout>

@@ -31,6 +31,16 @@
                 android:text="@string/nav_needs"
                 style="@style/Needs.Text.ScreenTitle" />
 
+            <!-- E03 · Phản ánh (cần xử lý / đã gửi) -->
+            <ImageButton
+                android:id="@+id/btnHeaderReports"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/ui_open_reports"
+                android:src="@drawable/ic_flag"
+                app:tint="@color/text_primary" />
+
             <ImageButton
                 android:id="@+id/btnHeaderSearch"
                 android:layout_width="48dp"

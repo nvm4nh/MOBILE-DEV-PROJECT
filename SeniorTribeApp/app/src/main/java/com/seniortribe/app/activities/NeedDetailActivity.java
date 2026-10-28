@@ -16,6 +16,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.seniortribe.app.R;
+import com.seniortribe.app.data.FeedbackRepository;
 import com.seniortribe.app.dialogs.AcceptNeedDialog;
 import com.seniortribe.app.dialogs.NeedReasonSheet;
 import com.seniortribe.app.models.Membership;
@@ -38,6 +39,7 @@ import com.seniortribe.app.viewmodels.NeedDetailViewModel;
  *  - Đầu mối, nhu cầu REVIEW/OPEN        → Chỉnh sửa
  *  - Hai bên phụ trách, từ ACCEPTED      → Mở chat phối hợp
  *  - Menu ⋮: Trả lại (tổ chức phụ trách), Hủy (đầu mối)
+ *  - E03: Đầu mối, nhu cầu COMPLETED      → Đánh giá tổ chức; hai bên của lần tiếp nhận → menu Gửi phản ánh
  */
 public class NeedDetailActivity extends AppCompatActivity {
 
@@ -46,6 +48,7 @@ public class NeedDetailActivity extends AppCompatActivity {
     private static final int ACTION_ACCEPT = 2;
     private static final int ACTION_EDIT = 3;
     private static final int ACTION_CHAT = 4;
+    private static final int ACTION_RATE = 5;
 
     private NeedDetailViewModel viewModel;
     private StateView stateView;
@@ -87,6 +90,7 @@ public class NeedDetailActivity extends AppCompatActivity {
             else if (id == R.id.action_cancel_need) openReasonSheet(NeedReasonSheet.MODE_CANCEL);
             else if (id == R.id.action_need_history) openHistory();
             else if (id == R.id.action_need_sos) openSos();
+            else if (id == R.id.action_report_need) openReport();
             else return false;
             return true;
         });
@@ -193,6 +197,8 @@ public class NeedDetailActivity extends AppCompatActivity {
             setMenuVisible(false, false, false);
             MenuItem history = toolbar.getMenu().findItem(R.id.action_need_history);
             if (history != null) history.setVisible(false);
+            MenuItem report = toolbar.getMenu().findItem(R.id.action_report_need);
+            if (report != null) report.setVisible(false);
         }
     }
 
@@ -278,11 +284,15 @@ public class NeedDetailActivity extends AppCompatActivity {
         boolean chatMember = me != null
                 && (me.getUid().equals(n.getRecorderUid()) || me.getUid().equals(n.getAssigneeUid()));
         boolean canChat = chatMember && !TextUtils.isEmpty(n.getCurrentAssignmentId());
+        // E03: đầu mối đánh giá tổ chức sau khi hoàn thành; hai bên của lần tiếp nhận gửi phản ánh
+        boolean canRate = FeedbackRepository.canRate(me, n);
+        boolean canReport = FeedbackRepository.canReport(me, n);
 
         int primary = ACTION_NONE;
         if (canReview) primary = ACTION_REVIEW;
         else if (canAccept) primary = ACTION_ACCEPT;
         else if (canEdit) primary = ACTION_EDIT;
+        else if (canRate) primary = ACTION_RATE;
         else if (canChat) primary = ACTION_CHAT;
 
         int secondary = ACTION_NONE;
@@ -299,6 +309,8 @@ public class NeedDetailActivity extends AppCompatActivity {
         // E09 · SOS cho hai người đang phối hợp (đầu mối đã ghi nhận / người được giao)
         MenuItem sos = toolbar.getMenu().findItem(R.id.action_need_sos);
         if (sos != null) sos.setVisible(canChat && n.isCoordinating());
+        MenuItem report = toolbar.getMenu().findItem(R.id.action_report_need);
+        if (report != null) report.setVisible(canReport);
     }
 
     /** E09 · Màn hình Khẩn cấp, chọn sẵn nhu cầu này để báo cho bên cùng phối hợp. */
@@ -327,6 +339,10 @@ public class NeedDetailActivity extends AppCompatActivity {
                 button.setText(n.isNeedsRevision() ? R.string.detail_action_supplement : R.string.action_edit_need);
                 button.setOnClickListener(v -> openEdit());
                 break;
+            case ACTION_RATE:
+                button.setText(R.string.detail_action_rate);
+                button.setOnClickListener(v -> openRate());
+                break;
             case ACTION_CHAT:
             default:
                 button.setText(R.string.detail_action_chat);
@@ -346,6 +362,14 @@ public class NeedDetailActivity extends AppCompatActivity {
     // =====================================================================
     // Điều hướng và thao tác
     // =====================================================================
+
+    private void openRate() {
+        startActivity(new Intent(this, RateOrgActivity.class).putExtra(Constants.EXTRA_NEED_ID, needId));
+    }
+
+    private void openReport() {
+        startActivity(new Intent(this, ReportFormActivity.class).putExtra(Constants.EXTRA_NEED_ID, needId));
+    }
 
     private void openReview() {
         Intent intent = new Intent(this, ReviewNeedActivity.class);

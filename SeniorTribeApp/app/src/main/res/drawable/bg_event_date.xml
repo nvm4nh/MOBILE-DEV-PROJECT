@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E07 · Ô ngày tháng của thẻ sự kiện -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/primary_light" />
+    <corners android:radius="12dp" />
+</shape>

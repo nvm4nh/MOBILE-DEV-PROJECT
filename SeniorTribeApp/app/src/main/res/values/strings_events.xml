@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- E07 · Nhóm và sự kiện -->
+<resources>
+    <string name="events_title">Sự kiện cộng đồng</string>
+    <string name="events_open">Sự kiện</string>
+    <string name="events_chip_all">Sắp diễn ra</string>
+    <string name="events_chip_mine">Tổ chức của tôi</string>
+    <string name="events_fab_create">Tạo sự kiện</string>
+    <string name="events_offline">Đang offline · chỉ xem sự kiện đã tải</string>
+    <string name="events_empty_title">Chưa có sự kiện sắp diễn ra</string>
+    <string name="events_empty_message">Các tổ chức trong mạng lưới đăng sự kiện ở đây để cùng tham gia.</string>
+    <string name="events_empty_mine_title">Tổ chức của bạn chưa có sự kiện sắp diễn ra</string>
+    <string name="events_empty_mine_message">Đại diện tổ chức có thể bấm “Tạo sự kiện” để mời các tổ chức khác.</string>
+
+    <string name="event_month">TH%1$d</string>
+    <string name="event_capacity">%1$d/%2$d chỗ</string>
+    <string name="event_capacity_full">%1$d/%2$d · đã đủ chỗ</string>
+    <string name="event_time_range">%1$s · %2$s</string>
+    <string name="event_my_org_owner">Do tổ chức của bạn tạo</string>
+
+    <string name="event_detail_title">Sự kiện</string>
+    <string name="event_who_open">Thành viên các tổ chức trong mạng lưới</string>
+    <string name="event_who_own">Chỉ thành viên của %1$s</string>
+    <string name="event_registered_label">Đã đăng ký</string>
+    <string name="event_remaining">Còn %1$d chỗ · tự đóng đăng ký khi đủ người</string>
+    <string name="event_full_note">Đã đủ chỗ. Bạn có thể quay lại khi có tổ chức hủy tham gia.</string>
+    <string name="event_no_registration">Chưa có tổ chức nào đăng ký.</string>
+    <string name="event_content_label">Nội dung</string>
+    <string name="event_privacy">Danh sách đăng ký chỉ hiện tên tổ chức và số người. Không đăng ảnh hay thông tin riêng của các cụ tham dự.</string>
+    <string name="event_register_for">%1$s đăng ký</string>
+    <string name="event_people_label">Số thành viên tham gia</string>
+    <string name="event_people_minus">Giảm một người</string>
+    <string name="event_people_plus">Thêm một người</string>
+    <string name="event_action_register">Đăng ký tham gia</string>
+    <string name="event_action_update">Cập nhật số người</string>
+    <string name="event_action_cancel_registration">Hủy tham gia</string>
+    <string name="event_rule_cancel">Có thể hủy hoặc giảm số người trước giờ bắt đầu ít nhất 24 giờ.</string>
+    <string name="event_rule_no_cancel">Sự kiện này không cho hủy trong ứng dụng. Hãy liên hệ tổ chức tạo sự kiện nếu cần.</string>
+    <string name="event_registered_note">Tổ chức của bạn đã đăng ký %1$d người.</string>
+    <string name="event_cannot_register_role">Chỉ đại diện tổ chức mới đăng ký được.</string>
+    <string name="event_cannot_register_own">Sự kiện chỉ dành cho thành viên của tổ chức tạo sự kiện.</string>
+    <string name="event_started_note">Sự kiện đã bắt đầu, không đăng ký thêm được.</string>
+    <string name="event_cancelled_note">Sự kiện đã bị hủy.</string>
+    <string name="event_organizer_note">Bạn là đại diện của tổ chức tạo sự kiện. Có thể hủy sự kiện ở menu ⋮.</string>
+    <string name="event_cancel_event">Hủy sự kiện</string>
+    <string name="event_cancel_event_title">Hủy sự kiện này?</string>
+    <string name="event_cancel_event_message">Các tổ chức đã đăng ký sẽ thấy sự kiện bị hủy. Sự kiện đã hủy không mở lại được.</string>
+    <string name="event_cancel_registration_title">Hủy tham gia?</string>
+    <string name="event_cancel_registration_message">Số chỗ của tổ chức bạn sẽ được trả lại cho các tổ chức khác.</string>
+    <string name="event_action_confirm">Đồng ý</string>
+
+    <string name="create_event_title">Tạo sự kiện</string>
+    <string name="create_event_as">Đăng với tư cách</string>
+    <string name="create_event_name">Tên sự kiện</string>
+    <string name="create_event_name_hint">Ví dụ: Ngày hội sức khỏe người cao tuổi</string>
+    <string name="create_event_date">Ngày</string>
+    <string name="create_event_time">Giờ</string>
+    <string name="create_event_pick_date">Chọn ngày</string>
+    <string name="create_event_pick_time">Chọn giờ</string>
+    <string name="create_event_pick_start">Giờ bắt đầu</string>
+    <string name="create_event_pick_end">Giờ kết thúc</string>
+    <string name="create_event_place">Địa điểm</string>
+    <string name="create_event_place_hint">Ví dụ: Nhà văn hóa Phường 7</string>
+    <string name="create_event_area">Khu vực (không bắt buộc)</string>
+    <string name="create_event_area_hint">Ví dụ: Quận 3</string>
+    <string name="create_event_capacity">Số chỗ tối đa</string>
+    <string name="create_event_capacity_note">Tính theo số thành viên các tổ chức đăng ký</string>
+    <string name="create_event_allow_cancel">Cho hủy trước 24 giờ</string>
+    <string name="create_event_open">Mở cho tổ chức khác</string>
+    <string name="create_event_open_note">Tắt nếu chỉ dành cho thành viên của tổ chức bạn</string>
+    <string name="create_event_content">Nội dung</string>
+    <string name="create_event_content_hint">Hoạt động gì, mỗi tổ chức cần chuẩn bị gì…</string>
+    <string name="create_event_privacy">Không ghi tên, địa chỉ hay ảnh của các cụ tham dự vào nội dung sự kiện.</string>
+    <string name="create_event_submit">Đăng sự kiện</string>
+    <string name="create_event_done">Đã đăng sự kiện.</string>
+    <string name="create_event_not_rep">Chỉ đại diện tổ chức mới tạo được sự kiện.</string>
+    <string name="create_event_error_date">Hãy chọn ngày và giờ diễn ra.</string>
+    <string name="create_event_error_end">Giờ kết thúc phải sau giờ bắt đầu.</string>
+    <string name="create_event_error_name">Tên sự kiện cần ít nhất 5 ký tự.</string>
+    <string name="create_event_error_place">Hãy ghi địa điểm.</string>
+    <string name="create_event_error_content">Nội dung cần ít nhất 10 ký tự.</string>
+    <string name="create_event_phone_warning">Nội dung có vẻ chứa số điện thoại. Hãy bỏ thông tin riêng trước khi đăng.</string>
+</resources>

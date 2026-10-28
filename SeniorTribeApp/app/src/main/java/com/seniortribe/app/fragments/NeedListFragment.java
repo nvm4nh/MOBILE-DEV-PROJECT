@@ -25,6 +25,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.seniortribe.app.R;
 import com.seniortribe.app.activities.CreateNeedActivity;
 import com.seniortribe.app.activities.NeedDetailActivity;
+import com.seniortribe.app.activities.ReportListActivity;
 import com.seniortribe.app.activities.ReviewNeedActivity;
 import com.seniortribe.app.adapters.NeedAdapter;
 import com.seniortribe.app.models.Membership;
@@ -131,6 +132,9 @@ public class NeedListFragment extends Fragment implements NeedAdapter.OnNeedClic
             viewModel.setMode(NeedListViewModel.MODE_SEARCH);
             etSearch.requestFocus();
         });
+        // E03 · Danh sách phản ánh
+        v.findViewById(R.id.btnHeaderReports).setOnClickListener(x ->
+                startActivity(new Intent(requireContext(), ReportListActivity.class)));
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}

@@ -4,6 +4,8 @@
 //   F12 · đề xuất / thống nhất lịch (needs_assignments/{id}/schedules + needs_summary)
 //   F13 · báo hỗ trợ và đối soát (needs_summary)
 //   F14 · trả lại nhu cầu phải xóa hết lịch đã chốt (needs_summary)
+//   E03 · đánh giá sau hỗ trợ (org_ratings) và xử lý phản ánh (feedback_reports)
+//   E07 · sự kiện cộng đồng và đăng ký tham gia (community_events)
 // Chạy: npm test (Firebase Emulator, không đụng tới project thật).
 
 import { readFileSync } from 'node:fs';
@@ -557,5 +559,422 @@ describe('F04, F05 · Bảng tin (posts)', () => {
     await assertFails(posts(REP).doc('p-visible').update({ orgId: OTHER_ORG, updatedAt: FieldValue.serverTimestamp() }));
     await assertFails(posts(REP).doc('p-visible').update({ authorUid: ASSIGNEE, updatedAt: FieldValue.serverTimestamp() }));
     await assertFails(posts(REP).doc('p-visible').delete());
+  });
+});
+
+// =====================================================================
+// E03 · Đánh giá sau hỗ trợ và xử lý phản ánh
+// =====================================================================
+
+const REVIEWER = 'u-reviewer';      // điều phối viên của đơn vị ghi nhận (REVIEWER)
+
+async function seedFeedback(opts = { needStatus: 'COMPLETED', assignmentStatus: 'CLOSED' }) {
+  await seed(opts);
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await ctx.firestore().doc(`memberships/${REVIEWER}/organizations/${REC_ORG}`)
+      .set({ roles: ['REVIEWER'], active: true, orgId: REC_ORG });
+  });
+}
+
+function rating(overrides = {}) {
+  return {
+    needId: NEED, caseCode: 'NC-0142', recorderOrgId: REC_ORG, orgId: ORG,
+    orgName: 'Đoàn TN Phường 7', assigneeName: 'Nguyễn Minh Khoa',
+    stars: 5, tags: ['Đúng giờ', 'Nhiệt tình'], comment: 'Cụ vui lắm', elderAsked: true,
+    byUid: RECORDER, byName: 'Trần Thị Mai', createdAt: FieldValue.serverTimestamp(),
+    ...overrides,
+  };
+}
+
+function report(overrides = {}) {
+  return {
+    needId: NEED, caseCode: 'NC-0142', assignmentId: ASSIGN, recorderOrgId: REC_ORG,
+    reporterOrgId: REC_ORG, reportedOrgId: ORG, reportedOrgName: 'Đoàn TN Phường 7',
+    type: 'LATE', description: 'Hẹn 15:00 nhưng 16:10 mới đến, không báo trước.',
+    status: 'OPEN', createdByUid: RECORDER, createdByName: 'Trần Thị Mai',
+    createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
+    ...overrides,
+  };
+}
+
+function note(kind, uid, byRole, text = 'Nội dung') {
+  return { kind, text, byUid: uid, byName: 'Người ghi', byRole, at: FieldValue.serverTimestamp() };
+}
+
+/** Phản ánh đã có sẵn (tạo bằng quyền quản trị). */
+async function seedReport(status = 'OPEN', extra = {}) {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await ctx.firestore().doc('feedback_reports/r1').set({
+      ...report(), status, createdAt: Timestamp.now(), updatedAt: Timestamp.now(), ...extra,
+    });
+  });
+}
+
+function startBatch(d, uid = REVIEWER) {
+  const b = d.batch();
+  b.update(d.doc('feedback_reports/r1'), {
+    status: 'IN_PROGRESS', handlerUid: uid, handlerName: 'Lê Hoàng', updatedAt: FieldValue.serverTimestamp(),
+  });
+  b.set(d.collection('feedback_reports/r1/notes').doc(), note('START', uid, 'REVIEWER', 'Tiếp nhận phản ánh'));
+  return b.commit();
+}
+
+function closeBatch(d, resolution = 'Đã nhắc tổ chức báo trước khi đến trễ.') {
+  const b = d.batch();
+  b.update(d.doc('feedback_reports/r1'), {
+    status: 'CLOSED', resolution, closedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
+  });
+  b.set(d.collection('feedback_reports/r1/notes').doc(), note('CLOSE', REVIEWER, 'REVIEWER', resolution || 'x'));
+  return b.commit();
+}
+
+describe('E03 · Đánh giá tổ chức sau khi hoàn thành', () => {
+  const ratingDoc = (uid) => db(uid).doc(`org_ratings/${ASSIGN}`);
+
+  test('đầu mối ghi nhận đánh giá được khi nhu cầu đã hoàn thành', async () => {
+    await seedFeedback();
+    await assertSucceeds(ratingDoc(RECORDER).get());   // kiểm tra "đã đánh giá chưa"
+    await assertSucceeds(ratingDoc(RECORDER).set(rating()));
+  });
+
+  test('mỗi lần hỗ trợ chỉ đánh giá một lần; không sửa, không xóa', async () => {
+    await seedFeedback();
+    await assertSucceeds(ratingDoc(RECORDER).set(rating()));
+    await assertFails(ratingDoc(RECORDER).set(rating({ stars: 1 })));
+    await assertFails(ratingDoc(RECORDER).update({ stars: 1 }));
+    await assertFails(ratingDoc(RECORDER).delete());
+  });
+
+  test('chưa hoàn thành thì chưa đánh giá được', async () => {
+    await seedFeedback({ needStatus: 'DELIVERED', assignmentStatus: 'ACTIVE' });
+    await assertFails(ratingDoc(RECORDER).set(rating()));
+  });
+
+  test('tổ chức được đánh giá và tổ chức khác không tự đánh giá', async () => {
+    await seedFeedback();
+    await assertFails(ratingDoc(REP).set(rating({ byUid: REP })));
+    await assertFails(ratingDoc(OUTSIDER).set(rating({ byUid: OUTSIDER })));
+  });
+
+  test('phải hỏi ý kiến cụ, số sao 1–5, đúng tổ chức của lần tiếp nhận', async () => {
+    await seedFeedback();
+    await assertFails(ratingDoc(RECORDER).set(rating({ elderAsked: false })));
+    await assertFails(ratingDoc(RECORDER).set(rating({ stars: 0 })));
+    await assertFails(ratingDoc(RECORDER).set(rating({ stars: 6 })));
+    await assertFails(ratingDoc(RECORDER).set(rating({ orgId: OTHER_ORG })));
+    await assertFails(ratingDoc(RECORDER).set(rating({ byUid: RECORDER2 })));
+    await assertFails(ratingDoc(RECORDER).set(rating({ createdAt: Timestamp.fromMillis(0) })));
+    await assertFails(ratingDoc(RECORDER).set(rating({ comment: 'a'.repeat(501) })));
+  });
+
+  test('nhận xét không bắt buộc', async () => {
+    await seedFeedback();
+    await assertSucceeds(ratingDoc(RECORDER).set(rating({ comment: null, tags: [] })));
+  });
+
+  test('chỉ hai bên của lần tiếp nhận đọc được đánh giá', async () => {
+    await seedFeedback();
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await ctx.firestore().doc(`org_ratings/${ASSIGN}`).set({ ...rating(), createdAt: Timestamp.now() });
+    });
+    await assertSucceeds(ratingDoc(RECORDER2).get());
+    await assertSucceeds(ratingDoc(ASSIGNEE).get());
+    await assertFails(ratingDoc(OUTSIDER).get());
+  });
+});
+
+describe('E03 · Gửi phản ánh', () => {
+  const reports = (uid) => db(uid).collection('feedback_reports');
+
+  test('đầu mối ghi nhận phản ánh tổ chức phụ trách', async () => {
+    await seedFeedback();
+    await assertSucceeds(reports(RECORDER).add(report()));
+  });
+
+  test('thành viên tổ chức phụ trách phản ánh đơn vị ghi nhận', async () => {
+    await seedFeedback();
+    await assertSucceeds(reports(ASSIGNEE).add(report({
+      reporterOrgId: ORG, reportedOrgId: REC_ORG, reportedOrgName: 'Hội CTĐ Quận 3',
+      type: 'ATTITUDE', createdByUid: ASSIGNEE, createdByName: 'Nguyễn Minh Khoa',
+    })));
+  });
+
+  test('tổ chức ngoài lần tiếp nhận không gửi được', async () => {
+    await seedFeedback();
+    await assertFails(reports(OUTSIDER).add(report({ reporterOrgId: OTHER_ORG, createdByUid: OUTSIDER })));
+  });
+
+  test('phản ánh phải nói về bên còn lại của lần tiếp nhận', async () => {
+    await seedFeedback();
+    await assertFails(reports(RECORDER).add(report({ reportedOrgId: OTHER_ORG })));
+    await assertFails(reports(RECORDER).add(report({ reportedOrgId: REC_ORG })));
+  });
+
+  test('loại phản ánh hợp lệ, mô tả đủ dài, trạng thái ban đầu là OPEN', async () => {
+    await seedFeedback();
+    await assertFails(reports(RECORDER).add(report({ type: 'SPAM' })));
+    await assertFails(reports(RECORDER).add(report({ description: 'ngắn' })));
+    await assertFails(reports(RECORDER).add(report({ status: 'CLOSED' })));
+    await assertFails(reports(RECORDER).add(report({ createdByUid: RECORDER2 })));
+    await assertFails(reports(RECORDER).add(report({ handlerUid: REVIEWER })));
+  });
+
+  test('tổ chức bị phản ánh chỉ đọc được khi điều phối viên đã tiếp nhận', async () => {
+    await seedFeedback();
+    await seedReport('OPEN');
+    await assertSucceeds(reports(RECORDER).doc('r1').get());
+    await assertSucceeds(reports(REVIEWER).doc('r1').get());
+    await assertFails(reports(REP).doc('r1').get());
+    await assertFails(reports(OUTSIDER).doc('r1').get());
+    await assertSucceeds(startBatch(db(REVIEWER)));
+    await assertSucceeds(reports(REP).doc('r1').get());
+  });
+
+  test('danh sách: điều phối viên lọc theo đơn vị; người gửi lọc theo chính mình', async () => {
+    await seedFeedback();
+    await seedReport('OPEN');
+    await assertSucceeds(reports(REVIEWER).where('recorderOrgId', '==', REC_ORG).get());
+    await assertSucceeds(reports(RECORDER).where('createdByUid', '==', RECORDER).get());
+    await assertFails(reports(REP).where('recorderOrgId', '==', REC_ORG).get());
+    await assertFails(reports(RECORDER2).where('recorderOrgId', '==', REC_ORG).get());
+  });
+});
+
+describe('E03 · Điều phối viên xử lý phản ánh', () => {
+  const notes = (uid) => db(uid).collection('feedback_reports/r1/notes');
+
+  test('tiếp nhận → hỏi thêm → người gửi bổ sung → đóng có kết quả', async () => {
+    await seedFeedback();
+    await seedReport('OPEN');
+    await assertSucceeds(startBatch(db(REVIEWER)));
+    await assertSucceeds(notes(REVIEWER).add(note('ASK', REVIEWER, 'REVIEWER', 'Tổ chức có báo trễ qua chat không?')));
+    await assertSucceeds(notes(RECORDER).add(note('INFO', RECORDER, 'REPORTER', 'Không báo gì cả.')));
+    await assertSucceeds(notes(REP).get());
+    await assertSucceeds(closeBatch(db(REVIEWER)));
+  });
+
+  test('chỉ điều phối viên đơn vị ghi nhận tiếp nhận; không tự xử lý phản ánh của mình', async () => {
+    await seedFeedback();
+    await seedReport('OPEN');
+    await assertFails(startBatch(db(RECORDER2), RECORDER2));
+    await assertFails(startBatch(db(REP), REP));
+    await seedReport('OPEN', { createdByUid: REVIEWER });
+    await assertFails(startBatch(db(REVIEWER)));
+  });
+
+  test('đóng phải có kết quả xử lý và đi đúng thứ tự trạng thái', async () => {
+    await seedFeedback();
+    await seedReport('OPEN');
+    await assertFails(closeBatch(db(REVIEWER)));               // chưa tiếp nhận
+    await assertSucceeds(startBatch(db(REVIEWER)));
+    await assertFails(closeBatch(db(REVIEWER), 'ok'));         // kết quả quá ngắn
+    await assertSucceeds(closeBatch(db(REVIEWER)));
+    await assertFails(db(REVIEWER).doc('feedback_reports/r1').update({
+      status: 'OPEN', updatedAt: FieldValue.serverTimestamp(),
+    }));
+  });
+
+  test('ghi chú: hỏi thêm chỉ khi đang xử lý; người khác không bổ sung; đã đóng thì không bổ sung', async () => {
+    await seedFeedback();
+    await seedReport('OPEN');
+    await assertFails(notes(REVIEWER).add(note('ASK', REVIEWER, 'REVIEWER')));
+    await assertFails(notes(OUTSIDER).add(note('INFO', OUTSIDER, 'REPORTER')));
+    await assertFails(notes(RECORDER).add(note('START', RECORDER, 'REVIEWER')));
+    await seedReport('CLOSED', { resolution: 'Đã xử lý xong', closedAt: Timestamp.now() });
+    await assertFails(notes(RECORDER).add(note('INFO', RECORDER, 'REPORTER')));
+  });
+
+  test('không sửa nội dung phản ánh, không xóa phản ánh / ghi chú', async () => {
+    await seedFeedback();
+    await seedReport('IN_PROGRESS', { handlerUid: REVIEWER });
+    await assertFails(db(REVIEWER).doc('feedback_reports/r1').update({
+      description: 'Đã sửa lại nội dung', updatedAt: FieldValue.serverTimestamp(),
+    }));
+    await assertFails(db(RECORDER).doc('feedback_reports/r1').delete());
+    const ref = await notes(REVIEWER).add(note('ASK', REVIEWER, 'REVIEWER'));
+    await assertFails(db(REVIEWER).doc(ref.path).update({ text: 'sửa' }));
+    await assertFails(db(REVIEWER).doc(ref.path).delete());
+  });
+});
+
+// =====================================================================
+// E07 · Nhóm và sự kiện cộng đồng
+// =====================================================================
+
+const EVENT = 'ev-1';
+const REP2 = 'u-rep-2';             // đại diện của đơn vị ghi nhận (REC_ORG)
+
+async function seedEvent(overrides = {}) {
+  await seed();
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    const d = ctx.firestore();
+    await d.doc(`memberships/${REP2}/organizations/${REC_ORG}`)
+      .set({ roles: ['REPRESENTATIVE'], active: true, orgId: REC_ORG });
+    await d.doc(`community_events/${EVENT}`).set({
+      ...eventData(), startAt: at(hours(72)), endAt: at(hours(75)),
+      createdAt: Timestamp.now(), updatedAt: Timestamp.now(), ...overrides,
+    });
+  });
+}
+
+function eventData(overrides = {}) {
+  return {
+    title: 'Ngày hội sức khỏe người cao tuổi', content: 'Đo huyết áp, tư vấn dinh dưỡng, văn nghệ.',
+    place: 'Nhà văn hóa Phường 7', area: 'Quận 3', orgId: ORG, orgName: 'Đoàn TN Phường 7',
+    createdByUid: REP, createdByName: 'Đại diện Đoàn TN',
+    startAt: at(hours(72)), endAt: at(hours(75)), capacity: 10, registeredCount: 0,
+    allowCancel: true, openToOtherOrgs: true, cancelled: false,
+    createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
+    ...overrides,
+  };
+}
+
+/** Đăng ký / đổi số người như EventRepository.register: phiếu + bộ đếm trong cùng một lần ghi. */
+function registerBatch(d, orgId, people, { count, exists = false, before = 0, uid = OUTSIDER } = {}) {
+  const b = d.batch();
+  const reg = d.doc(`community_events/${EVENT}/registrations/${orgId}`);
+  if (exists) {
+    b.update(reg, { people, byUid: uid, byName: 'Đại diện', updatedAt: FieldValue.serverTimestamp() });
+  } else {
+    b.set(reg, {
+      orgName: 'Tổ chức', people, byUid: uid, byName: 'Đại diện',
+      createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
+    });
+  }
+  b.update(d.doc(`community_events/${EVENT}`), { registeredCount: count, lastRegOrgId: orgId });
+  return b.commit();
+}
+
+function cancelBatch(d, orgId, count) {
+  const b = d.batch();
+  b.delete(d.doc(`community_events/${EVENT}/registrations/${orgId}`));
+  b.update(d.doc(`community_events/${EVENT}`), { registeredCount: count, lastRegOrgId: orgId });
+  return b.commit();
+}
+
+async function seedRegistration(orgId, people, eventOverrides = {}) {
+  await seedEvent({ registeredCount: people, ...eventOverrides });
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await ctx.firestore().doc(`community_events/${EVENT}/registrations/${orgId}`).set({
+      orgName: 'Tổ chức', people, byUid: OUTSIDER, byName: 'Đại diện',
+      createdAt: Timestamp.now(), updatedAt: Timestamp.now(),
+    });
+  });
+}
+
+describe('E07 · Tạo và hủy sự kiện', () => {
+  const events = (uid) => db(uid).collection('community_events');
+
+  test('đại diện tổ chức tạo sự kiện cho tổ chức của mình', async () => {
+    await seed();
+    await assertSucceeds(events(REP).add(eventData()));
+  });
+
+  test('thành viên không phải đại diện, hoặc tạo thay tổ chức khác, đều bị từ chối', async () => {
+    await seed();
+    await assertFails(events(ASSIGNEE).add(eventData({ createdByUid: ASSIGNEE })));
+    await assertFails(events(REP).add(eventData({ orgId: OTHER_ORG })));
+    await assertFails(events(REP).add(eventData({ createdByUid: ASSIGNEE })));
+  });
+
+  test('giờ phải ở tương lai, kết thúc sau bắt đầu; số chỗ 1–500; chưa ai đăng ký', async () => {
+    await seed();
+    await assertFails(events(REP).add(eventData({ startAt: at(-hours(1)), endAt: at(hours(2)) })));
+    await assertFails(events(REP).add(eventData({ endAt: at(hours(71)) })));
+    await assertFails(events(REP).add(eventData({ capacity: 0 })));
+    await assertFails(events(REP).add(eventData({ capacity: 501 })));
+    await assertFails(events(REP).add(eventData({ registeredCount: 3 })));
+    await assertFails(events(REP).add(eventData({ cancelled: true })));
+    await assertFails(events(REP).add(eventData({ title: 'Hi' })));
+  });
+
+  test('tài khoản đăng nhập xem được sự kiện và danh sách đăng ký', async () => {
+    await seedRegistration(OTHER_ORG, 2);
+    await assertSucceeds(events(ASSIGNEE).doc(EVENT).get());
+    await assertSucceeds(events(RECORDER).where('cancelled', '==', false).get());
+    await assertSucceeds(db(RECORDER).collection(`community_events/${EVENT}/registrations`).get());
+    await assertFails(env.unauthenticatedContext().firestore().doc(`community_events/${EVENT}`).get());
+  });
+
+  test('tổ chức tạo sự kiện hủy được; tổ chức khác không hủy được; đã hủy không mở lại', async () => {
+    await seedEvent();
+    const cancel = { cancelled: true, updatedAt: FieldValue.serverTimestamp() };
+    await assertFails(events(OUTSIDER).doc(EVENT).update(cancel));
+    await assertFails(events(ASSIGNEE).doc(EVENT).update(cancel));
+    await assertSucceeds(events(REP).doc(EVENT).update(cancel));
+    await assertFails(events(REP).doc(EVENT).update({ cancelled: false, updatedAt: FieldValue.serverTimestamp() }));
+  });
+
+  test('không sửa thẳng bộ đếm, không xóa sự kiện', async () => {
+    await seedEvent();
+    await assertFails(events(REP).doc(EVENT).update({ registeredCount: 5, lastRegOrgId: ORG }));
+    await assertFails(events(OUTSIDER).doc(EVENT).update({ registeredCount: 5, lastRegOrgId: OTHER_ORG }));
+    await assertFails(events(REP).doc(EVENT).delete());
+  });
+});
+
+describe('E07 · Đăng ký tham gia sự kiện', () => {
+  test('đại diện tổ chức khác đăng ký số thành viên; bộ đếm tăng đúng', async () => {
+    await seedEvent();
+    await assertSucceeds(registerBatch(db(OUTSIDER), OTHER_ORG, 3, { count: 3 }));
+  });
+
+  test('đăng ký mà không cập nhật bộ đếm, hoặc bộ đếm sai, bị từ chối', async () => {
+    await seedEvent();
+    await assertFails(db(OUTSIDER).doc(`community_events/${EVENT}/registrations/${OTHER_ORG}`).set({
+      orgName: 'Tổ chức', people: 3, byUid: OUTSIDER, byName: 'Đại diện',
+      createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
+    }));
+    await assertFails(registerBatch(db(OUTSIDER), OTHER_ORG, 3, { count: 1 }));
+  });
+
+  test('không vượt quá số chỗ', async () => {
+    await seedEvent({ capacity: 4, registeredCount: 3 });
+    await assertFails(registerBatch(db(OUTSIDER), OTHER_ORG, 2, { count: 5 }));
+    await assertSucceeds(registerBatch(db(OUTSIDER), OTHER_ORG, 1, { count: 4 }));
+  });
+
+  test('chỉ đại diện, đăng ký cho đúng tổ chức của mình, tối đa 20 người', async () => {
+    await seedEvent();
+    await assertFails(registerBatch(db(ASSIGNEE), ORG, 1, { count: 1, uid: ASSIGNEE }));
+    await assertFails(registerBatch(db(OUTSIDER), REC_ORG, 1, { count: 1 }));
+    await assertFails(registerBatch(db(OUTSIDER), OTHER_ORG, 21, { count: 21 }));
+  });
+
+  test('sự kiện chỉ cho tổ chức tạo: tổ chức khác không đăng ký được', async () => {
+    await seedEvent({ openToOtherOrgs: false });
+    await assertFails(registerBatch(db(OUTSIDER), OTHER_ORG, 1, { count: 1 }));
+    await assertSucceeds(registerBatch(db(REP), ORG, 2, { count: 2, uid: REP }));
+  });
+
+  test('sự kiện đã hủy hoặc đã bắt đầu thì không đăng ký được', async () => {
+    await seedEvent({ cancelled: true });
+    await assertFails(registerBatch(db(OUTSIDER), OTHER_ORG, 1, { count: 1 }));
+    await seedEvent({ startAt: at(-hours(1)), endAt: at(hours(2)) });
+    await assertFails(registerBatch(db(OUTSIDER), OTHER_ORG, 1, { count: 1 }));
+  });
+
+  test('tăng số người lúc nào cũng được (còn chỗ); giảm chỉ khi còn hơn 24 giờ', async () => {
+    await seedRegistration(OTHER_ORG, 2);
+    await assertSucceeds(registerBatch(db(OUTSIDER), OTHER_ORG, 4, { count: 4, exists: true }));
+    await assertSucceeds(registerBatch(db(OUTSIDER), OTHER_ORG, 1, { count: 1, exists: true }));
+    await seedRegistration(OTHER_ORG, 2, { startAt: at(hours(12)), endAt: at(hours(14)) });
+    await assertFails(registerBatch(db(OUTSIDER), OTHER_ORG, 1, { count: 1, exists: true }));
+    await assertSucceeds(registerBatch(db(OUTSIDER), OTHER_ORG, 3, { count: 3, exists: true }));
+  });
+
+  test('hủy tham gia trả lại chỗ, chỉ trước 24 giờ và khi sự kiện cho hủy', async () => {
+    await seedRegistration(OTHER_ORG, 2);
+    await assertFails(cancelBatch(db(OUTSIDER), OTHER_ORG, 2));   // không trả lại chỗ
+    await assertSucceeds(cancelBatch(db(OUTSIDER), OTHER_ORG, 0));
+    await seedRegistration(OTHER_ORG, 2, { allowCancel: false });
+    await assertFails(cancelBatch(db(OUTSIDER), OTHER_ORG, 0));
+    await seedRegistration(OTHER_ORG, 2, { startAt: at(hours(12)), endAt: at(hours(14)) });
+    await assertFails(cancelBatch(db(OUTSIDER), OTHER_ORG, 0));
+  });
+
+  test('không hủy hộ tổ chức khác', async () => {
+    await seedRegistration(OTHER_ORG, 2);
+    await assertFails(cancelBatch(db(REP2), OTHER_ORG, 0));
   });
 });

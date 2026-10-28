@@ -1273,6 +1273,265 @@ service cloud.firestore {
     }
 
     // ================================================================
+    // E03 · ĐÁNH GIÁ SAU HỖ TRỢ VÀ XỬ LÝ PHẢN ÁNH
+    // ================================================================
+
+    // Đánh giá tổ chức sau khi nhu cầu hoàn thành. Id tài liệu = id lần tiếp nhận, nên mỗi lần
+    // hỗ trợ chỉ đánh giá một lần. Chỉ đầu mối của đơn vị ghi nhận gửi; không sửa, không xóa.
+    // Không hiện trên bảng tin: chỉ hai bên của lần tiếp nhận đọc được.
+    match /org_ratings/{assignmentId} {
+      // resource == null: cho phép kiểm tra "đã đánh giá chưa" trước khi gửi
+      allow read: if signedIn()
+        && (resource == null
+          || isMember(resource.data.recorderOrgId)
+          || isMember(resource.data.orgId));
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['needId', 'caseCode', 'recorderOrgId', 'orgId',
+             'orgName', 'assigneeName', 'stars', 'tags', 'comment', 'elderAsked',
+             'byUid', 'byName', 'createdAt'])
+        && ratingMatchesNeed(request.resource.data, get(needPath(request.resource.data.needId)).data)
+        && hasRole(request.resource.data.recorderOrgId, 'RECORDER')
+        && request.resource.data.byUid == request.auth.uid
+        && request.resource.data.stars is int
+        && request.resource.data.stars >= 1
+        && request.resource.data.stars <= 5
+        && request.resource.data.elderAsked == true
+        && request.resource.data.tags is list
+        && request.resource.data.tags.size() <= 6
+        && (request.resource.data.comment == null || isText(request.resource.data.comment, 1, 500))
+        && request.resource.data.createdAt == request.time;
+
+      allow update, delete: if false;
+
+      function ratingMatchesNeed(d, need) {
+        return need.status == 'COMPLETED'
+          && need.currentAssignmentId == assignmentId
+          && d.orgId == need.assignedOrgId
+          && d.recorderOrgId == need.recorderOrgId;
+      }
+    }
+
+    // Phản ánh về một lần hỗ trợ. Người gửi là thành viên của một trong hai bên (đơn vị ghi nhận
+    // hoặc tổ chức tiếp nhận), phản ánh luôn nói về bên còn lại. Điều phối viên (REVIEWER) của đơn vị
+    // ghi nhận xử lý: OPEN → IN_PROGRESS → CLOSED, không tự xử lý phản ánh của chính mình.
+    // Tổ chức bị phản ánh chỉ đọc được khi phản ánh đã được tiếp nhận xử lý.
+    function reportPath(reportId) {
+      return /databases/$(database)/documents/feedback_reports/$(reportId);
+    }
+
+    function reportReviewer(r) {
+      return hasRole(r.recorderOrgId, 'REVIEWER') && request.auth.uid != r.createdByUid;
+    }
+
+    function canReadReport(r) {
+      return signedIn()
+        && (r.createdByUid == request.auth.uid
+          || hasRole(r.recorderOrgId, 'REVIEWER')
+          || (r.status != 'OPEN' && isMember(r.reportedOrgId)));
+    }
+
+    match /feedback_reports/{reportId} {
+      allow read: if canReadReport(resource.data);
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['needId', 'caseCode', 'assignmentId', 'recorderOrgId',
+             'reporterOrgId', 'reportedOrgId', 'reportedOrgName', 'type', 'description', 'status',
+             'createdByUid', 'createdByName', 'createdAt', 'updatedAt'])
+        && reportMatchesAssignment(request.resource.data, get(assignmentPath(request.resource.data.assignmentId)).data)
+        && request.resource.data.type in ['LATE', 'ATTITUDE', 'PRIVACY', 'OTHER']
+        && isText(request.resource.data.description, 10, 1000)
+        && request.resource.data.status == 'OPEN'
+        && request.resource.data.createdByUid == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if reportReviewer(resource.data)
+        && request.resource.data.updatedAt == request.time
+        && (reviewerStarts() || reviewerCloses());
+
+      allow delete: if false;
+
+      function reportMatchesAssignment(d, a) {
+        return a.needId == d.needId
+          && d.recorderOrgId == a.recorderOrgId
+          && (
+            (isMember(a.recorderOrgId) && d.reporterOrgId == a.recorderOrgId && d.reportedOrgId == a.orgId)
+            || (isMember(a.orgId) && d.reporterOrgId == a.orgId && d.reportedOrgId == a.recorderOrgId)
+          );
+      }
+
+      function reviewerStarts() {
+        return resource.data.status == 'OPEN'
+          && request.resource.data.status == 'IN_PROGRESS'
+          && request.resource.data.handlerUid == request.auth.uid
+          && changed().hasOnly(['status', 'handlerUid', 'handlerName', 'updatedAt']);
+      }
+
+      function reviewerCloses() {
+        return resource.data.status == 'IN_PROGRESS'
+          && request.resource.data.status == 'CLOSED'
+          && isText(request.resource.data.resolution, 5, 1000)
+          && request.resource.data.closedAt == request.time
+          && changed().hasOnly(['status', 'resolution', 'closedAt', 'updatedAt']);
+      }
+
+      // Quá trình xử lý: chỉ thêm, không sửa / xóa.
+      match /notes/{noteId} {
+        allow read: if canReadReport(get(reportPath(reportId)).data);
+
+        allow create: if signedIn()
+          && request.resource.data.keys().hasOnly(['kind', 'text', 'byUid', 'byName', 'byRole', 'at'])
+          && request.resource.data.byUid == request.auth.uid
+          && request.resource.data.at == request.time
+          && isText(request.resource.data.text, 1, 1000)
+          && noteAllowed(request.resource.data, get(reportPath(reportId)).data,
+               getAfter(reportPath(reportId)).data);
+
+        allow update, delete: if false;
+
+        function noteAllowed(n, prevReport, nextReport) {
+          return (n.kind == 'START' && n.byRole == 'REVIEWER' && reportReviewer(prevReport)
+              && prevReport.status == 'OPEN' && nextReport.status == 'IN_PROGRESS')
+            || (n.kind == 'ASK' && n.byRole == 'REVIEWER' && reportReviewer(prevReport)
+              && prevReport.status == 'IN_PROGRESS')
+            || (n.kind == 'INFO' && n.byRole == 'REPORTER' && prevReport.createdByUid == request.auth.uid
+              && prevReport.status != 'CLOSED')
+            || (n.kind == 'CLOSE' && n.byRole == 'REVIEWER' && reportReviewer(prevReport)
+              && prevReport.status == 'IN_PROGRESS' && nextReport.status == 'CLOSED');
+        }
+      }
+    }
+
+    // ================================================================
+    // E07 · NHÓM VÀ SỰ KIỆN CỘNG ĐỒNG
+    // ================================================================
+
+    // Sự kiện do đại diện tổ chức tạo; tài khoản đã đăng nhập xem được. Mỗi tổ chức đăng ký một
+    // phiếu registrations/{orgId} (số thành viên tham gia). registeredCount trên sự kiện luôn khớp
+    // tổng số người: chỉ đổi cùng lúc với phiếu đăng ký (transaction) và không vượt sức chứa.
+    function eventPath(eventId) {
+      return /databases/$(database)/documents/community_events/$(eventId);
+    }
+
+    function registrationPath(eventId, orgId) {
+      return /databases/$(database)/documents/community_events/$(eventId)/registrations/$(orgId);
+    }
+
+    match /community_events/{eventId} {
+      allow read: if signedIn();
+
+      allow create: if hasRole(request.resource.data.orgId, 'REPRESENTATIVE')
+        && request.resource.data.keys().hasOnly(['title', 'content', 'place', 'area', 'orgId', 'orgName',
+             'createdByUid', 'createdByName', 'startAt', 'endAt', 'capacity', 'registeredCount',
+             'allowCancel', 'openToOtherOrgs', 'cancelled', 'createdAt', 'updatedAt'])
+        && request.resource.data.createdByUid == request.auth.uid
+        && isText(request.resource.data.title, 5, 120)
+        && isText(request.resource.data.content, 10, 2000)
+        && isText(request.resource.data.place, 2, 160)
+        && isText(request.resource.data.area, 0, 120)
+        && request.resource.data.startAt is timestamp
+        && request.resource.data.endAt is timestamp
+        && request.resource.data.startAt > request.time
+        && request.resource.data.endAt > request.resource.data.startAt
+        && request.resource.data.capacity is int
+        && request.resource.data.capacity >= 1
+        && request.resource.data.capacity <= 500
+        && request.resource.data.registeredCount == 0
+        && request.resource.data.allowCancel is bool
+        && request.resource.data.openToOtherOrgs is bool
+        && request.resource.data.cancelled == false
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      // Tổ chức tạo sự kiện hủy sự kiện (không mở lại được), hoặc cập nhật số người cùng phiếu đăng ký
+      allow update: if organizerCancels() || counterFollowsRegistration();
+
+      allow delete: if false;
+
+      function organizerCancels() {
+        return hasRole(resource.data.orgId, 'REPRESENTATIVE')
+          && resource.data.cancelled == false
+          && request.resource.data.cancelled == true
+          && request.resource.data.updatedAt == request.time
+          && changed().hasOnly(['cancelled', 'updatedAt']);
+      }
+
+      function peopleBefore(orgId) {
+        return exists(registrationPath(eventId, orgId))
+          ? get(registrationPath(eventId, orgId)).data.people : 0;
+      }
+
+      function peopleAfter(orgId) {
+        return existsAfter(registrationPath(eventId, orgId))
+          ? getAfter(registrationPath(eventId, orgId)).data.people : 0;
+      }
+
+      function counterFollowsRegistration() {
+        let org = request.resource.data.lastRegOrgId;
+        let prevPeople = peopleBefore(org);
+        let nextPeople = peopleAfter(org);
+        return changed().hasOnly(['registeredCount', 'lastRegOrgId'])
+          && org is string
+          && hasRole(org, 'REPRESENTATIVE')
+          && request.resource.data.registeredCount == resource.data.registeredCount - prevPeople + nextPeople
+          && (nextPeople <= prevPeople || request.resource.data.registeredCount <= resource.data.capacity);
+      }
+
+      match /registrations/{orgId} {
+        allow read: if signedIn();
+
+        allow create: if hasRole(orgId, 'REPRESENTATIVE')
+          && request.resource.data.keys().hasOnly(['orgName', 'people', 'byUid', 'byName', 'createdAt', 'updatedAt'])
+          && request.resource.data.byUid == request.auth.uid
+          && validPeople(request.resource.data.people)
+          && eventOpenFor(get(eventPath(eventId)).data)
+          && counterMatches(0, request.resource.data.people)
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.updatedAt == request.time;
+
+        allow update: if hasRole(orgId, 'REPRESENTATIVE')
+          && changed().hasOnly(['people', 'byUid', 'byName', 'updatedAt'])
+          && request.resource.data.byUid == request.auth.uid
+          && validPeople(request.resource.data.people)
+          && eventOpenFor(get(eventPath(eventId)).data)
+          && (request.resource.data.people >= resource.data.people
+            || beforeCancelDeadline(get(eventPath(eventId)).data))
+          && counterMatches(resource.data.people, request.resource.data.people)
+          && request.resource.data.updatedAt == request.time;
+
+        // Hủy tham gia: sự kiện cho hủy và còn ít nhất 24 giờ trước giờ bắt đầu
+        allow delete: if hasRole(orgId, 'REPRESENTATIVE')
+          && beforeCancelDeadline(get(eventPath(eventId)).data)
+          && counterMatches(resource.data.people, 0);
+
+        function validPeople(p) {
+          return p is int && p >= 1 && p <= 20;
+        }
+
+        function eventOpenFor(ev) {
+          return ev.cancelled == false
+            && ev.startAt > request.time
+            && (ev.openToOtherOrgs == true || ev.orgId == orgId);
+        }
+
+        function beforeCancelDeadline(ev) {
+          return ev.allowCancel == true
+            && request.time < ev.startAt - duration.value(24, 'h');
+        }
+
+        // Sự kiện phải được cập nhật trong cùng transaction: số người đổi đúng bằng phần chênh lệch
+        function counterMatches(oldPeople, newPeople) {
+          let ev = get(eventPath(eventId)).data;
+          let evAfter = getAfter(eventPath(eventId)).data;
+          return evAfter.registeredCount == ev.registeredCount - oldPeople + newPeople
+            && evAfter.lastRegOrgId == orgId
+            && (newPeople <= oldPeople || evAfter.registeredCount <= ev.capacity);
+        }
+      }
+    }
+
+    // ================================================================
     // MẶC ĐỊNH TỪ CHỐI
     // ================================================================
     match /{document=**} {
