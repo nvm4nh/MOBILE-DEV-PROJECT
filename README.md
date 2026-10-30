@@ -1,100 +1,170 @@
-﻿# 👵 SeniorTribe — Ứng Dụng Android Kết Nối & Hỗ Trợ Người Cao Tuổi
+# SeniorTribe — Ứng dụng Android kết nối và hỗ trợ người cao tuổi neo đơn
 
 [![Platform](https://img.shields.io/badge/Platform-Android%20Native-3DDC84.svg?style=flat&logo=android&logoColor=white)](https://developer.android.com)
 [![Language](https://img.shields.io/badge/Language-Java%20%7C%20XML-ED8B00.svg?style=flat&logo=openjdk&logoColor=white)]()
 [![Backend](https://img.shields.io/badge/Backend-Firebase%20Firestore-FFCA28.svg?style=flat&logo=firebase&logoColor=black)](https://firebase.google.com)
-[![Auth](https://img.shields.io/badge/Auth-Google%20Sign--In-4285F4.svg?style=flat&logo=google&logoColor=white)]()
-[![Database](https://img.shields.io/badge/Local%20DB-SQLite%20Offline-003B57.svg?style=flat&logo=sqlite&logoColor=white)]()
-[![UI/UX](https://img.shields.io/badge/Design-Figma%20UI%2FUX-F24E1E.svg?style=flat&logo=figma&logoColor=white)](https://www.figma.com/design/joOcxsdJHhw9Dm8O4XIGUi/Untitled?node-id=0-1&t=JtOY4b3zqACJ78iL-1)
+[![Local DB](https://img.shields.io/badge/Local%20DB-SQLite-003B57.svg?style=flat&logo=sqlite&logoColor=white)]()
+[![Design](https://img.shields.io/badge/Design-Figma-F24E1E.svg?style=flat&logo=figma&logoColor=white)](https://www.figma.com/design/joOcxsdJHhw9Dm8O4XIGUi/Untitled?node-id=0-1&t=JtOY4b3zqACJ78iL-1)
+
+SeniorTribe là ứng dụng điều phối hỗ trợ giữa **đầu mối cộng đồng** (ghi nhận nhu cầu của người cao tuổi), **điều phối viên** (rà soát trước khi công khai) và **đại diện tổ chức xã hội** (tiếp nhận, hẹn lịch, thực hiện và báo kết quả). Người cao tuổi là người thụ hưởng, có quyền đồng ý hoặc từ chối và không cần có tài khoản.
+
+| | |
+|:---|:---|
+| **Học phần** | Phát triển ứng dụng Mobile |
+| **Đơn vị** | Trường Công nghệ và Thiết kế — Đại học Kinh tế TP. Hồ Chí Minh (UEH), Khóa K50 |
+| **Giảng viên hướng dẫn** | TS. Đặng Ngọc Hoàng Thành |
+| **Thiết kế giao diện** | [Figma SeniorTribe](https://www.figma.com/design/joOcxsdJHhw9Dm8O4XIGUi/Untitled?node-id=0-1&t=JtOY4b3zqACJ78iL-1) |
 
 ---
 
-## 📌 THÔNG TIN HỌC PHẦN & ĐỀ TÀI
-* **Cơ sở đào tạo:** Trường Công nghệ và Thiết kế — Đại học Kinh tế TP. Hồ Chí Minh (UEH)
-* **Chuyên ngành:** Công nghệ Phần mềm — Khóa: K50
-* **Học phần:** Phát triển Ứng dụng Mobile
-* **Giảng viên hướng dẫn:** TS. Đặng Ngọc Hoàng Thành
-* **Tên đề tài:** **SeniorTribe — Ứng dụng hỗ trợ và trò chuyện với người già neo đơn**  
-  Phát triển mạng xã hội cộng đồng hỗ trợ các tổ chức xã hội ghi nhận nhu cầu, phân công điều phối, thăm hỏi và theo dõi tiến độ giúp đỡ người cao tuổi có hoàn cảnh khó khăn.
+## 1. Thành viên và phân công
+
+Mỗi thành viên phụ trách một nhóm chức năng trọn vẹn, từ giao diện, ViewModel, Repository đến Security Rules của phần đó. Cột **Minh chứng** dẫn tới các pull request đã merge vào `main`; tác giả commit trong từng PR là người phụ trách tương ứng.
+
+### 1.1. Phần mã nguồn
+
+| Thành viên | MSSV | Chức năng phụ trách | Nhánh | Minh chứng (PR đã merge) |
+|:---|:---:|:---|:---|:---|
+| **Ông Tố Quyên** *(Trưởng nhóm)* | 31231024412 | **Bảng tin và offline:** bảng tin cộng đồng (F04), đăng / sửa / ẩn bài của tổ chức (F05), giao diện chung và lưu bài đã tải bằng SQLite (F16)<br>**Mở rộng:** nhập giọng nói (E04), trợ lý gợi ý (E05) | `feat/bang-tin-f04-f05-f16-v2`<br>`feat/voice-input-ai-assistant-v2` | [#8](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/8), [#14](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/14), [#17](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/17) |
+| **Khiếu Hoàng Nam Anh** | 31241022203 | **Khung dự án và phối hợp hỗ trợ:** khung Android chung; chat phối hợp (F11), thống nhất lịch (F12), báo và đối soát kết quả (F13), lịch và lịch sử hỗ trợ (F15); siết Security Rules và bộ kiểm thử rules<br>**Mở rộng:** nhắc lịch và thông báo (E01), đổi lịch (E02), chat nâng cao: ảnh / tệp, gọi thoại / video (E06) | `feat/chat-schedule`<br>`feat/coordination-figma`<br>`feat/notifications-reschedule-chat`<br>`fix/bang-tin-va-rules` | [#7](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/7), [#9](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/9), [#15](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/15), [#22](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/22) |
+| **Lê Trọng Hiếu** | 31231025382 | **Nghiệp vụ nhu cầu:** ghi nhận (F06), rà soát (F07), nhu cầu của đơn vị (F08), tìm và lọc (F09), tiếp nhận bằng transaction (F10), hủy / trả lại (F14); Security Rules bản đầu, dữ liệu demo<br>**Mở rộng:** đánh giá và xử lý phản ánh (E03), sự kiện cộng đồng (E07) | `feat/requests`<br>`ix/f14-tra-lai-xoa-lich`<br>`feat/feedback-groups-events` | [#6](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/6), [#12](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/12), [#18](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/18) |
+| **Nguyễn Văn Trường** | 31221025476 | **Tài khoản và phân quyền:** đăng ký, đăng nhập email / Google, quên mật khẩu (F01), phân quyền theo tổ chức (F02), hồ sơ tài khoản và đổi email có xác minh (F03)<br>**Mở rộng:** tìm kiếm chung, cỡ chữ và dark mode (E08), màn hình khẩn cấp SOS (E09) | `feat/auth-profile`<br>`feat/search-ui-sos-v2` | [#11](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/11), [#20](https://github.com/nvm4nh/MOBILE-DEV-PROJECT/pull/20) |
+
+### 1.2. Phần báo cáo và thuyết trình
+
+Báo cáo theo mẫu `Mau Do An - Mobile v2.docx`. Ở Chương 5 và Chương 7, mỗi người viết phần chức năng mình làm.
+
+| Thành viên | Phần báo cáo | Thuyết trình, kiểm thử |
+|:---|:---|:---|
+| **Ông Tố Quyên** | Chương 5: cấu trúc ứng dụng (5.1), bảng tin và SQLite offline; Chương 7: E04, E05 | Slide, điều phối demo 5 phút |
+| **Khiếu Hoàng Nam Anh** | Mục 2.1 Workflow Diagram; Chương 5: chat, lịch, kết quả; Chương 6 Quy trình thực thi; Chương 7: E01, E02, E06 | Demo kỹ thuật, kiểm thử rules |
+| **Lê Trọng Hiếu** | Mục 2.2 BFD; Chương 4 Cơ sở dữ liệu và truy vấn; Chương 5: nhu cầu; Chương 7: E03, E07; Phụ lục cài đặt | Chuẩn bị dữ liệu demo |
+| **Nguyễn Văn Trường** | Chương 1 Tổng quan; Chương 3 Thiết kế giao diện; Chương 5: tài khoản, phân quyền; Chương 7: E08, E09 | Kiểm tra Turnitin (< 20%), kiểm thử xoay màn hình |
+
+### 1.3. Quy trình làm việc trên GitHub
+
+1. Mỗi đầu việc làm trên một nhánh riêng tạo từ `main` mới nhất.
+2. Commit bằng email đã xác minh trên GitHub để đóng góp được tính đúng người.
+3. Mở pull request vào `main`, ghi chức năng đã làm và cách kiểm thử; một thành viên khác review.
+4. Chỉ merge khi `assembleDebug` build được và bộ kiểm thử rules chạy qua.
+5. Sau khi merge, mọi người pull `main` trước khi làm đầu việc tiếp theo.
+
+Kế hoạch và timeline chi tiết: [Phân công.md](Phân%20công.md).
 
 ---
 
-## 👥 THÀNH VIÊN NHÓM & PHÂN CÔNG ĐỘC LẬP
-> ⚠️ **Tuân thủ quy định giảng viên:** Phân chia trách nhiệm độc lập, rõ ràng từng cá nhân; minh chứng dựa trên nhánh (branch), commit và pull request trên GitHub.
+## 2. Chức năng
 
-| STT | Họ và Tên | MSSV | Vai trò | Nhánh GitHub | Phụ trách Code chính | Phụ trách Báo cáo & Thuyết trình |
-|:---:|:---|:---:|:---|:---:|:---|:---|
-| 1 | **Ông Tố Quyên** | `31231024412` | **Trưởng nhóm** | `feat/chat-schedule`<br>`main` | • Quản trị repository, điều phối nhánh và merge PR tuần 1, 2.<br>• Chat phối hợp realtime 1-1 (F11).<br>• Đề xuất & thống nhất lịch hẹn (F12).<br>• Đối soát kết quả & lịch sử (F13, F15). | • Chương 5: Cấu trúc ứng dụng & Chat/Lịch (Mục 5.1 & 5.3).<br>• Quản lý tiến độ tổng thể, phân công nhiệm vụ.<br>• Phụ trách slide thuyết trình & điều phối demo 5p.<br>• Kiểm thử xoay màn hình mục chat. |
-| 2 | **Khiếu Hoàng Nam Anh** | `31241022203` | **Thành viên** | `feat/requests`<br>`main` | • Cấu hình khung Android chung.<br>• Transaction tiếp nhận nhu cầu (F10).<br>• Hủy & trả lại nhu cầu (F14). | • Sơ đồ luồng công việc (Workflow Diagram - Mục 2.1).<br>• Chương 6: Quy trình thực thi.<br>• Tham gia thuyết trình & demo kỹ thuật. |
-| 3 | **Lê Trọng Hiếu** | `31231025382` | **Thành viên** | `feat/requests` | • Form Ghi nhận nhu cầu (F06).<br>• Rà soát & duyệt nhu cầu (F07).<br>• Tìm kiếm & lọc nhu cầu (F08, F09).<br>• Firestore Security Rules. | • Sơ đồ phân rã chức năng (BFD - Mục 2.2).<br>• Chương 4: Cơ sở dữ liệu, Sơ đồ tương tác & Truy vấn.<br>• Phụ lục hướng dẫn cài đặt & ghép PDF. |
-| 4 | **Nguyễn Văn Trường** | `31221025476` | **Thành viên** | `feat/auth-profile`<br>`feat/community-offline` | • Đăng nhập Email/Google & Phân quyền (F01–F03).<br>• Bảng tin & đăng bài tổ chức (F04, F05).<br>• Offline cache lưu bài viết bằng SQLite (F16, T05).<br>• Xử lý Responsive xoay màn hình (T04). | • Chương 1: Tổng quan đề tài & công cụ (Mục 1.1–1.4).<br>• Chương 3: Thiết kế giao diện (dọc/ngang).<br>• Chương 5: Kết nối DB & SQLite Offline (Mục 5.2 & 5.3).<br>• Kiểm tra đạo văn Turnitin (< 20%). |
+**Chức năng chính (F01–F16):** chi tiết trong [Phạm vi chức năng.md](Phạm%20vi%20chức%20năng.md).
 
----
+| Nhóm | Mã |
+|:---|:---|
+| Tài khoản, phân quyền, hồ sơ | F01–F03 |
+| Bảng tin, đăng bài | F04, F05 |
+| Ghi nhận, rà soát, tìm lọc, tiếp nhận, hủy / trả lại nhu cầu | F06–F10, F14 |
+| Chat, thống nhất lịch, đối soát kết quả, lịch sử | F11–F13, F15 |
+| Giao diện, xoay màn hình, offline | F16 |
 
-## 📂 MỤC LỤC TÀI LIỆU DỰ ÁN & BÁO CÁO
+**Chức năng mở rộng đã làm:** E01 nhắc lịch và thông báo · E02 đổi lịch · E03 đánh giá và phản ánh · E04 nhập giọng nói · E05 trợ lý gợi ý · E06 gửi ảnh / tệp, gọi thoại / video · E07 sự kiện cộng đồng · E08 tìm kiếm chung, cỡ chữ, dark mode · E09 SOS.
 
-Các tài liệu chính thức của đồ án được chuẩn hóa theo mẫu của giảng viên TS. Đặng Ngọc Hoàng Thành:
+### Luồng trạng thái nhu cầu
 
-1. 📘 **[Kế hoạch & Đề cương Báo cáo chi tiết (theo Mau Do An - Mobile v2.docx)](KE_HOACH_BAO_CAO.md)**: Bản chuyển hướng chi tiết 7 chương báo cáo chuẩn barem (Tổng quan, Phân tích thiết kế, Giao diện, CSDL, Cài đặt ứng dụng, Quy trình thực thi, Hướng mở rộng và Phụ lục).
-2. 📋 **[Checklist Công Việc & Deadline](Checklist.md)** *(hoặc [Trang tính1.md](Trang%20tính1.md))*: Danh mục 11 tác vụ MVP (M01–M10), 15 tác vụ mở rộng (E01–E15) và tiến độ báo cáo.
-3. 🎯 **[Tổng Quan Đề Tài](Tổng%20quan.md)**: Bài toán nghiên cứu, đối tượng sử dụng, quy trình nghiệp vụ và cơ sở thực tiễn (Vầng Trăng Khuyết, HelpAge).
-4. ⚙️ **[Phạm Vi Chức Năng](Phạm%20vi%20chức%20năng.md)**: Chi tiết 16 chức năng MVP (F01–F16), bảng luồng 7 trạng thái, kỹ thuật (T01–T06) và 9 quy tắc nghiệp vụ (R01–R09).
-5. 👥 **[Phân Công & Quy Trình GitHub](Phân%20công.md)**: Timeline ngày 1–26, 6 mốc bàn giao và quy trình chuẩn 6 bước phối hợp nhóm trên GitHub.
-
----
-
-## 🎯 BÀI TOÁN NGHIÊN CỨU & QUY TRÌNH NGHIỆP VỤ
-
-### 1. Bài toán nghiên cứu
-Kết nối nhu cầu hỗ trợ đã được đầu mối cộng đồng ghi nhận với tổ chức xã hội có khả năng thực hiện, đồng thời minh bạch người phụ trách, tiến độ và kết quả thực hiện.
-
-### 2. Đối tượng sử dụng
-* **Đầu mối cộng đồng:** Nhân viên, cộng tác viên hoặc tình nguyện viên được phân công ghi nhận và theo dõi nhu cầu tại địa bàn.
-* **Tổ chức hỗ trợ:** Tổ chức xã hội, hội/đoàn thể hoặc nhóm thiện nguyện tiếp nhận và trực tiếp thực hiện hỗ trợ.
-* **Người cao tuổi:** Người được hỗ trợ, có quyền đồng ý hoặc từ chối phương án hỗ trợ; không bắt buộc phải có tài khoản.
-
-### 3. Quy trình luân chuyển trạng thái (6 bước khép kín)
 ```
-[Ghi nhận] ➔ [Rà soát] ➔ [Tiếp nhận] ➔ [Thống nhất lịch] ➔ [Thực hiện] ➔ [Ghi nhận kết quả]
- (REVIEW)      (OPEN)     (ACCEPTED)      (SCHEDULED)      (DELIVERED)      (COMPLETED)
+REVIEW → OPEN → ACCEPTED → SCHEDULED → DELIVERED → COMPLETED
+ rà soát  chờ     đã tiếp     đã chốt      chờ đối      hoàn
+          nhận    nhận        lịch         soát         thành
 ```
-* **Bảo vệ quyền riêng tư:** Thông tin cá nhân nhạy cảm (tên đầy đủ, địa chỉ nhà, số điện thoại, giấy đồng ý) được lưu trữ riêng trong collection `needs_private` và chỉ phân quyền cho đầu mối ghi nhận cùng đại diện được giao tiếp nhận sau khi đã duyệt.
+
+* Điều phối viên có thể yêu cầu bổ sung, nhu cầu ở lại `REVIEW` cho đầu mối sửa.
+* Tổ chức không thực hiện được thì trả lại, nhu cầu về `OPEN`, bắt buộc ghi lý do.
+* Đầu mối có thể hủy (`CANCELLED`) khi nhu cầu chưa hoàn thành, bắt buộc ghi lý do.
 
 ---
 
-## ⚡ KỸ THUẬT CỐT LÕI (BÁM SÁT BAREM CHẤM ĐIỂM [*])
+## 3. Kỹ thuật chính
 
-* **Firebase Services:**
-  * **Authentication:** Xác thực tài khoản bằng Email/Mật khẩu và **Google Sign-In API**.
-  * **Cloud Firestore:** Lưu trữ dữ liệu NoSQL realtime, phân quyền bằng Security Rules và xử lý chống nhận trùng bằng **Firestore Transaction**.
-* **Responsive Layout:**
-  * Hỗ trợ xoay ngang (`Landscape`) và dọc (`Portrait`) không vỡ giao diện.
-  * Giữ nguyên dữ liệu form nhập dở khi xoay thiết bị thông qua `ViewModel` và `onSaveInstanceState`.
-* **Cơ chế Caching & SQLite Offline:**
-  * Tích hợp bộ nhớ đệm cục bộ với `SQLiteOpenHelper`.
-  * Tự động lưu cache các bài viết cộng đồng đã tải; khi ngắt kết nối mạng (`Offline`), người dùng vẫn đọc được các bài đã xem trước đó.
+* **Firebase Authentication:** email / mật khẩu và Google Sign-In.
+* **Cloud Firestore:** snapshot listener cho cập nhật realtime; mọi bước đổi trạng thái nhu cầu chạy trong transaction, nên hai tổ chức bấm tiếp nhận cùng lúc chỉ một bên thành công.
+* **Quyền riêng tư:** nhu cầu tách làm hai document. `needs_summary` chia sẻ trong mạng lưới; `needs_private` (họ tên, liên hệ, địa chỉ) chỉ đơn vị ghi nhận đọc được, đại diện được giao chỉ đọc được sau khi lịch đã chốt (`SCHEDULED`, `DELIVERED`).
+* **Security Rules:** kiểm tra lại vai trò, trạng thái và lần tiếp nhận ở phía máy chủ; có bộ kiểm thử trên Firebase Emulator.
+* **Responsive:** bố cục dọc (`layout/`) và ngang (`layout-land/`); ViewModel giữ dữ liệu khi xoay màn hình.
+* **Offline:** SQLite lưu bài đăng đã tải để đọc khi mất mạng; không lưu thông tin riêng của người cao tuổi hay nội dung chat xuống thiết bị.
+* **Kiến trúc:** MVVM kết hợp Repository.
 
 ---
 
-## 🛠️ HƯỚNG DẪN CÀI ĐẶT & CHẠY DỰ ÁN
+## 4. Cài đặt và chạy
 
-### Yêu cầu môi trường
-* **Android Studio:** Phiên bản Flamingo (2022.2.1) hoặc mới hơn (Giraffe/Hedgehog).
-* **JDK:** Java Development Kit 17.
-* **Android SDK:** API Level 34 (Android 14) hoặc tối thiểu API Level 26 (Android 8.0).
+### Yêu cầu
 
-### Các bước khởi chạy
-1. **Clone repository:**
+* Android Studio, **JDK 17** cho Gradle (Gradle 8.2 không chạy với JDK 21 trở lên).
+* Android SDK API 34; ứng dụng chạy từ Android 7.0 (API 24).
+* Node.js 20+ cho dữ liệu demo và kiểm thử rules; Java 21+ để chạy Firebase Emulator.
+
+### Chạy ứng dụng
+
+1. Clone repository:
    ```bash
    git clone https://github.com/nvm4nh/MOBILE-DEV-PROJECT.git
    ```
-2. **Mở project:** Khởi động Android Studio và chọn thư mục `SeniorTribeApp`.
-3. **Cấu hình Firebase:** Đặt file `google-services.json` được cấp vào thư mục `SeniorTribeApp/app/`.
-4. **Đồng bộ dependencies:** Nhấn **Sync Project with Gradle Files**.
-5. **Chạy ứng dụng:** Chọn thiết bị ảo (Emulator API 30+) hoặc cắm điện thoại Android (đã bật USB Debugging), nhấn **Run 'app'** (`Shift + F10`).
+2. Mở thư mục `SeniorTribeApp` bằng Android Studio.
+3. Vào `Settings → Build, Execution, Deployment → Build Tools → Gradle`, chọn **Gradle JDK** là JDK 17.
+4. **Sync Project with Gradle Files.** Tệp `app/google-services.json` đã có sẵn.
+5. Chạy trên emulator (API 30+) hoặc máy thật đã bật USB Debugging bằng **Run 'app'**.
+
+Nếu gặp lỗi `Unsupported class file major version`, Gradle đang dùng JDK quá mới; chọn lại JDK 17 ở bước 3.
+
+### Dữ liệu demo
+
+```bash
+cd SeniorTribeApp/firebase/seed
+cp demo-accounts.example.json demo-accounts.json   # điền email 4 tài khoản demo
+npm install
+node seed-demo.js ./serviceAccount.json ./demo-accounts.json          # lần đầu
+node seed-demo.js ./serviceAccount.json ./demo-accounts.json --reset  # làm mới trước buổi demo
+```
+
+`serviceAccount.json` là khóa quản trị Firebase, **không commit** lên GitHub.
+
+### Kiểm thử Security Rules
+
+```bash
+cd SeniorTribeApp/firebase/tests
+npm install
+npm test
+```
 
 ---
 
-## 🎨 THIẾT KẾ GIAO DIỆN & LIÊN KẾT LIÊN QUAN
-* **Figma Prototype:** [Truy cập bản thiết kế UI/UX SeniorTribe trên Figma](https://www.figma.com/design/joOcxsdJHhw9Dm8O4XIGUi/Untitled?node-id=0-1&t=JtOY4b3zqACJ78iL-1)
-* **Báo cáo PDF:** Đang được hoàn thiện theo mẫu `Mau Do An - Mobile v2.docx` tại nhánh `main`.
+## 5. Cấu trúc thư mục
+
+```
+SeniorTribeApp/
+├── app/src/main/java/com/seniortribe/app/
+│   ├── activities/, fragments/, dialogs/   Giao diện
+│   ├── viewmodels/                          Trạng thái màn hình
+│   ├── data/                                Repository (Firestore, SQLite)
+│   ├── models/, utils/                      Đối tượng dữ liệu, tiện ích
+│   └── notifications/, calls/, sos/, ...    Chức năng mở rộng
+├── firebase/
+│   ├── firestore.rules                      Security Rules
+│   ├── seed/                                Dữ liệu demo
+│   └── tests/                               Kiểm thử rules
+└── docs/                                    Tài liệu từng nhóm chức năng
+```
+
+---
+
+## 6. Tài liệu
+
+| Tài liệu | Nội dung |
+|:---|:---|
+| [Tổng quan.md](Tổng%20quan.md) | Bài toán, đối tượng sử dụng, cơ sở thực tiễn |
+| [Phạm vi chức năng.md](Phạm%20vi%20chức%20năng.md) | F01–F16, E01–E09, trạng thái, quy tắc nghiệp vụ |
+| [Phân công.md](Phân%20công.md) | Kế hoạch, timeline, mốc bàn giao |
+| [KE_HOACH_BAO_CAO.md](KE_HOACH_BAO_CAO.md) | Đề cương 7 chương báo cáo |
+| [docs/tai-khoan-F01-F02-F03.md](SeniorTribeApp/docs/tai-khoan-F01-F02-F03.md) | Tài khoản, phân quyền, hồ sơ |
+| [docs/nhu-cau-F06-F10-F14.md](SeniorTribeApp/docs/nhu-cau-F06-F10-F14.md) | Nghiệp vụ nhu cầu, schema, ca kiểm thử |
+| [docs/phoi-hop-F11-F15.md](SeniorTribeApp/docs/phoi-hop-F11-F15.md) | Chat, lịch, kết quả, lịch sử |
+| [docs/mo-rong-E01-E02-E06.md](SeniorTribeApp/docs/mo-rong-E01-E02-E06.md) | Thông báo, đổi lịch, chat nâng cao |
+| [docs/mo-rong-E08-E09.md](SeniorTribeApp/docs/mo-rong-E08-E09.md) | Tìm kiếm, giao diện nâng cao, SOS |
